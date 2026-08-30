@@ -1,0 +1,41 @@
+name: Assemble staging
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  assemble:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reassemble and verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat vinhedo_staging_part_00 vinhedo_staging_part_01 vinhedo_staging_part_02 > vinhedo_staging.tar.gz
+          echo "7cc52f039729b7735cb7dfde1e86e410901aa077b07c5be5c49333d71845b96f  vinhedo_staging.tar.gz" | sha256sum -c -
+          tar -xzf vinhedo_staging.tar.gz
+          test -f index.html
+          test -d assets/media
+          test "$(find assets/media -type f | wc -l)" -eq 558
+          echo "c8058329772ae58aad55018caebf6fd968310299752b43ab2bfecfa49db4adc2  index.html" | sha256sum -c -
+
+      - name: Commit assembled site
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f vinhedo_staging.tar.gz
+          rm -f vinhedo_staging_part_00 vinhedo_staging_part_01 vinhedo_staging_part_02
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Assemble Vinhedo do Pão staging"
+          git push origin HEAD:main
