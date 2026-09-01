@@ -1,0 +1,9 @@
+=== VINHEDO DO PÃO — INTEGRITY CHECK ===
+OK   558 referências estáticas locais de mídia verificadas
+OK   68 IDs HTML / 68 únicos
+OK   5 blocos JavaScript inline compilados
+RESULTADO: PASS estrutural
+OBS: PASS estrutural não substitui teste runtime em navegador.
+files=558
+index_bytes=5103290
+index_sha256=4027f6b4a0ad83844e873d967ed0444575f16ab23ac9c9654b5bc157f037cce2
