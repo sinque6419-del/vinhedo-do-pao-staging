@@ -2688,6 +2688,217 @@ body{background:linear-gradient(180deg,#f8f1df,#f3e7cf)!important;color:var(--v1
 }
 </style>
 
+
+<style id="etapa08-aplicacao-visual-real">
+/* ==========================================================
+   ETAPA 08 — CORREÇÃO DE APLICAÇÃO VISUAL REAL
+   Mapeamento feito sobre o DOM que realmente aparece no fluxo atual.
+   Escopo: telas internas. A entrada oficial não é alterada.
+   ========================================================== */
+:root{
+  --e8-green:#153E2B;--e8-deep:#0C2B1E;--e8-paper:#F8F7F2;
+  --e8-parch:#EEE3CE;--e8-cream:#FFF9EC;--e8-gold:#A88445;
+  --e8-gold2:#C6AB72;--e8-wine:#6D2F3D;--e8-wood:#5A4535;
+  --e8-ink:#26342D;--e8-muted:#6A716C;--e8-line:#D4C5A9;
+}
+
+/* ---------- CENTRAL DE FERRAMENTAS REAL ---------- */
+.v117-tools-page{
+  background:
+    radial-gradient(circle at 15% 4%,rgba(168,132,69,.10),transparent 26rem),
+    repeating-linear-gradient(0deg,rgba(89,69,53,.018) 0 1px,transparent 1px 5px),
+    var(--e8-paper)!important;
+  color:var(--e8-ink)!important;
+}
+.v117-tools-page .v117-tools-hero{
+  min-height:360px!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.025),transparent 30%),
+    linear-gradient(135deg,#173F2D 0%,#0C2B1E 68%,#102C21 100%)!important;
+  border-bottom:1px solid rgba(198,171,114,.65)!important;
+  box-shadow:none!important;
+}
+.v117-tools-page .v117-vineyard-lines{opacity:.20!important;color:#D9C48F!important}
+.v117-tools-page .v117-tools-title h1{
+  color:#F4E7C6!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(52px,12vw,92px)!important;
+  letter-spacing:-.045em!important;
+  text-shadow:none!important;
+}
+.v117-tools-page .v117-tools-title>p:last-child{color:#E8DDC6!important;font-family:Georgia,serif!important}
+.v117-tools-page .v117-ornament{color:var(--e8-gold2)!important}
+.v117-tools-page .v117-logo b{color:#F5E8C7!important}.v117-tools-page .v117-logo small{color:#CDBB91!important}
+.v117-tools-page .v117-wine-still{color:#CBB47C!important;opacity:.68!important}
+.v117-tools-page .v117-tools-main{max-width:1040px!important;padding:42px 18px 110px!important}
+.v117-tools-page .v117-tools-grid{gap:14px!important}
+.v117-tools-page .v117-tool-card{
+  position:relative!important;overflow:hidden!important;
+  min-height:286px!important;padding:28px 22px 48px!important;
+  border:1px solid var(--e8-line)!important;border-radius:4px!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.74),rgba(255,249,236,.86)),
+    repeating-linear-gradient(0deg,rgba(90,69,53,.024) 0 1px,transparent 1px 4px)!important;
+  color:var(--e8-ink)!important;box-shadow:none!important;
+}
+.v117-tools-page .v117-tool-card:before{
+  content:"ADEGA · GUIA";position:absolute;right:16px;top:14px;
+  font:700 8px/1 Arial,sans-serif;letter-spacing:.18em;color:#9A8054;
+}
+.v117-tools-page .v117-tool-icon{color:var(--e8-green)!important}
+.v117-tools-page .v117-tool-card h2{
+  margin-top:16px!important;color:var(--e8-green)!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(24px,4vw,34px)!important;line-height:.98!important;letter-spacing:-.025em!important;
+}
+.v117-tools-page .v117-tool-card p{color:#635F57!important;font-family:Georgia,serif!important;line-height:1.5!important}
+.v117-tools-page .v117-use{
+  background:var(--e8-green)!important;color:#F1DEAD!important;
+  border-radius:0!important;border-top:1px solid rgba(168,132,69,.55)!important;
+  letter-spacing:.16em!important;
+}
+.v117-tools-page .v117-attendant-tip{
+  margin-top:28px!important;border:1px solid var(--e8-line)!important;border-radius:3px!important;
+  background:linear-gradient(100deg,#EEE2C9,#F8F2E6)!important;box-shadow:none!important;
+}
+.v117-tools-page .v117-tip-label{color:var(--e8-wine)!important;letter-spacing:.16em!important}
+.v117-tools-page .v117-tools-bottom{
+  background:rgba(12,43,30,.97)!important;border-top:1px solid rgba(198,171,114,.55)!important;
+  box-shadow:0 -7px 24px rgba(7,21,15,.14)!important;
+}
+.v117-tools-page .v117-tools-bottom button{color:#E8D9B8!important}
+.v117-tools-page .v117-tools-bottom button.is-active{background:rgba(168,132,69,.27)!important;color:#F6E2AE!important}
+
+/* ---------- CATÁLOGO DE VINHOS REAL ---------- */
+[x-show="showInventory"]{background:rgba(5,20,14,.84)!important;backdrop-filter:blur(8px)!important}
+[x-show="showInventory"]>div{
+  max-width:1120px!important;border-radius:0!important;border:1px solid rgba(198,171,114,.42)!important;
+  background:var(--e8-paper)!important;box-shadow:0 26px 90px rgba(0,0,0,.36)!important;
+}
+[x-show="showInventory"]>div>.p-5{
+  background:linear-gradient(135deg,var(--e8-deep),#173F2D)!important;
+  border-bottom:1px solid rgba(198,171,114,.58)!important;color:#F5E7C5!important;
+}
+[x-show="showInventory"]>div>.p-5 .text-vinhedo-500{color:#CBB783!important;letter-spacing:.22em!important}
+[x-show="showInventory"]>div>.p-5 h3{font-family:Georgia,serif!important;color:#FFF2CF!important;font-size:clamp(32px,6vw,52px)!important}
+[x-show="showInventory"] input{
+  border-radius:2px!important;border:1px solid rgba(198,171,114,.5)!important;
+  background:#FFF9EC!important;color:var(--e8-ink)!important;
+}
+[x-show="showInventory"] .overflow-auto{background:linear-gradient(180deg,#FAF7F0,#F3EADB)!important}
+[x-show="showInventory"] .grid.md\:grid-cols-2>button,
+[x-show="showInventory"] .grid.lg\:grid-cols-3>button{
+  border-radius:3px!important;border:1px solid var(--e8-line)!important;
+  background:rgba(255,251,243,.96)!important;box-shadow:none!important;
+  padding:14px!important;
+}
+[x-show="showInventory"] .grid.md\:grid-cols-2>button>div:first-child,
+[x-show="showInventory"] .grid.lg\:grid-cols-3>button>div:first-child{
+  height:190px!important;border-radius:2px!important;
+  background:linear-gradient(180deg,#F3E9D6,#FFFDF8)!important;
+  border-bottom:1px solid #DDCBA8!important;
+}
+[x-show="showInventory"] .font-semibold{font-family:Georgia,serif!important;color:var(--e8-green)!important;font-size:18px!important}
+[x-show="showInventory"] .text-xs.text-vinhedo-600{color:#706A61!important}
+[x-show="showInventory"] .text-xs.font-semibold.text-vinhedo-700{color:var(--e8-wine)!important;letter-spacing:.04em!important}
+
+/* ---------- TELAS INTERNAS REAIS ---------- */
+section[data-main-tools]{
+  max-width:none!important;background:
+    radial-gradient(circle at 90% 2%,rgba(168,132,69,.08),transparent 25rem),
+    linear-gradient(180deg,#FAF7F0,#F3EBDD)!important;
+}
+section[data-main-tools] .v121-back-only{
+  border-radius:2px!important;background:#F5EBD8!important;border-color:#CDB78B!important;
+  color:var(--e8-green)!important;font-family:Georgia,serif!important;
+}
+.v119-tool-shell,.vp-ingredients-page,.vp-recipes-page,.pizza-wine-page{
+  color:var(--e8-ink)!important;
+}
+.v119-tool-shell .v119-intro-panel,
+.v119-tool-shell .v119-question-panel,
+.v119-tool-shell .v119-results,
+.vp-ingredients-page .vp-ingredients-select{
+  border-radius:3px!important;box-shadow:none!important;
+}
+.v119-tool-shell .v119-intro-panel{
+  border:1px solid var(--e8-line)!important;
+  background:linear-gradient(120deg,#F9F4E9 0%,#EEE0C5 100%)!important;
+}
+.v119-tool-shell .v119-intro-copy h2,
+.v119-tool-shell .v119-question,
+.vp-ingredients-page h2,
+.vp-recipes-page h1,
+.pizza-wine-page h1,
+.v119-library h2{font-family:Georgia,"Times New Roman",serif!important;letter-spacing:-.03em!important}
+.v119-tool-shell .v119-primary,
+.vp-ingredients-page button[class*="primary"],
+.pizza-wine-page .pizza-wine-primary{
+  border-radius:2px!important;background:var(--e8-green)!important;color:#F6E4B5!important;
+  box-shadow:none!important;border:1px solid rgba(168,132,69,.46)!important;
+}
+
+/* ---------- RECEITAS REAL: reforço visual perceptível ---------- */
+.vp-recipes-page .vp-recipes-hero{
+  border-radius:3px!important;border:1px solid var(--e8-line)!important;
+  background:linear-gradient(135deg,#F2E5CD,#FCF8EF)!important;box-shadow:none!important;
+}
+.vp-recipes-page .vp-recipes-hero h1{color:var(--e8-green)!important;font-size:clamp(38px,8vw,64px)!important}
+.vp-recipes-page .vp-recipe-card,
+.vp-recipes-page article{
+  border-radius:3px!important;box-shadow:none!important;
+}
+
+/* ---------- PIZZA REAL: reforço trattoria ---------- */
+.pizza-wine-page .pizza-wine-home-hero{
+  border-radius:3px!important;border:1px solid #C5A76B!important;
+  box-shadow:none!important;
+}
+.pizza-wine-page .pizza-wine-card{
+  border-radius:3px!important;box-shadow:none!important;
+  background:linear-gradient(180deg,#FFF9ED,#EFE1C9)!important;
+}
+
+/* ---------- DETALHE DO VINHO REAL ---------- */
+.v150-wine-page{background:radial-gradient(circle at 50% 0,#214636 0,#091A12 68%)!important}
+.v150-wine-page .v150-wine-shell{border-radius:0!important;background:var(--e8-paper)!important}
+.v150-wine-page .v150-wine-topbar{background:var(--e8-deep)!important;border-bottom:1px solid rgba(198,171,114,.5)!important}
+.v150-wine-page .v150-wine-title{font-family:Georgia,serif!important;color:var(--e8-green)!important}
+.v150-wine-page .v150-attendant-tip{border-radius:3px!important;background:#F0E3CB!important;border-color:#CDB98E!important}
+
+/* ---------- MINHA ADEGA REAL ---------- */
+.v119-library-overlay{background:rgba(5,20,14,.88)!important}
+.v119-library{
+  border-radius:0!important;border:1px solid rgba(198,171,114,.48)!important;
+  background:
+    repeating-linear-gradient(0deg,rgba(90,69,53,.018) 0 1px,transparent 1px 4px),
+    var(--e8-paper)!important;box-shadow:0 24px 80px rgba(0,0,0,.34)!important;
+}
+.v119-library>header{background:linear-gradient(135deg,#173F2D,#0C2B1E)!important;color:#F5E5C2!important}
+.v119-library .v150-library-mode-tabs button{border-radius:0!important}
+.v119-library .v119-wine-card,.v119-library .v119-recipe-card{border-radius:3px!important;box-shadow:none!important}
+
+/* ---------- MOBILE: mudança clara sem tocar na Home ---------- */
+@media(max-width:640px){
+  .v117-tools-page .v117-tools-hero{min-height:315px!important}
+  .v117-tools-page .v117-tools-main{padding:28px 12px 104px!important}
+  .v117-tools-page .v117-tools-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+  .v117-tools-page .v117-tool-card{min-height:265px!important;padding:22px 12px 42px!important}
+  .v117-tools-page .v117-tool-card h2{font-size:clamp(22px,6.5vw,29px)!important}
+  .v117-tools-page .v117-tool-card p{font-size:12px!important;line-height:1.42!important}
+  [x-show="showInventory"]{padding:0!important}
+  [x-show="showInventory"]>div{height:100dvh!important;border:0!important}
+  [x-show="showInventory"] .grid.md\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+  [x-show="showInventory"] .grid.md\:grid-cols-2>button{padding:9px!important}
+  [x-show="showInventory"] .grid.md\:grid-cols-2>button>div:first-child{height:150px!important}
+  [x-show="showInventory"] .font-semibold{font-size:15px!important;line-height:1.1!important}
+}
+@media(max-width:380px){
+  .v117-tools-page .v117-tool-card{min-height:250px!important}
+  .v117-tools-page .v117-tool-card p{font-size:11px!important}
+}
+</style>
+
 </head>
 <!-- V95 CONTINUIDADE: evidencias ZIP associadas=185; imagens faltantes preenchidas=39; preços despriorizados/ocultos na UI pública. -->
 <!-- V96: recuperacao de fotos pendentes + novos rotulos confirmados visualmente; sem exclusao insegura de rotulos duvidosos. -->
