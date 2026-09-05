@@ -3359,20 +3359,19 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
   </div>
 </div>
 
-<!-- VP SCANNER — IMPLEMENTAÇÃO ISOLADA / MOCKUP CANÔNICO -->
-      <div x-show="tab==='scanner'" x-transition class="vp-scanner-page" aria-label="Ler código">
+<!-- VP SCANNER — LEITOR DE RÓTULO V176 -->
+      <div x-show="tab==='scanner'" x-transition class="vp-scanner-page" aria-label="Ler rótulo">
         <header class="vp-scanner-header">
           <span class="vp-scanner-user" aria-hidden="true">♙</span>
           <strong>VINHEDO DO PÃO</strong>
           <button type="button" @click="openLibrary('favorites')" aria-label="Abrir favoritos">♡</button>
         </header>
 
-        <div class="vp-scanner-content" role="region" aria-label="Conteúdo do leitor de código">
-          <!-- ESTADO DE CAPTURA -->
+        <div class="vp-scanner-content" role="region" aria-label="Conteúdo do leitor de rótulo">
           <section x-show="scannerMatches.length!==1" class="vp-scanner-intro">
-            <p class="vp-scanner-kicker">LER CÓDIGO</p>
-            <h2>Identifique seu vinho</h2>
-            <p class="vp-scanner-lead">Aponte a câmera para o código de barras da garrafa. O sistema só confirma um vinho quando o código corresponde exatamente.</p>
+            <p class="vp-scanner-kicker">LER RÓTULO</p>
+            <h2>Identifique seu vinho pela imagem</h2>
+            <p class="vp-scanner-lead">Aponte a câmera para a frente do rótulo. O sistema lê nome e produtor e só confirma quando a correspondência é forte.</p>
 
             <section class="vp-scanner-camera-card">
               <div class="vp-scanner-camera-frame">
@@ -3380,50 +3379,46 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
                 <canvas x-ref="scannerCanvas" class="hidden"></canvas>
 
                 <div class="vp-scanner-camera-overlay">
-                  <p x-show="scannerCameraOn">Posicione o código de barras<br>dentro do quadro</p>
-                  <div class="vp-scanner-focus" :class="scannerWorking?'is-processing':''">
+                  <p x-show="scannerCameraOn">Centralize o nome do vinho e o produtor<br>dentro do quadro</p>
+                  <div class="vp-scanner-focus" :class="scannerWorking||scannerOcrBusy?'is-processing':''">
                     <i></i><i></i><i></i><i></i>
                   </div>
                 </div>
 
                 <div x-show="!scannerCameraOn" class="vp-scanner-camera-empty">
                   <div class="vp-scanner-empty-icon">▯</div>
-                  <strong x-text="scannerWorking ? 'Solicitando acesso à câmera…' : 'Permita o acesso à câmera'"></strong>
-                  <p x-text="scannerMessage || 'Ao entrar em Ler Código, o navegador deve perguntar se você permite usar a câmera.'"></p>
+                  <strong x-text="scannerWorking ? 'Preparando leitor…' : 'Permita o acesso à câmera'"></strong>
+                  <p x-text="scannerMessage || 'Ao entrar em Ler Rótulo, permita o uso da câmera para reconhecer a garrafa.'"></p>
                   <button type="button" @click.stop="startLiveLabelScanner()">ABRIR CÂMERA</button>
                 </div>
 
-                <div x-show="scannerCameraOn && scannerWorking" class="vp-scanner-processing">PROCESSANDO…</div>
+                <div x-show="scannerCameraOn && (scannerWorking||scannerOcrBusy)" class="vp-scanner-processing">LENDO RÓTULO…</div>
               </div>
 
-              <div x-show="scannerMessage && !scannerCameraOn" class="vp-scanner-message" role="status">
+              <div x-show="scannerCameraOn" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+                <button type="button" class="vp-scanner-open-wine" style="flex:1;min-width:180px" @click="scannerCaptureLabel()" :disabled="scannerOcrBusy">IDENTIFICAR RÓTULO AGORA</button>
+                <button type="button" x-show="scannerTorchSupported" @click="scannerToggleTorch()" class="vp-scanner-open-wine" style="flex:0 0 auto" x-text="scannerTorchOn?'DESLIGAR LUZ':'LIGAR LUZ'"></button>
+              </div>
+
+              <div x-show="scannerMessage" class="vp-scanner-message" role="status">
                 <span>ⓘ</span><p x-text="scannerMessage"></p>
               </div>
             </section>
 
             <div class="vp-scanner-actions">
-              <button type="button"
-                :disabled="!scannerTorchSupported"
-                :class="scannerTorchOn?'is-on':''"
-                @click="scannerToggleTorch()">
-                <span>♧</span>
-                <small>LANTERNA</small>
-                <b x-text="scannerTorchSupported ? (scannerTorchOn?'Desativar':'Ativar') : 'Indisponível'"></b>
-              </button>
-
               <button type="button" @click="$refs.scannerGalleryInput.click()">
                 <span>▧</span>
                 <small>FOTO DA GALERIA</small>
-                <b>Selecionar</b>
+                <b>Selecionar rótulo</b>
               </button>
-              <input x-ref="scannerGalleryInput" type="file" accept="image/*" class="hidden" @change="handleScannerGallery($event)" aria-label="Selecionar foto da galeria para leitura">
-            </div>
+              <input x-ref="scannerGalleryInput" type="file" accept="image/*" class="hidden" @change="handleScannerGallery($event)" aria-label="Selecionar foto do rótulo na galeria">
 
-            <button type="button" class="vp-scanner-manual-card" @click="scannerManualOpen=!scannerManualOpen">
-              <span class="vp-scanner-manual-icon">▯</span>
-              <span><b>Não tem o código?</b><small>Busque pelo nome do vinho ou do produtor.</small></span>
-              <strong>›</strong>
-            </button>
+              <button type="button" @click="scannerManualOpen=!scannerManualOpen">
+                <span>⌕</span>
+                <small>BUSCA MANUAL</small>
+                <b>Nome ou produtor</b>
+              </button>
+            </div>
 
             <section x-show="scannerManualOpen" x-transition class="vp-scanner-search-panel">
               <label for="vpScannerSearch">BUSCAR MANUALMENTE</label>
@@ -3437,31 +3432,30 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
             </section>
 
             <section x-show="scannerMatches.length>1" class="vp-scanner-candidates">
-              <p class="vp-scanner-kicker">POSSÍVEIS CORRESPONDÊNCIAS</p>
+              <p class="vp-scanner-kicker">CONFIRA AS POSSÍVEIS CORRESPONDÊNCIAS</p>
               <template x-for="m in scannerMatches" :key="m.wine.id">
                 <button type="button" @click="scannerSelectCandidate(m)" class="vp-scanner-candidate">
                   <img :src="wineImage(m.wine)" :alt="m.wine.name" loading="lazy" @error="nextWineImage($event,m.wine)">
-                  <span><b x-text="m.wine.name"></b><small x-text="m.wine.producer || m.wine.vinicola || ''"></small></span>
+                  <span><b x-text="m.wine.name"></b><small x-text="(m.wine.producer || m.wine.vinicola || '') + (m.reason ? ' • '+m.reason : '')"></small></span>
                   <strong>›</strong>
                 </button>
               </template>
             </section>
 
             <section class="vp-scanner-how">
-              <p class="vp-scanner-kicker">COMO FUNCIONA</p>
+              <p class="vp-scanner-kicker">PARA RECONHECER MAIS RÁPIDO</p>
               <div class="vp-scanner-how-grid">
-                <article><span>▯</span><b>1. Escaneie</b><p>Aponte a câmera para o código de barras do rótulo.</p></article>
-                <article><span>✓</span><b>2. Identificamos</b><p>O sistema procura o código na base cadastrada.</p></article>
-                <article><span>♙</span><b>3. Descubra</b><p>Veja informações, perfil, harmonizações e receitas.</p></article>
+                <article><span>▯</span><b>1. Rótulo de frente</b><p>Enquadre principalmente o nome e o produtor, sem inclinar a garrafa.</p></article>
+                <article><span>☼</span><b>2. Evite reflexo</b><p>Use boa luz, mas sem brilho forte sobre as letras.</p></article>
+                <article><span>✓</span><b>3. Confirmação segura</b><p>Se a leitura não for forte, mostramos candidatos em vez de chutar outro vinho.</p></article>
               </div>
             </section>
           </section>
 
-          <!-- ESTADO DE SUCESSO / RESULTADO -->
           <section x-show="scannerMatches.length===1" x-transition class="vp-scanner-success">
             <header class="vp-scanner-success-head">
               <span>✓</span>
-              <div><h2>Código identificado com sucesso!</h2><p>Confira o vinho encontrado.</p></div>
+              <div><h2>Rótulo identificado!</h2><p>Confira o vinho encontrado antes de abrir a ficha.</p></div>
             </header>
 
             <template x-for="m in scannerMatches.slice(0,1)" :key="m.wine.id">
@@ -3473,61 +3467,28 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
                     <p x-text="m.wine.producer || m.wine.vinicola || ''"></p>
                     <p x-show="m.wine.country || m.wine.region"><span x-text="[m.wine.country,m.wine.region].filter(Boolean).join(' • ')"></span></p>
                     <p x-show="m.wine.grapes || m.wine.grapeRegion" x-text="Array.isArray(m.wine.grapes)?m.wine.grapes.join(' / '):(m.wine.grapes||m.wine.grapeRegion)"></p>
-                    <p x-show="m.wine.type || m.wine.estilo" x-text="[m.wine.type,m.wine.estilo].filter(Boolean).join(' • ')"></p>
-
-                    <button type="button" class="vp-scanner-favorite"
-                      @click="toggleFavorite('wine',m.wine.id)"
-                      :class="isFavorite('wine',m.wine.id)?'is-on':''" :aria-label="isFavorite('wine',m.wine.id)?'Remover dos favoritos':'Adicionar aos favoritos'">
-                      <span x-text="isFavorite('wine',m.wine.id)?'♥':'♡'"></span>
-                      <b x-text="isFavorite('wine',m.wine.id)?'FAVORITADO':'FAVORITO'"></b>
-                    </button>
                     <button type="button" class="vp-scanner-open-wine" @click="stopScanner();openWine(m.wine)">VER VINHO</button>
                   </div>
                 </article>
 
-                <section class="vp-scanner-product-details">
-                  <p class="vp-scanner-kicker">DETALHES DO PRODUTO</p>
-                  <div x-show="scannerBarcodeValue(m.wine) || scannerLastBarcode" class="vp-scanner-detail-row">
-                    <span>▥</span><b>Código de barras</b><strong x-text="scannerBarcodeValue(m.wine) || scannerLastBarcode"></strong>
-                  </div>
-                  <div x-show="m.wine.lot || m.wine.lote" class="vp-scanner-detail-row">
-                    <span>▣</span><b>Lote</b><strong x-text="m.wine.lot || m.wine.lote"></strong>
-                  </div>
-                  <div x-show="m.wine.producer || m.wine.vinicola" class="vp-scanner-detail-row">
-                    <span>⌂</span><b>Produtor</b><strong x-text="m.wine.producer || m.wine.vinicola"></strong>
-                  </div>
-                  <div x-show="m.wine.volume || m.wine.technical?.volume" class="vp-scanner-detail-row">
-                    <span>♙</span><b>Volume</b><strong x-text="m.wine.volume || m.wine.technical?.volume"></strong>
-                  </div>
-                  <div x-show="m.wine.alcohol || m.wine.technical?.alcohol" class="vp-scanner-detail-row">
-                    <span>%</span><b>Teor alcoólico</b><strong x-text="m.wine.alcohol || m.wine.technical?.alcohol"></strong>
-                  </div>
-                </section>
-
                 <section class="vp-scanner-wrong">
                   <h3>Não foi este vinho?</h3>
-                  <p>Tente novamente ou busque manualmente.</p>
+                  <p>A leitura anterior é descartada antes de uma nova tentativa.</p>
                   <div>
-                    <button type="button" @click="scannerRestart()">↻ ESCANEAR NOVAMENTE</button>
-                    <button type="button" @click="scannerMatches=[];scannerManualOpen=true;scannerSearched=false">⌕ BUSCAR MANUALMENTE</button>
+                    <button type="button" @click="scannerRestart()">↻ LER OUTRO RÓTULO</button>
+                    <button type="button" @click="scannerMatches=[];scannerMessage='';scannerManualOpen=true;scannerSearched=false">⌕ BUSCAR MANUALMENTE</button>
                   </div>
                 </section>
-
-                <aside class="vp-scanner-safety">
-                  <span>♢</span><div><b>Dica de segurança</b><p>Sempre verifique o rótulo antes de confirmar o vinho encontrado.</p></div>
-                </aside>
               </div>
             </template>
           </section>
 
-          <!-- ESTADO SEM CORRESPONDÊNCIA -->
-          <section x-show="scannerSearched && !scannerWorking && scannerMatches.length===0 && scannerMessage && !scannerCameraOn"
+          <section x-show="scannerSearched && !scannerWorking && !scannerOcrBusy && scannerMatches.length===0 && scannerMessage"
             class="vp-scanner-not-found">
-            <h3 x-text="scannerLastBarcode ? 'Não encontramos este código na nossa adega.' : 'Não conseguimos identificar o vinho.'"></h3>
-            <p x-show="scannerLastBarcode">Código lido: <strong x-text="scannerLastBarcode"></strong></p>
+            <h3>Não conseguimos confirmar este rótulo.</h3>
             <p x-text="scannerMessage"></p>
             <div>
-              <button type="button" @click="scannerRestart()">ESCANEAR NOVAMENTE</button>
+              <button type="button" @click="scannerRestart()">TENTAR NOVAMENTE</button>
               <button type="button" @click="scannerManualOpen=true;scannerSearched=false;scannerMessage=''">BUSCAR MANUALMENTE</button>
             </div>
           </section>
@@ -4760,6 +4721,11 @@ function wineApp(){
     scannerTimer:null,
     scannerDetector:null,
     scannerOcrLibLoading:false,
+    scannerOcrWorker:null,
+    scannerOcrReady:false,
+    scannerOcrBusy:false,
+    scannerLastOcrSignature:'',
+    scannerLastScanAt:0,
     scannerLiveLoopCount:0,
     scannerStableWineId:null,
     scannerStableHits:0,
@@ -4770,8 +4736,6 @@ function wineApp(){
     scannerTorchOn:false,
     scannerLastBarcode:'',
     scannerReadLocked:false,
-    scannerBarcodeMap:{},
-    scannerLastDetectAt:0,
     wineVideoOpen:false,
     wineVideoInlineOpen:false,
     wineAudioMap:{"2":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=903b21d6-b2a5-4bf8-be4a-014e1bda1175.wav","duration":42.39673469387755,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"6":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c76d1771-ac68-4544-80a2-fe3fe035f1d3.wav","duration":42.266122448979594,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"7":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=42bf7958-f580-46d3-8fad-6caf3f3b92a3.wav","duration":43.07591836734694,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"9":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ce9044a5-2072-4a3d-b71d-3d754cb7dd60.wav","duration":39.88897959183674,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"11":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=4c6828a5-e01d-4119-9c17-a0fdccbb488a.wav","duration":42.21387755102041,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"12":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c85f6413-f463-4382-a645-c060f324b086.wav","duration":41.6130612244898,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"13":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ed0eb5f3-fe79-4ec7-a0a9-eeb0d29fef60.wav","duration":38.50448979591837,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"14":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=83ea4640-3b78-4426-9aa7-2cab284f935e.wav","duration":41.48244897959184,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"15":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=f82e1682-96c4-425c-b335-8d682aeb59aa.wav","duration":40.333061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"16":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=b444d427-77b2-4eb3-b15f-58f15d1dec26.wav","duration":38.53061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"20":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=a78f2494-0c0a-4e00-9045-d7ff85a4cd06.wav","duration":39.053061224489795,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"21":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=51c64f38-e395-4576-ad57-9039a418b1c1.wav","duration":39.20979591836735,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"22":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=3b017629-e23b-436d-bac2-3f40b80ef065.wav","duration":36.96326530612245,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"25":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=14130435-cc40-4b03-8a77-ec501e87b6c6.wav","duration":38.21714285714286,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"}},
@@ -6732,11 +6696,6 @@ function wineApp(){
           else if(h==='#home'||h==='') history.replaceState({vinhedo:true,screen:'home'},'','#home');
         }
       }catch(e){}
-      try{
-        const stored=JSON.parse(localStorage.getItem('vinhedoBarcodeMap')||'{}');
-        const validIds=new Set(this.wines.map(w=>Number(w.id)));
-        this.scannerBarcodeMap=Object.fromEntries(Object.entries(stored||{}).filter(([code,id])=>this.scannerBarcodeIsPlausible(code)&&validIds.has(Number(id))));
-      }catch(e){ this.scannerBarcodeMap={}; }
       if(this.screen==='tool' && this.tab==='scanner'){ this.scannerReset(); this.$nextTick(()=>this.startLiveLabelScanner()); }
       this.auditRecipes(true);
       try{ this.seenSurprises=JSON.parse(sessionStorage.getItem('vinhedoSeen')||sessionStorage.getItem('vinhedoSeenSurprises')||'[]'); }catch(e){ this.seenSurprises=[]; }
@@ -7238,7 +7197,7 @@ function wineApp(){
     },
     async startLiveLabelScanner(){
       this.stopScanner();
-      this.scannerMode='barcode';
+      this.scannerMode='label';
       this.scannerMessage='';
       this.scannerMatches=[];
       this.scannerOcrText='';
@@ -7247,52 +7206,34 @@ function wineApp(){
       this.scannerStableHits=0;
       this.scannerLiveLoopCount=0;
       this.scannerReadLocked=false;
-      this.scannerLastBarcode='';
-      this.scannerBarcode='';
-      this.scannerLastDetectAt=0;
+      this.scannerLastOcrSignature='';
+      this.scannerLastScanAt=0;
 
       if(!window.isSecureContext){
         this.scannerSearched=true;
-        this.scannerMessage='A câmera só pode ser aberta em conexão segura (HTTPS). Abra a versão publicada do site.';
+        this.scannerMessage='A câmera só funciona em conexão segura (HTTPS). Abra a versão publicada do site.';
         return;
       }
       if(!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia!=='function'){
         this.scannerSearched=true;
-        this.scannerMessage='Este navegador não liberou acesso à câmera. Use a busca manual pelo nome do vinho.';
-        return;
-      }
-      if(!('BarcodeDetector' in window)){
-        this.scannerSearched=true;
-        this.scannerMessage='Este navegador não oferece leitura nativa de código de barras. No Android, abra o site no Chrome atualizado ou use a busca manual.';
+        this.scannerMessage='Este navegador não liberou acesso à câmera. Você ainda pode selecionar uma foto da galeria ou buscar pelo nome.';
         return;
       }
 
       let stream=null;
       try{
-        // Prioriza câmera traseira e resolução suficiente para barras finas, sem pedir 4K.
         try{
-          stream=await navigator.mediaDevices.getUserMedia({
-            video:{
-              facingMode:{ideal:'environment'},
-              width:{ideal:1920,min:960},
-              height:{ideal:1080,min:540}
-            },
-            audio:false
-          });
+          stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1600,min:720},height:{ideal:1200,min:540}},audio:false});
         }catch(firstError){
           stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
         }
-
         this.scannerStream=stream;
         await this.$nextTick();
         const video=this.$refs?.scannerVideo;
         if(!video) throw new Error('SCANNER_VIDEO_NOT_FOUND');
         video.setAttribute('playsinline','');
         video.setAttribute('webkit-playsinline','');
-        video.muted=true;
-        video.autoplay=true;
-        video.srcObject=stream;
-
+        video.muted=true; video.autoplay=true; video.srcObject=stream;
         if(video.readyState<1){
           await new Promise((resolve,reject)=>{
             const timer=setTimeout(resolve,1200);
@@ -7303,72 +7244,54 @@ function wineApp(){
             video.addEventListener('error',bad,{once:true});
           });
         }
-        try{ await video.play(); }catch(playError){ if(video.paused) throw playError; }
-
+        try{await video.play();}catch(e){if(video.paused) throw e;}
         this.scannerCameraOn=true;
-        this.scannerMessage='';
         const track=stream.getVideoTracks?.()[0];
         try{
           const caps=track?.getCapabilities?.()||{};
           this.scannerTorchSupported=!!caps.torch;
           this.scannerTorchOn=false;
-          // Autofoco contínuo quando o aparelho oferece essa capacidade.
           if(track?.applyConstraints && Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')){
-            try{ await track.applyConstraints({advanced:[{focusMode:'continuous'}]}); }catch(e){}
+            try{await track.applyConstraints({advanced:[{focusMode:'continuous'}]});}catch(e){}
           }
-        }catch(e){ this.scannerTorchSupported=false; }
+        }catch(e){this.scannerTorchSupported=false;}
 
-        const formats=await BarcodeDetector.getSupportedFormats();
-        // Varejo de vinho usa majoritariamente GTIN/EAN/UPC. Menos formatos = detecção mais rápida e menos falso positivo.
-        const preferred=['ean_13','ean_8','upc_a','upc_e'].filter(x=>formats.includes(x));
-        this.scannerDetector=new BarcodeDetector(preferred.length?{formats:preferred}:undefined);
+        if('TextDetector' in window){
+          try{this.scannerTextDetector=new TextDetector();}catch(e){this.scannerTextDetector=null;}
+        }
+        // Prepara o OCR em segundo plano. A câmera abre primeiro; o módulo não bloqueia a interface.
+        if(!this.scannerTextDetector) this.scannerLoadTesseract().catch(()=>{});
 
         const loop=async()=>{
-          if(!this.scannerCameraOn || !this.scannerDetector || this.scannerReadLocked) return;
+          if(!this.scannerCameraOn) return;
           this.scannerLiveLoopCount++;
           try{
             const now=performance.now();
-            // ~5 leituras/s: suficiente para resposta rápida sem sobrecarregar celulares Android.
-            if(now-this.scannerLastDetectAt>=180 && video.readyState>=2){
-              this.scannerLastDetectAt=now;
-              const codes=await this.scannerDetector.detect(video);
-              if(codes?.length){
-                const candidates=codes
-                  .map(c=>String(c?.rawValue||'').replace(/\D/g,''))
-                  .filter(v=>this.scannerBarcodeIsPlausible(v));
-                const raw=candidates[0]||'';
-                if(raw){
-                  this.scannerReadLocked=true;
-                  this.scannerLastBarcode=raw;
-                  this.scannerBarcode=raw;
-                  const found=this.lookupBarcode(raw,true);
-                  this.stopScanner();
-                  if(!found){
-                    this.scannerManualOpen=true;
-                    this.scannerMessage='Código lido corretamente, mas ele ainda não está associado a um vinho. Busque o vinho pelo nome abaixo para vincular este código neste aparelho.';
-                  }
-                  return;
-                }
+            const interval=this.scannerTextDetector?420:1450;
+            if(!this.scannerOcrBusy && now-this.scannerLastScanAt>=interval && video.readyState>=2){
+              this.scannerLastScanAt=now;
+              await this.scannerReadVideoFrame(false);
+              if(this.scannerMatches.length===1 && this.scannerStableHits>=2){
+                this.stopScanner();
+                return;
               }
             }
           }catch(e){}
-          this.scannerTimer=setTimeout(loop,90);
+          this.scannerTimer=setTimeout(loop,120);
         };
         loop();
       }catch(e){
         this.stopScanner();
         this.scannerSearched=true;
         const name=String(e?.name||'');
-        if(name==='NotAllowedError' || name==='PermissionDeniedError'){
-          this.scannerMessage='A câmera foi negada para este site. Libere a permissão de Câmera no Chrome e tente novamente.';
-        }else{
-          this.scannerMessage='Não foi possível abrir a câmera. Verifique a permissão do navegador e tente novamente.';
-        }
+        if(name==='NotAllowedError' || name==='PermissionDeniedError') this.scannerMessage='A câmera foi negada. Libere a permissão de câmera do site no Chrome e tente novamente.';
+        else if(name==='NotReadableError' || name==='TrackStartError') this.scannerMessage='A câmera parece estar em uso por outro aplicativo. Feche o outro app e tente novamente.';
+        else this.scannerMessage='Não foi possível abrir a câmera. Verifique a permissão do navegador e tente novamente.';
       }
     },
     scannerReset(){
       this.stopScanner();
-      this.scannerMode='barcode';
+      this.scannerMode='label';
       this.scannerQuery='';
       this.scannerBarcode='';
       this.scannerMatches=[];
@@ -7381,280 +7304,273 @@ function wineApp(){
       this.scannerTorchOn=false;
       this.scannerLastBarcode='';
       this.scannerReadLocked=false;
-      this.scannerLastDetectAt=0;
+      this.scannerStableWineId=null;
+      this.scannerStableHits=0;
+      this.scannerLastOcrSignature='';
+      this.scannerLastScanAt=0;
     },
     async scannerToggleTorch(){
       if(!this.scannerStream) return;
       const track=this.scannerStream.getVideoTracks?.()[0];
       if(!track?.applyConstraints) return;
       const caps=track.getCapabilities?.()||{};
-      if(!caps.torch){ this.scannerTorchSupported=false; return; }
+      if(!caps.torch){this.scannerTorchSupported=false;return;}
       try{
         const next=!this.scannerTorchOn;
         await track.applyConstraints({advanced:[{torch:next}]});
         this.scannerTorchOn=next;
-      }catch(e){
-        this.scannerTorchSupported=false;
-        this.scannerTorchOn=false;
+      }catch(e){this.scannerTorchSupported=false;this.scannerTorchOn=false;}
+    },
+    scannerNormalize(v){
+      return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
+    },
+    scannerTokens(v){
+      const stop=new Set(['vinho','wine','vinos','vino','tinto','branco','rose','rosado','red','white','750ml','750','ml','doc','igt','aop','reserva','reserve','gran','grand','selection','seleccion','2020','2021','2022','2023','2024','2025','2026','argentina','chile','brasil','portugal','italia','france','franca','espana','spain']);
+      return [...new Set(this.scannerNormalize(v).split(' ').filter(x=>x.length>=3&&!stop.has(x)))];
+    },
+    scannerWineText(w){
+      return this.scannerNormalize([w.name,w.producer,w.vinicola,w.grapes,w.grapeRegion,w.country,w.region,w.denominacao,w.vintage,w.type,w.estilo].filter(Boolean).join(' '));
+    },
+    scannerDistinctiveParts(w){
+      const name=this.scannerNormalize(w?.name||'');
+      const producer=this.scannerNormalize(w?.producer||w?.vinicola||'');
+      return {name,producer,nameTokens:this.scannerTokens(name),producerTokens:this.scannerTokens(producer)};
+    },
+    scannerRank(query,fromOCR=false){
+      const q=this.scannerNormalize(query);
+      const qTokens=new Set(this.scannerTokens(q));
+      if(!q || qTokens.size===0) return [];
+      const ranked=[];
+      for(const w of this.wines){
+        const p=this.scannerDistinctiveParts(w);
+        const nameHits=p.nameTokens.filter(t=>qTokens.has(t) || q.includes(t));
+        const producerHits=p.producerTokens.filter(t=>qTokens.has(t) || q.includes(t));
+        const exactName=p.name.length>=4 && q.includes(p.name);
+        const exactProducer=p.producer.length>=4 && q.includes(p.producer);
+        const allText=this.scannerWineText(w);
+        let metaHits=0;
+        for(const t of qTokens){ if(allText.includes(t) && !p.nameTokens.includes(t) && !p.producerTokens.includes(t)) metaHits++; }
+
+        // Segurança: OCR nunca confirma só por uva/país. Precisa reconhecer o nome do rótulo ou nome+produtor.
+        const distinctiveCount=nameHits.length+producerHits.length;
+        let eligible=false;
+        if(exactName) eligible=true;
+        else if(p.nameTokens.length>=2 && nameHits.length>=2) eligible=true;
+        else if(nameHits.length>=1 && (producerHits.length>=1 || exactProducer)) eligible=true;
+        else if(p.nameTokens.length===1 && nameHits.length===1 && p.nameTokens[0].length>=5 && (producerHits.length>=1 || metaHits>=1)) eligible=true;
+        if(!eligible) continue;
+
+        let score=0;
+        if(exactName) score+=120;
+        if(exactProducer) score+=38;
+        score+=nameHits.length*34;
+        score+=producerHits.length*24;
+        score+=Math.min(metaHits,3)*5;
+        if(fromOCR && distinctiveCount<2 && !exactName) score-=24;
+        ranked.push({wine:w,score,nameHits:nameHits.length,producerHits:producerHits.length,exactName,exactProducer,distinctiveCount});
       }
+      ranked.sort((a,b)=>b.score-a.score || b.nameHits-a.nameHits || b.producerHits-a.producerHits || Number(a.wine.id)-Number(b.wine.id));
+      return ranked.slice(0,5).map((x,i)=>({
+        wine:x.wine,score:x.score,nameHits:x.nameHits,producerHits:x.producerHits,exactName:x.exactName,
+        confidence:(x.exactName||x.score>=110)?'Alta confiança':x.score>=78?'Boa correspondência':'Conferir',
+        reason:x.exactName?'nome do rótulo reconhecido':`${x.nameHits} termo(s) do nome${x.producerHits?` + ${x.producerHits} do produtor`:''}`
+      }));
+    },
+    scannerAcceptOCRText(raw,auto=true){
+      const clean=String(raw||'').replace(/\s+/g,' ').trim().slice(0,1200);
+      this.scannerOcrText=clean;
+      this.scannerSearched=true;
+      if(!clean){
+        this.scannerMatches=[];
+        this.scannerStableWineId=null;this.scannerStableHits=0;
+        this.scannerMessage='Ainda não consegui ler as letras. Aproxime um pouco o nome do vinho e evite reflexo.';
+        return false;
+      }
+      const ranked=this.scannerRank(clean,true);
+      const top=ranked[0], second=ranked[1];
+      const strong=!!top && (top.exactName || top.score>=105) && (!second || top.score-second.score>=28);
+      if(!strong){
+        this.scannerStableWineId=null; this.scannerStableHits=0;
+        this.scannerMatches=ranked.slice(0,Math.min(3,ranked.length));
+        this.scannerMessage=ranked.length?'A leitura ainda não é forte o bastante para confirmar. Confira os candidatos ou aproxime o rótulo.':'Não encontrei correspondência segura. Aproxime o nome do vinho e do produtor.';
+        return false;
+      }
+      const id=String(top.wine.id);
+      if(this.scannerStableWineId===id) this.scannerStableHits++;
+      else {this.scannerStableWineId=id;this.scannerStableHits=1;}
+      // Nunca mantém resultado antigo: só mostra um único vinho após confirmação forte repetida.
+      if(!auto || this.scannerStableHits>=2){
+        this.scannerMatches=[top];
+        this.scannerMessage='Rótulo reconhecido com alta confiança.';
+        return true;
+      }
+      this.scannerMatches=[];
+      this.scannerMessage='Quase lá — mantenha o rótulo parado por mais um instante.';
+      return false;
+    },
+    async scannerLoadTesseract(){
+      if(this.scannerOcrWorker){this.scannerOcrReady=true;return true;}
+      if(this.scannerOcrLibLoading){
+        for(let i=0;i<24 && this.scannerOcrLibLoading;i++) await new Promise(r=>setTimeout(r,100));
+        return !!this.scannerOcrWorker;
+      }
+      this.scannerOcrLibLoading=true;
+      try{
+        if(!window.Tesseract){
+          await new Promise((resolve,reject)=>{
+            const existing=document.querySelector('script[data-vp-tesseract]');
+            if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return;}
+            const sc=document.createElement('script');
+            sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+            sc.async=true; sc.dataset.vpTesseract='1'; sc.onload=resolve; sc.onerror=reject; document.head.appendChild(sc);
+          });
+        }
+        if(!window.Tesseract) return false;
+        // Worker persistente: carrega uma vez e reutiliza nas próximas leituras, muito mais rápido que Tesseract.recognize a cada quadro.
+        this.scannerOcrWorker=await Tesseract.createWorker('eng');
+        this.scannerOcrReady=!!this.scannerOcrWorker;
+        return this.scannerOcrReady;
+      }catch(e){
+        this.scannerOcrWorker=null; this.scannerOcrReady=false; return false;
+      }finally{this.scannerOcrLibLoading=false;}
+    },
+    scannerPrepareCanvas(video){
+      const canvas=this.$refs?.scannerCanvas;
+      if(!canvas || !video?.videoWidth) return null;
+      const vw=video.videoWidth, vh=video.videoHeight;
+      // Recorta o centro, onde o guia de rótulo fica. Menos pixels = OCR mais rápido e menos texto de fundo.
+      const sw=Math.round(vw*0.86), sh=Math.round(vh*0.68);
+      const sx=Math.round((vw-sw)/2), sy=Math.round((vh-sh)/2);
+      const outW=Math.min(900,sw), outH=Math.max(1,Math.round(outW*sh/sw));
+      canvas.width=outW; canvas.height=outH;
+      const ctx=canvas.getContext('2d',{willReadFrequently:true});
+      ctx.drawImage(video,sx,sy,sw,sh,0,0,outW,outH);
+      try{
+        const img=ctx.getImageData(0,0,outW,outH), d=img.data;
+        for(let i=0;i<d.length;i+=4){
+          const g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+          const c=Math.max(0,Math.min(255,(g-128)*1.35+128));
+          d[i]=d[i+1]=d[i+2]=c;
+        }
+        ctx.putImageData(img,0,0);
+      }catch(e){}
+      return canvas;
+    },
+    async scannerReadVideoFrame(force=false){
+      const video=this.$refs?.scannerVideo;
+      if(!video || video.readyState<2 || this.scannerOcrBusy) return false;
+      this.scannerOcrBusy=true;
+      try{
+        let text='';
+        if(this.scannerTextDetector){
+          const bmp=await createImageBitmap(video);
+          const blocks=await this.scannerTextDetector.detect(bmp);
+          try{bmp.close();}catch(e){}
+          text=(blocks||[]).map(x=>x.rawValue||'').join(' ');
+        }else{
+          const ok=await this.scannerLoadTesseract();
+          if(!ok){
+            if(force){this.scannerSearched=true;this.scannerMessage='O módulo de leitura de texto não conseguiu carregar. Tente novamente com internet ativa ou use uma foto da galeria.';}
+            return false;
+          }
+          const canvas=this.scannerPrepareCanvas(video);
+          if(!canvas) return false;
+          const result=await this.scannerOcrWorker.recognize(canvas);
+          text=result?.data?.text||'';
+        }
+        const sig=this.scannerNormalize(text).slice(0,220);
+        if(!force && sig && sig===this.scannerLastOcrSignature) return false;
+        this.scannerLastOcrSignature=sig;
+        return this.scannerAcceptOCRText(text,!force);
+      }catch(e){
+        if(force){this.scannerSearched=true;this.scannerMessage='Não consegui ler este quadro. Aproxime o rótulo, mantenha a câmera reta e tente de novo.';}
+        return false;
+      }finally{this.scannerOcrBusy=false;}
+    },
+    async scannerCaptureLabel(){
+      // Nova tentativa sempre descarta completamente o resultado anterior.
+      this.scannerMatches=[]; this.scannerMessage=''; this.scannerSearched=false;
+      this.scannerStableWineId=null; this.scannerStableHits=0; this.scannerLastOcrSignature='';
+      const ok=await this.scannerReadVideoFrame(true);
+      if(ok && this.scannerMatches.length===1){this.stopScanner();}
+      else if(this.scannerMatches.length>1){this.scannerMessage='Não vou escolher por aproximação. Toque no candidato correto ou tente novamente mais perto.';}
     },
     async handleScannerGallery(ev){
       const file=ev?.target?.files?.[0];
       if(!file) return;
       this.stopScanner();
-      this.scannerWorking=true;
-      this.scannerMatches=[];
-      this.scannerMessage='';
-      this.scannerLastBarcode='';
-      this.scannerBarcode='';
-      this.scannerSearched=false;
-      this.scannerReadLocked=false;
+      this.scannerWorking=true; this.scannerOcrBusy=true;
+      this.scannerMatches=[]; this.scannerMessage=''; this.scannerOcrText=''; this.scannerSearched=false;
+      this.scannerStableWineId=null;this.scannerStableHits=0;this.scannerLastOcrSignature='';
       try{
-        if(!('BarcodeDetector' in window)){
-          this.scannerSearched=true;
-          this.scannerMessage='Este navegador não oferece leitura de código de barras em fotos. Use o Chrome atualizado no Android ou a busca manual.';
-          return;
-        }
-        const formats=await BarcodeDetector.getSupportedFormats();
-        const preferred=['ean_13','ean_8','upc_a','upc_e'].filter(x=>formats.includes(x));
-        const det=new BarcodeDetector(preferred.length?{formats:preferred}:undefined);
-        const bmp=await createImageBitmap(file);
-        const codes=await det.detect(bmp);
-        try{bmp.close();}catch(e){}
-        const raw=(codes||[]).map(c=>String(c?.rawValue||'').replace(/\D/g,'')).find(v=>this.scannerBarcodeIsPlausible(v))||'';
-        this.scannerSearched=true;
-        if(raw){
-          this.scannerLastBarcode=raw;
-          this.scannerBarcode=raw;
-          const found=this.lookupBarcode(raw,true);
-          if(!found){
-            this.scannerManualOpen=true;
-            this.scannerMessage='Código lido corretamente, mas ele ainda não está associado a um vinho. Busque pelo nome para vincular este código neste aparelho.';
-          }
-        }else{
-          this.scannerMessage='Não consegui localizar um código EAN/UPC válido nesta foto. Fotografe o código de barras de frente, ocupando boa parte da imagem.';
-        }
-      }catch(e){
-        this.scannerSearched=true;
-        this.scannerMessage='Não foi possível ler o código desta foto. Tente outra imagem mais próxima e sem reflexo.';
-      }finally{
-        this.scannerWorking=false;
-        if(ev?.target) ev.target.value='';
-      }
-    },
-    scannerRestart(){
-      this.scannerReset();
-      this.$nextTick(()=>this.startLiveLabelScanner());
-    },
-    scannerNormalize(v){
-      return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').replace(/\s+/g,' ').trim();
-    },
-    scannerWineText(w){
-      return this.scannerNormalize([
-        w.name,w.producer,w.vinicola,w.grapes,w.grapeRegion,w.country,w.region,w.denominacao,w.vintage,w.type,w.estilo,
-        Array.isArray(w.tags)?w.tags.join(' '):w.tags
-      ].filter(Boolean).join(' '));
-    },
-    scannerTokens(v){
-      const stop=new Set(['vinho','wine','vinos','vignoble','vino','tinto','branco','rose','rosado','red','white','750ml','750','ml','doc','igt','do','aop','reserva','reserve','2020','2021','2022','2023','2024','2025','2026']);
-      return [...new Set(this.scannerNormalize(v).split(' ').filter(x=>x.length>=3&&!stop.has(x)))];
-    },
-    scannerRank(query,fromOCR=false){
-      const q=this.scannerNormalize(query);
-      const toks=this.scannerTokens(q);
-      if(!q || toks.length===0) return [];
-      const ranked=this.wines.map(w=>{
-        const wt=this.scannerWineText(w);
-        const wn=this.scannerNormalize(w.name);
-        const prod=this.scannerNormalize(w.producer||'');
-        const grapes=this.scannerNormalize(w.grapes||w.grapeRegion||'');
-        let score=0, hits=0;
-        if(q.length>=5 && wt.includes(q)) score+=55;
-        if(wn && q.includes(wn)) score+=70;
-        if(prod && prod.length>=4 && q.includes(prod)) score+=16;
-        for(const t of toks){
-          if(wt.includes(t)){ hits++; score += wn.includes(t)?15 : grapes.includes(t)?9 : 5; }
-        }
-        const coverage=hits/Math.max(1,toks.length);
-        score += coverage*28;
-        if(fromOCR && coverage<0.18) score-=25;
-        return {wine:w,score,coverage};
-      }).filter(x=>x.score>=24 && x.coverage>=0.12)
-        .sort((a,b)=>b.score-a.score || b.coverage-a.coverage)
-        .slice(0,6);
-
-      return ranked.map((x,i)=>{
-        const high=x.score>=78 && x.coverage>=0.3;
-        const medium=x.score>=50;
-        return {
-          wine:x.wine,
-          score:x.score,
-          confidence:high?'Alta confiança':medium?'Possível correspondência':'Revisar correspondência',
-          reason:`${Math.round(x.coverage*100)}% dos termos úteis reconhecidos`
-        };
-      });
-    },
-    scannerSearch(query){
-      this.scannerSearched=true;
-      this.scannerMessage='';
-      this.scannerMatches=this.scannerRank(query,false);
-      if(!this.scannerMatches.length) this.scannerMessage='Nenhum vinho cadastrado corresponde com segurança ao texto informado.';
-    },
-    scannerApplyOCRText(raw){
-      this.scannerOcrText=String(raw||'').replace(/\s+/g,' ').trim().slice(0,1400);
-      this.scannerSearched=true;
-      this.scannerMatches=this.scannerRank(this.scannerOcrText,true);
-      if(!this.scannerMatches.length){
-        this.scannerMessage='Não consegui relacionar este rótulo com segurança. Tente uma foto mais frontal ou use a busca manual.';
-      }else{
-        const top=this.scannerMatches[0], second=this.scannerMatches[1];
-        if(top.score>=86 && (!second || top.score-second.score>=18)){
-          this.scannerMessage='Rótulo reconhecido com alta confiança. Toque no resultado para abrir a ficha.';
-        }else{
-          this.scannerMessage='Encontrei candidatos. Confira a foto e o nome antes de abrir.';
-        }
-      }
-    },
-    async scannerLoadTesseract(){
-      if(window.Tesseract) return true;
-      if(this.scannerOcrLibLoading) return false;
-      this.scannerOcrLibLoading=true;
-      try{
-        await new Promise((resolve,reject)=>{
-          const s=document.createElement('script');
-          s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-          s.async=true;
-          s.onload=resolve;
-          s.onerror=reject;
-          document.head.appendChild(s);
-        });
-        return !!window.Tesseract;
-      }catch(e){
-        return false;
-      }finally{
-        this.scannerOcrLibLoading=false;
-      }
-    },
-    async handleLabelImage(ev){
-      const file=ev?.target?.files?.[0];
-      if(!file) return;
-      this.stopScanner();
-      this.scannerWorking=true;
-      this.scannerMatches=[];
-      this.scannerMessage='';
-      this.scannerOcrText='';
-      this.scannerSearched=false;
-      try{
-        // Prefer the browser's native TextDetector when available.
+        let text='';
         if('TextDetector' in window){
           const bmp=await createImageBitmap(file);
           const det=new TextDetector();
           const blocks=await det.detect(bmp);
-          const txt=blocks.map(x=>x.rawValue||'').join(' ');
-          if(txt.trim()){
-            this.scannerApplyOCRText(txt);
-            return;
-          }
+          try{bmp.close();}catch(e){}
+          text=(blocks||[]).map(x=>x.rawValue||'').join(' ');
+        }else{
+          const ok=await this.scannerLoadTesseract();
+          if(!ok){this.scannerSearched=true;this.scannerMessage='Não consegui carregar o leitor de texto. Verifique a internet e tente novamente.';return;}
+          // Redimensiona fotos enormes antes do OCR para acelerar no Android.
+          const bmp=await createImageBitmap(file);
+          const maxW=1200, scale=Math.min(1,maxW/bmp.width);
+          const canvas=this.$refs?.scannerCanvas||document.createElement('canvas');
+          canvas.width=Math.max(1,Math.round(bmp.width*scale));canvas.height=Math.max(1,Math.round(bmp.height*scale));
+          const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(bmp,0,0,canvas.width,canvas.height);try{bmp.close();}catch(e){}
+          const result=await this.scannerOcrWorker.recognize(canvas);
+          text=result?.data?.text||'';
         }
-        // Fallback loaded only when needed.
-        const ok=await this.scannerLoadTesseract();
-        if(!ok){
-          this.scannerSearched=true;
-          this.scannerMessage='Este navegador não possui leitura de rótulo nativa e o módulo OCR não pôde ser carregado. Use “Digitar” ou o código de barras.';
-          return;
-        }
-        const result=await Tesseract.recognize(file,'por+eng');
-        this.scannerApplyOCRText(result?.data?.text||'');
-      }catch(e){
+        const ranked=this.scannerRank(text,true);
+        const top=ranked[0], second=ranked[1];
+        const strong=!!top && (top.exactName||top.score>=105) && (!second||top.score-second.score>=28);
+        this.scannerOcrText=String(text||'').replace(/\s+/g,' ').trim().slice(0,1200);
         this.scannerSearched=true;
-        this.scannerMessage='Não foi possível ler esta imagem. Tente novamente com o rótulo de frente e bem iluminado.';
-      }finally{
-        this.scannerWorking=false;
-        if(ev?.target) ev.target.value='';
-      }
+        if(strong){this.scannerMatches=[top];this.scannerMessage='Rótulo reconhecido com alta confiança.';}
+        else {this.scannerMatches=ranked.slice(0,3);this.scannerMessage=ranked.length?'Encontrei possíveis rótulos, mas não vou escolher automaticamente. Confira os candidatos.':'Não consegui relacionar esta foto com segurança. Tente uma imagem mais frontal e próxima do nome do vinho.';}
+      }catch(e){this.scannerSearched=true;this.scannerMessage='Não foi possível ler esta imagem. Tente uma foto mais frontal, próxima e sem reflexo.';}
+      finally{this.scannerWorking=false;this.scannerOcrBusy=false;if(ev?.target)ev.target.value='';}
     },
-    scannerBarcodeValue(w){
-      return String(w?.ean||w?.barcode||w?.gtin||w?.ean13||'').replace(/\D/g,'');
-    },
-    scannerBarcodeIsPlausible(code=''){
-      const raw=String(code||'').replace(/\D/g,'');
-      if(![8,12,13,14].includes(raw.length)) return false;
-      const digits=[...raw].map(Number);
-      const check=digits.pop();
-      let sum=0, weight=3;
-      for(let i=digits.length-1;i>=0;i--){ sum+=digits[i]*weight; weight=weight===3?1:3; }
-      return ((10-(sum%10))%10)===check;
-    },
-    scannerFindByBarcode(code=''){
-      const raw=String(code||'').replace(/\D/g,'');
-      if(!raw) return null;
-      const direct=this.wines.find(w=>this.scannerBarcodeValue(w)===raw);
-      if(direct) return direct;
-      const mappedId=Number(this.scannerBarcodeMap?.[raw]);
-      if(Number.isFinite(mappedId)) return this.wines.find(w=>Number(w.id)===mappedId)||null;
-      return null;
-    },
-    scannerSaveBarcodeMap(){
-      try{ localStorage.setItem('vinhedoBarcodeMap',JSON.stringify(this.scannerBarcodeMap||{})); }catch(e){}
-    },
-    scannerRememberBarcode(wine){
-      const raw=String(this.scannerLastBarcode||this.scannerBarcode||'').replace(/\D/g,'');
-      const id=Number(wine?.id);
-      if(!this.scannerBarcodeIsPlausible(raw) || !Number.isFinite(id)) return false;
-      this.scannerBarcodeMap={...(this.scannerBarcodeMap||{}),[raw]:id};
-      this.scannerSaveBarcodeMap();
-      return true;
+    scannerSearch(query){
+      this.scannerSearched=true; this.scannerMessage='';
+      const q=this.scannerNormalize(query);
+      if(!q){this.scannerMatches=[];return;}
+      // Busca manual pode ser mais permissiva, mas não autoabre nada.
+      const toks=this.scannerTokens(q);
+      const rows=this.wines.map(w=>{
+        const t=this.scannerWineText(w), n=this.scannerNormalize(w.name), p=this.scannerNormalize(w.producer||w.vinicola||'');
+        let score=(n.includes(q)?100:0)+(p.includes(q)?50:0)+toks.reduce((a,x)=>a+(t.includes(x)?12:0),0);
+        return {wine:w,score,confidence:'Busca manual',reason:'resultado da busca'};
+      }).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||Number(a.wine.id)-Number(b.wine.id)).slice(0,6);
+      this.scannerMatches=rows;
+      if(!rows.length)this.scannerMessage='Nenhum vinho cadastrado corresponde ao texto informado.';
     },
     scannerSelectCandidate(m){
-      const wine=m?.wine;
-      if(!wine) return;
-      const learned=this.scannerLastBarcode ? this.scannerRememberBarcode(wine) : false;
-      this.scannerMatches=[{wine,score:learned?100:Number(m.score||0),confidence:learned?'Código vinculado':'Selecionado manualmente',reason:learned?'Código confirmado manualmente neste aparelho':(m.reason||'Selecionado manualmente')}];
-      this.scannerSearched=true;
-      this.scannerMessage='';
-      this.stopScanner();
+      const wine=m?.wine;if(!wine)return;
+      this.scannerMatches=[{...m,wine,confidence:'Confirmado por você'}];
+      this.scannerSearched=true;this.scannerMessage='';this.stopScanner();
     },
-    lookupBarcode(code='',fromCamera=false){
-      const raw=String(code||this.scannerBarcode||'').replace(/\D/g,'');
-      this.scannerBarcode=raw;
-      this.scannerLastBarcode=raw;
-      this.scannerSearched=true;
-      this.scannerMatches=[];
-      if(!this.scannerBarcodeIsPlausible(raw)){
-        this.scannerMessage='O código lido não passou na validação EAN/UPC. Reposicione a câmera e tente novamente.';
-        return null;
-      }
-      const wine=this.scannerFindByBarcode(raw);
-      if(wine){
-        this.scannerMatches=[{wine,score:100,confidence:'Código exato',reason:'EAN/UPC associado exatamente a este wineId'}];
-        this.scannerMessage='';
-        if(!fromCamera) this.stopScanner();
-        return wine;
-      }
-      this.scannerMessage='Código válido, mas ainda não associado a um vinho cadastrado.';
+    scannerRestart(){this.scannerReset();this.$nextTick(()=>this.startLiveLabelScanner());},
+    async handleLabelImage(ev){return this.handleScannerGallery(ev);},
+    scannerBarcodeValue(w){return String(w?.ean||w?.barcode||w?.gtin||w?.ean13||'').replace(/\D/g,'');},
+    lookupBarcode(code=''){
+      // Mantido apenas por compatibilidade com dados antigos; o fluxo V176 identifica o rótulo pela imagem.
+      const raw=String(code||'').replace(/\D/g,'');
+      const wine=raw?this.wines.find(w=>this.scannerBarcodeValue(w)===raw):null;
+      if(wine){this.scannerMatches=[{wine,score:100,confidence:'Código exato',reason:'EAN/UPC cadastrado'}];return wine;}
       return null;
     },
-    async startBarcodeScanner(){
-      return this.startLiveLabelScanner();
-    },
+    async startBarcodeScanner(){return this.startLiveLabelScanner();},
     stopScanner(){
-      if(this.scannerTimer){ clearTimeout(this.scannerTimer); this.scannerTimer=null; }
-      if(this.scannerAutoOpenTimer){ clearTimeout(this.scannerAutoOpenTimer); this.scannerAutoOpenTimer=null; }
+      if(this.scannerTimer){clearTimeout(this.scannerTimer);this.scannerTimer=null;}
+      if(this.scannerAutoOpenTimer){clearTimeout(this.scannerAutoOpenTimer);this.scannerAutoOpenTimer=null;}
       this.scannerTextDetector=null;
-      this.scannerStableWineId=null;
-      this.scannerStableHits=0;
-      if(this.scannerStream){
-        try{ this.scannerStream.getTracks().forEach(t=>t.stop()); }catch(e){}
-      }
-      this.scannerStream=null;
-      this.scannerDetector=null;
-      this.scannerCameraOn=false;
-      this.scannerTorchSupported=false;
-      this.scannerTorchOn=false;
-      try{
-        const v=this.$refs?.scannerVideo;
-        if(v) v.srcObject=null;
-      }catch(e){}
+      this.scannerStableWineId=null;this.scannerStableHits=0;
+      if(this.scannerStream){try{this.scannerStream.getTracks().forEach(t=>t.stop());}catch(e){}}
+      this.scannerStream=null;this.scannerDetector=null;this.scannerCameraOn=false;this.scannerTorchSupported=false;this.scannerTorchOn=false;
+      try{const v=this.$refs?.scannerVideo;if(v)v.srcObject=null;}catch(e){}
+      // O worker OCR fica carregado para a próxima leitura; isso reduz bastante a espera no Android.
     },
     surprisePool(){
       const moment=this.surpriseMoments.find(m=>m.name===this.surpriseMoment);
@@ -10486,7 +10402,7 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 </script>
 
 
-<script type="application/json" id="checkpoint-v175-scanner">{"version":"V175","date":"2026-09-05","scope":"Ler Código","changes":["leitura ao vivo somente por EAN/UPC nativo","remoção do OCR como fallback de código para impedir rótulo errado","validação de dígito verificador GTIN","reset completo entre leituras","loop ~5 leituras/s","autofoco contínuo quando suportado","mapeamento local código→wineId após confirmação manual","galeria sem chute por OCR"],"dataPreserved":true}</script>
+<script type="application/json" id="checkpoint-v176-scanner-label">{"version":"V176","date":"2026-09-05","scope":"Ler Rótulo por imagem","changes":["restaurado reconhecimento de rótulo por imagem","OCR persistente reutilizável","pré-carga em segundo plano","crop central e downscale para Android","ranking estrito por nome/produtor","sem autoescolha por uva/país","reset total a cada nova leitura","confirmação forte em duas leituras","galeria lê rótulo e não código de barras"],"dataPreserved":true}</script>
 </body>
 </html>
 
