@@ -2962,6 +2962,25 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
 }
 </style>
 
+
+<style id="v179-scanner-automatico-vertical">
+/* V179 — scanner visual automático, vertical e ampliado */
+.vp-scanner-content{padding-left:10px!important;padding-right:10px!important}
+.vp-scanner-camera-card{width:min(100%,560px);margin-inline:auto}
+.vp-scanner-camera-frame{width:100%!important;aspect-ratio:3/4!important;min-height:0!important;height:auto!important;max-height:72svh;border-radius:18px!important}
+.vp-scanner-camera-frame video{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center center!important}
+.vp-scanner-focus{width:82%!important;height:58%!important;min-height:0!important}
+.vp-scanner-camera-overlay p{top:18px!important;width:90%;font-size:13px!important;font-weight:800}
+.vp-scanner-processing{bottom:18px!important}
+.v179-auto-note{padding:10px 14px;text-align:center;font-size:11px;font-weight:900;letter-spacing:.05em;color:#153E2B;background:#F5E8C7;border-top:1px solid rgba(178,139,63,.25)}
+@media(max-width:640px){
+ .vp-scanner-content{padding:14px 8px 18px!important}
+ .vp-scanner-intro>h2{font-size:26px!important}
+ .vp-scanner-lead{margin-bottom:12px!important}
+ .vp-scanner-camera-frame{aspect-ratio:3/4!important;max-height:70svh!important}
+ .vp-scanner-focus{width:86%!important;height:60%!important}
+}
+</style>
 </head>
 <!-- V95 CONTINUIDADE: evidencias ZIP associadas=185; imagens faltantes preenchidas=39; preços despriorizados/ocultos na UI pública. -->
 <!-- V96: recuperacao de fotos pendentes + novos rotulos confirmados visualmente; sem exclusao insegura de rotulos duvidosos. -->
@@ -3371,7 +3390,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
           <section x-show="scannerMatches.length!==1" class="vp-scanner-intro">
             <p class="vp-scanner-kicker">LER RÓTULO</p>
             <h2>Identifique seu vinho pela imagem</h2>
-            <p class="vp-scanner-lead">Aponte a câmera para a frente do rótulo. O sistema lê nome e produtor e só confirma quando a correspondência é forte.</p>
+            <p class="vp-scanner-lead">Aponte a câmera para a frente do rótulo. O leitor trabalha sozinho: lê nome e produtor continuamente e cruza com os vinhos cadastrados.</p>
 
             <section class="vp-scanner-camera-card">
               <div class="vp-scanner-camera-frame">
@@ -3379,7 +3398,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
                 <canvas x-ref="scannerCanvas" class="hidden"></canvas>
 
                 <div class="vp-scanner-camera-overlay">
-                  <p x-show="scannerCameraOn">Centralize o nome do vinho e o produtor<br>dentro do quadro</p>
+                  <p x-show="scannerCameraOn">Centralize o rótulo inteiro na vertical<br>O reconhecimento é automático</p>
                   <div class="vp-scanner-focus" :class="scannerWorking||scannerOcrBusy?'is-processing':''">
                     <i></i><i></i><i></i><i></i>
                   </div>
@@ -3395,9 +3414,9 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
                 <div x-show="scannerCameraOn && (scannerWorking||scannerOcrBusy)" class="vp-scanner-processing">LENDO RÓTULO…</div>
               </div>
 
-              <div x-show="scannerCameraOn" style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-                <button type="button" class="vp-scanner-open-wine" style="flex:1;min-width:180px" @click="scannerCaptureLabel()" :disabled="scannerOcrBusy">IDENTIFICAR RÓTULO AGORA</button>
-                <button type="button" x-show="scannerTorchSupported" @click="scannerToggleTorch()" class="vp-scanner-open-wine" style="flex:0 0 auto" x-text="scannerTorchOn?'DESLIGAR LUZ':'LIGAR LUZ'"></button>
+              <div x-show="scannerCameraOn" class="v179-auto-note">AUTOMÁTICO • mantenha o rótulo centralizado por alguns instantes</div>
+              <div x-show="scannerCameraOn && scannerTorchSupported" style="display:flex;justify-content:center;margin-top:8px">
+                <button type="button" @click="scannerToggleTorch()" class="vp-scanner-open-wine" x-text="scannerTorchOn?'DESLIGAR LUZ':'LIGAR LUZ'"></button>
               </div>
 
               <div x-show="scannerMessage" class="vp-scanner-message" role="status">
@@ -7229,7 +7248,7 @@ function wineApp(){
       let stream=null;
       try{
         try{
-          stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1600,min:720},height:{ideal:1200,min:540}},audio:false});
+          stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1080,min:720},height:{ideal:1920,min:960},aspectRatio:{ideal:0.5625}},audio:false});
         }catch(firstError){
           stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
         }
@@ -7252,6 +7271,7 @@ function wineApp(){
         }
         try{await video.play();}catch(e){if(video.paused) throw e;}
         this.scannerCameraOn=true;
+        this.scannerMessage='Scanner automático ativo. Centralize o rótulo inteiro e mantenha a garrafa parada.';
         const track=stream.getVideoTracks?.()[0];
         try{
           const caps=track?.getCapabilities?.()||{};
@@ -7273,7 +7293,7 @@ function wineApp(){
           this.scannerLiveLoopCount++;
           try{
             const now=performance.now();
-            const interval=this.scannerTextDetector?420:1450;
+            const interval=this.scannerTextDetector?360:1050;
             if(!this.scannerOcrBusy && now-this.scannerLastScanAt>=interval && video.readyState>=2){
               this.scannerLastScanAt=now;
               await this.scannerReadVideoFrame(false);
@@ -7559,8 +7579,10 @@ function wineApp(){
       if(!canvas || !video?.videoWidth) return null;
       const vw=video.videoWidth, vh=video.videoHeight;
       // Duas janelas: uma mais ampla e uma mais fechada no nome principal.
-      const sw=Math.round(vw*(variant===1?0.78:0.90));
-      const sh=Math.round(vh*(variant===1?0.52:0.72));
+      const portrait=vh>=vw;
+      // Garrafa/rótulo é vertical. Em sensores que entregam vídeo landscape, usa faixa central estreita e alta.
+      const sw=Math.round(vw*(portrait?(variant===1?0.78:0.92):(variant===1?0.46:0.62)));
+      const sh=Math.round(vh*(portrait?(variant===1?0.62:0.84):(variant===1?0.86:0.96)));
       const sx=Math.round((vw-sw)/2), sy=Math.round((vh-sh)/2);
       const outW=Math.min(variant===1?1050:950,sw), outH=Math.max(1,Math.round(outW*sh/sw));
       canvas.width=outW; canvas.height=outH;
@@ -7586,7 +7608,8 @@ function wineApp(){
         let text='';
         if(this.scannerTextDetector){
           const vw=video.videoWidth, vh=video.videoHeight;
-          const sw=Math.round(vw*.90), sh=Math.round(vh*.72), sx=Math.round((vw-sw)/2), sy=Math.round((vh-sh)/2);
+          const portrait=vh>=vw;
+          const sw=Math.round(vw*(portrait?.92:.62)), sh=Math.round(vh*(portrait?.84:.96)), sx=Math.round((vw-sw)/2), sy=Math.round((vh-sh)/2);
           const bmp=await createImageBitmap(video,sx,sy,sw,sh);
           const blocks=await this.scannerTextDetector.detect(bmp);
           try{bmp.close();}catch(e){}
@@ -7597,7 +7620,8 @@ function wineApp(){
             if(force){this.scannerSearched=true;this.scannerMessage='O módulo de leitura de texto não conseguiu carregar. Tente novamente com internet ativa ou use uma foto da galeria.';}
             return false;
           }
-          const canvas=this.scannerPrepareCanvas(video,0);
+          const autoVariant=force?0:((this.scannerLiveLoopCount||0)%2);
+          const canvas=this.scannerPrepareCanvas(video,autoVariant);
           if(!canvas) return false;
           const result=await this.scannerOcrWorker.recognize(canvas);
           text=result?.data?.text||'';
@@ -10538,6 +10562,7 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 <!-- checkpoint-v177-label-name-crossmatch: OCR fuzzy name+producer catalog crossmatch; no stale fallback -->
 
 <!-- checkpoint-v178-scanner-rotulo-resiliente: OCR multi-pass, fuzzy nome/produtor, estados repetir/indisponivel -->
+<script type="application/json" id="checkpoint-v179-scanner-auto-vertical">{"version":"V179","date":"2026-09-05","scope":"Scanner de rótulos","changes":["visor vertical 3:4 ampliado","área de foco vertical 86%x60% no mobile","captura central adaptada à orientação real do sensor","preferência de câmera portrait 1080x1920","reconhecimento contínuo automático","botão manual removido do fluxo principal","crops OCR alternados automaticamente","intervalo OCR reduzido","falha não abre vinho e mantém estados repetir/indisponível"],"barcodeUsed":false,"dataPreserved":true}</script>
 </body>
 </html>
 
