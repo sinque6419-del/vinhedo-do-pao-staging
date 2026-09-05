@@ -19,11 +19,34 @@
   <meta name="twitter:image" content="https://vinhedo-do-pao-staging.vercel.app/assets/media/img_0003_5ecf509ed61e.jpg" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
+  <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            vinhedo: {
+              50:'#f5f8f6', 100:'#e8f0ec', 200:'#d0e0d8', 300:'#a9c7b8',
+              400:'#7ba892', 500:'#568b73', 600:'#3d705c', 700:'#315a4b',
+              800:'#28493d', 900:'#173a2f', 950:'#0d241d'
+            },
+            champagne:'#c9a96e',
+            cream:'#fbfaf6'
+          },
+          boxShadow: {
+            luxe:'0 18px 50px rgba(13,36,29,.12)',
+            soft:'0 8px 24px rgba(13,36,29,.08)'
+          }
+        }
+      }
+    }
+  </script>
+
   <link rel="preload" as="image" href="assets/media/img_0003_5ecf509ed61e.jpg" fetchpriority="high">
 <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/focus@3.16.3/dist/cdn.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.16.3/dist/cdn.min.js"></script>
-  <link rel="stylesheet" href="assets/css/tailwind.css">
 <style>
     [x-cloak]{display:none!important}
     html{scroll-behavior:smooth}
@@ -2493,6 +2516,100 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
 .v119-primary[disabled]{opacity:.72;cursor:wait;pointer-events:none}
 </style>
 
+
+<style id="v162-wine-detail-hardening">
+/* V162 — ficha individual nunca participa do fluxo normal da página */
+.v150-wine-page{
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483000!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  width:100%!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  background:#f5f0e5!important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.v150-wine-page[style*="display: none"]{display:none!important}
+.v150-wine-page .v150-wine-shell{
+  position:relative;
+  min-height:100%;
+  width:100%;
+  margin:0 auto;
+}
+@media(max-width:699px){
+  .v150-wine-page{height:100dvh!important;max-height:100dvh!important}
+  .v150-wine-page .v150-wine-topbar{
+    position:sticky!important;
+    top:0!important;
+    z-index:50!important;
+  }
+  .v150-wine-page .v150-wine-bottom{
+    position:sticky!important;
+    bottom:0!important;
+    z-index:50!important;
+  }
+}
+</style>
+
+
+<style id="v163-regression-hardening">
+/* V163 — hardening pós-regressão. Apenas componentes críticos. */
+.v150-wine-page{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  height:100dvh!important;
+  max-width:none!important;
+  max-height:100dvh!important;
+  margin:0!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  z-index:2147483000!important;
+  background:#f5f0e5!important;
+  contain:layout paint;
+}
+.v150-wine-page[x-cloak]{display:none!important}
+.v150-wine-page .v150-wine-shell{
+  width:100%!important;
+  min-height:100%!important;
+  margin:0 auto!important;
+}
+.v150-wine-page .v150-wine-topbar{
+  position:sticky!important;
+  top:0!important;
+  z-index:100!important;
+}
+.v150-wine-page .v150-wine-bottom{
+  position:sticky!important;
+  bottom:0!important;
+  z-index:100!important;
+}
+.v150-wine-page .v150-wine-copy h1{
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+@media(max-width:699px){
+  .v150-wine-page{
+    width:100%!important;
+    min-width:0!important;
+  }
+  .v150-wine-page .v150-wine-shell{
+    max-width:100%!important;
+    border-left:0!important;
+    border-right:0!important;
+  }
+  .v150-wine-page .v150-wine-copy{
+    min-width:0!important;
+  }
+  .v150-wine-page .v150-primary-actions{
+    min-width:0!important;
+  }
+}
+</style>
+
 </head>
 <!-- V95 CONTINUIDADE: evidencias ZIP associadas=185; imagens faltantes preenchidas=39; preços despriorizados/ocultos na UI pública. -->
 <!-- V96: recuperacao de fotos pendentes + novos rotulos confirmados visualmente; sem exclusao insegura de rotulos duvidosos. -->
@@ -3883,7 +4000,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
       </div>
       <div class="md:text-right">
         <div class="text-champagne font-semibold">Feito por Lucas Emanuel - Atendente de Vinhos</div>
-        <div class="text-white/50 text-xs mt-2">Valores exibidos como referência fixa do guia; a loja física e o e-commerce podem sofrer alterações.</div>
+        
       </div>
     </div>
   </footer>
@@ -6259,9 +6376,11 @@ function wineApp(){
             this.routeNotice='';
             this.selectedWine=wine;
             this.showWineDetail=true;
+            this.setWineDetailScrollLock(true);
           }else{
             this.showWineDetail=false;
             this.selectedWine=null;
+            this.setWineDetailScrollLock(false);
             this.routeNotice='Esse vinho não existe mais no catálogo. Você voltou para o início.';
             this.setScreen('home','','',false);
             try{history.replaceState({vinhedo:true,screen:'home'},'','#home');}catch(e){}
@@ -6294,6 +6413,7 @@ function wineApp(){
         this.closeWineVideo();
         this.showWineDetail=false;
         this.selectedWine=null;
+        this.setWineDetailScrollLock(false);
         if(!/^#receita\//.test(location.hash)) this.recipeOpenId='';
         this.syncScreenFromLocation();
         openFromHash();
@@ -7216,7 +7336,17 @@ function wineApp(){
       const left=pool.length-seenHere;
       return left>0 ? `${left} rótulos diferentes ainda podem surpreender você neste momento.` : 'Você conheceu todas as opções desta rodada. A próxima surpresa inicia uma nova volta sem sair da seleção da adega.';
     },
+    setWineDetailScrollLock(active){
+      try{
+        document.documentElement.style.overflow=active?'hidden':'';
+        document.body.style.overflow=active?'hidden':(this.screen==='home'?'hidden':'');
+      }catch(e){}
+    },
     openWine(wine){
+      const requestedId=Number(wine?.id);
+      const canonicalWine=this.wines.find(w=>Number(w.id)===requestedId) || wine;
+      if(!canonicalWine) return;
+      wine=canonicalWine;
       this.stopScanner();
       this.stopWineAudio();
       this.wineAudioCurrent=0;this.wineAudioDuration=0;this.wineAudioProgress=0;
@@ -7229,6 +7359,7 @@ function wineApp(){
       this.selectedWine=wine;
       this.wineTab='overview';
       this.showWineDetail=true;
+      this.setWineDetailScrollLock(true);
       this.$nextTick(()=>this.$refs.wineDialog?.focus());
       const returnHash=location.hash||'#home';
       try{
@@ -7243,6 +7374,7 @@ function wineApp(){
     closeWine(){ this.closeWineVideo();
       this.showWineDetail=false;
       this.selectedWine=null;
+      this.setWineDetailScrollLock(false);
       if(location.hash.startsWith('#vinho/')){
         const st=history.state||{};
         if(st.vinhedo===true && st.kind==='wine'){
@@ -7640,22 +7772,22 @@ function wineApp(){
     },
     wineImage(wine){
       if(!wine) return this.winePlaceholder();
-      wine._imageIndex = wine._imageIndex || 0;
-      return (wine.imageCandidates && wine.imageCandidates[wine._imageIndex]) || wine.image || this.winePlaceholder();
+      const primary=String(wine.image||'').trim();
+      const candidates=Array.isArray(wine.imageCandidates)?wine.imageCandidates.filter(Boolean):[];
+      return primary || candidates[0] || this.winePlaceholder();
     },
     nextWineImage(event, wine){
       if(!event || !event.target) return;
       if(!wine){ event.target.src=this.winePlaceholder(); return; }
-      wine._imageIndex = (wine._imageIndex || 0) + 1;
-      const next = wine.imageCandidates && wine.imageCandidates[wine._imageIndex];
-      if(next){
-        event.target.style.display = '';
-        event.target.src = next;
-        return;
-      }
-      if(wine.image && event.target.src && !String(event.target.src).includes(String(wine.image))){
+      const primary=String(wine.image||'').trim();
+      const candidates=Array.isArray(wine.imageCandidates)?wine.imageCandidates.filter(Boolean):[];
+      const sources=[primary,...candidates].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i);
+      const currentIndex=Number(event.target.dataset.vdpWineImageIndex||0);
+      const nextIndex=currentIndex+1;
+      if(nextIndex<sources.length){
+        event.target.dataset.vdpWineImageIndex=String(nextIndex);
         event.target.style.display='';
-        event.target.src=wine.image;
+        event.target.src=sources[nextIndex];
         return;
       }
       event.target.style.display='';
@@ -9738,6 +9870,45 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 
 
 <script type="application/json" id="checkpoint-v161-reported-mobile-fixes">{"version":"V161","date":"2026-09-04","fixes":["remove visible cheese methodology/photo-source blocks","expand mobile Home artwork with controlled crop","remove public wine ratings","reset Encontre seu Vinho and Tenho um Vinho when reopened from tools","add loading state to Encontre seu Vinho","keep wine title readable on light card over hero"],"dataMutation":false}</script>
+
+<script type="application/json" id="checkpoint-v162-wine-detail-bugfix">
+{
+  "version":"V162",
+  "fixes":[
+    "wine detail forced fullscreen independently of Tailwind utilities",
+    "openWine canonicalizes the selected wine using wine.id",
+    "wineImage prioritizes official wine.image before imageCandidates",
+    "image fallback state is local to each img element",
+    "footer fixed-price reference message removed",
+    "full Tailwind utility runtime restored after incomplete local build caused layout regression"
+  ]
+}
+</script>
+
+
+<script type="application/json" id="checkpoint-v163-general-regression-audit">
+{
+  "version":"V163",
+  "scope":"auditoria geral de regressão após atualização de produção",
+  "bugsConfirmedAndFixed":[
+    "CSS Tailwind local incompleto concorrendo com Tailwind runtime",
+    "ficha de vinho dependente de utilitários ausentes para se comportar como overlay",
+    "bloqueio de scroll dependente de :has() e estado visual",
+    "abertura direta por hash sem hardening explícito do fundo",
+    "restauração de histórico sem desbloqueio explícito do overlay"
+  ],
+  "preserved":[
+    "309 vinhos",
+    "700 receitas",
+    "200 pizzas",
+    "230 queijos",
+    "IDs e relações",
+    "Home e arte oficial",
+    "Favoritos e Minha Seleção"
+  ]
+}
+</script>
+
 </body>
 </html>
 
