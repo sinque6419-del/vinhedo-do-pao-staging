@@ -4760,6 +4760,9 @@ function wineApp(){
     scannerOcrHistory:[],
     scannerVoteMap:{},
     scannerOcrStatus:'',
+    scannerCatalogIndex:null,
+    scannerFastPasses:0,
+    scannerLastRecognizeMs:0,
     wineVideoOpen:false,
     wineVideoInlineOpen:false,
     wineAudioMap:{"2":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=903b21d6-b2a5-4bf8-be4a-014e1bda1175.wav","duration":42.39673469387755,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"6":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c76d1771-ac68-4544-80a2-fe3fe035f1d3.wav","duration":42.266122448979594,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"7":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=42bf7958-f580-46d3-8fad-6caf3f3b92a3.wav","duration":43.07591836734694,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"9":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ce9044a5-2072-4a3d-b71d-3d754cb7dd60.wav","duration":39.88897959183674,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"11":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=4c6828a5-e01d-4119-9c17-a0fdccbb488a.wav","duration":42.21387755102041,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"12":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c85f6413-f463-4382-a645-c060f324b086.wav","duration":41.6130612244898,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"13":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ed0eb5f3-fe79-4ec7-a0a9-eeb0d29fef60.wav","duration":38.50448979591837,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"14":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=83ea4640-3b78-4426-9aa7-2cab284f935e.wav","duration":41.48244897959184,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"15":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=f82e1682-96c4-425c-b335-8d682aeb59aa.wav","duration":40.333061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"16":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=b444d427-77b2-4eb3-b15f-58f15d1dec26.wav","duration":38.53061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"20":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=a78f2494-0c0a-4e00-9045-d7ff85a4cd06.wav","duration":39.053061224489795,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"21":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=51c64f38-e395-4576-ad57-9039a418b1c1.wav","duration":39.20979591836735,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"22":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=3b017629-e23b-436d-bac2-3f40b80ef065.wav","duration":36.96326530612245,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"25":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=14130435-cc40-4b03-8a77-ec501e87b6c6.wav","duration":38.21714285714286,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"}},
@@ -7237,6 +7240,8 @@ function wineApp(){
       this.scannerOcrHistory=[];
       this.scannerVoteMap={};
       this.scannerOcrStatus='';
+      this.scannerFastPasses=0;
+      this.scannerLastRecognizeMs=0;
 
       if(!window.isSecureContext){
         this.scannerSearched=true;
@@ -7297,7 +7302,7 @@ function wineApp(){
           this.scannerLiveLoopCount++;
           try{
             const now=performance.now();
-            const interval=this.scannerTextDetector?300:850;
+            const interval=this.scannerTextDetector?250:450;
             if(!this.scannerOcrBusy && now-this.scannerLastScanAt>=interval && video.readyState>=2){
               this.scannerLastScanAt=now;
               await this.scannerReadVideoFrame(false);
@@ -7377,10 +7382,45 @@ function wineApp(){
     scannerWineText(w){
       return this.scannerNormalize([w.name,w.producer,w.vinicola,w.grapes,w.grapeRegion,w.country,w.region,w.denominacao,w.vintage,w.type,w.estilo].filter(Boolean).join(' '));
     },
-    scannerDistinctiveParts(w){
+    scannerNameAliases(w){
       const name=this.scannerNormalize(w?.name||'');
       const producer=this.scannerNormalize(w?.producer||w?.vinicola||'');
-      return {name,producer,nameTokens:this.scannerTokens(name),producerTokens:this.scannerTokens(producer)};
+      const remove=new Set([
+        ...this.scannerTokens(Array.isArray(w?.grapes)?w.grapes.join(' '):(w?.grapes||'')),
+        ...this.scannerTokens(w?.grapeRegion||''),
+        ...this.scannerTokens(w?.country||''),
+        ...this.scannerTokens(w?.region||''),
+        ...this.scannerTokens(w?.type||''),
+        String(w?.vintage||'')
+      ]);
+      const generic=new Set(['cabernet','sauvignon','malbec','merlot','chardonnay','syrah','shiraz','pinot','noir','grigio','gris','riesling','tannat','tempranillo','carmenere','moscato','trebbiano','blend','rose','branco','tinto']);
+      let core=this.scannerTokens(name).filter(t=>!remove.has(t)&&!generic.has(t));
+      if(!core.length) core=this.scannerTokens(name);
+      const aliases=new Set();
+      if(name) aliases.add(name);
+      if(core.length) aliases.add(core.join(' '));
+      if(core.length>=2) aliases.add(core.slice(0,2).join(' '));
+      if(core.length>=3) aliases.add(core.slice(0,3).join(' '));
+      // Algumas fichas incluem safra/uva no nome, mas a frente do rótulo mostra só marca/linha.
+      // Mantemos essas formas curtas para o OCR cruzar o que realmente aparece na garrafa.
+      return {name,producer,coreTokens:core,aliases:[...aliases].filter(x=>x.length>=3)};
+    },
+    scannerEnsureCatalogIndex(){
+      if(Array.isArray(this.scannerCatalogIndex) && this.scannerCatalogIndex.length===this.wines.length) return this.scannerCatalogIndex;
+      const producerCount=new Map();
+      for(const w of this.wines){
+        const p=this.scannerNormalize(w?.producer||w?.vinicola||'');
+        if(p) producerCount.set(p,(producerCount.get(p)||0)+1);
+      }
+      this.scannerCatalogIndex=this.wines.map(w=>{
+        const a=this.scannerNameAliases(w);
+        return {wine:w,...a,nameTokens:this.scannerTokens(a.name),producerTokens:this.scannerTokens(a.producer),uniqueProducer:!!a.producer&&producerCount.get(a.producer)===1,allText:this.scannerWineText(w)};
+      });
+      return this.scannerCatalogIndex;
+    },
+    scannerDistinctiveParts(w){
+      const a=this.scannerNameAliases(w);
+      return {name:a.name,producer:a.producer,nameTokens:this.scannerTokens(a.name),producerTokens:this.scannerTokens(a.producer),aliases:a.aliases,coreTokens:a.coreTokens};
     },
     scannerEditDistance(a,b){
       a=String(a||''); b=String(b||'');
@@ -7422,76 +7462,70 @@ function wineApp(){
       if(!q || !ocrTokens.length) return [];
       const qCompact=q.replace(/\s+/g,'');
       const ranked=[];
-      for(const w of this.wines){
-        const p=this.scannerDistinctiveParts(w);
-        if(!p.nameTokens.length) continue;
-        const nameCompact=p.name.replace(/\s+/g,'');
-        const producerCompact=p.producer.replace(/\s+/g,'');
-        const exactName=p.name.length>=4 && (q.includes(p.name) || (nameCompact.length>=6 && qCompact.includes(nameCompact)));
-        const exactProducer=p.producer.length>=4 && (q.includes(p.producer) || (producerCompact.length>=6 && qCompact.includes(producerCompact)));
-
-        // Similaridade do nome completo ajuda quando o OCR cola/separa palavras ("SantaJulia" / "Santa Julia")
-        // ou erra uma ou duas letras, sem depender de país/uva.
-        let compactNear=0;
-        if(nameCompact.length>=6){
-          const qParts=qCompact.length<=64?[qCompact]:[];
-          if(qCompact.length>=nameCompact.length-3){
-            const win=Math.min(qCompact.length,Math.max(nameCompact.length+3,nameCompact.length));
-            for(let i=0;i<=Math.max(0,qCompact.length-win);i+=Math.max(1,Math.floor(nameCompact.length/4))){
-              qParts.push(qCompact.slice(i,i+win));
+      const index=this.scannerEnsureCatalogIndex();
+      for(const e of index){
+        const w=e.wine;
+        const nameCompact=e.name.replace(/\s+/g,'');
+        const producerCompact=e.producer.replace(/\s+/g,'');
+        let bestAliasExact=false,bestAliasNear=0,bestAlias='';
+        for(const alias of e.aliases){
+          const ac=alias.replace(/\s+/g,'');
+          if(alias.length>=4 && (q.includes(alias)||(ac.length>=5&&qCompact.includes(ac)))){bestAliasExact=true;bestAlias=alias;break;}
+          if(ac.length>=5 && qCompact.length>=4){
+            // Compara a forma compacta contra janelas do OCR; tolera 1–3 erros típicos sem virar chute livre.
+            const min=Math.max(4,ac.length-3), max=Math.min(qCompact.length,ac.length+3);
+            for(let len=min;len<=max;len++){
+              const step=Math.max(1,Math.floor(ac.length/3));
+              for(let i=0;i<=qCompact.length-len;i+=step){
+                const part=qCompact.slice(i,i+len), d=this.scannerEditDistance(ac,part);
+                const sim=1-d/Math.max(ac.length,part.length||1);
+                if(sim>bestAliasNear){bestAliasNear=sim;bestAlias=alias;}
+              }
             }
           }
-          for(const part of qParts){
-            const d=this.scannerEditDistance(nameCompact,part);
-            compactNear=Math.max(compactNear,1-d/Math.max(nameCompact.length,part.length||1));
-          }
         }
-
+        const exactName=e.name.length>=4 && (q.includes(e.name)||(nameCompact.length>=6&&qCompact.includes(nameCompact)));
+        const exactProducer=e.producer.length>=4 && (q.includes(e.producer)||(producerCompact.length>=6&&qCompact.includes(producerCompact)));
         let nameScore=0,nameExact=0,nameMatched=0;
-        for(const t of p.nameTokens){
-          const m=this.scannerBestTokenMatch(t,ocrTokens);
-          if(m.score>0){nameMatched++;nameScore+=m.score;if(m.exact)nameExact++;}
-        }
+        for(const t of e.nameTokens){const m=this.scannerBestTokenMatch(t,ocrTokens);if(m.score>0){nameMatched++;nameScore+=m.score;if(m.exact)nameExact++;}}
+        let coreScore=0,coreMatched=0;
+        for(const t of e.coreTokens){const m=this.scannerBestTokenMatch(t,ocrTokens);if(m.score>0){coreMatched++;coreScore+=m.score;}}
         let producerScore=0,producerMatched=0;
-        for(const t of p.producerTokens){
-          const m=this.scannerBestTokenMatch(t,ocrTokens);
-          if(m.score>0){producerMatched++;producerScore+=m.score;}
-        }
-        const nameCoverage=p.nameTokens.length?nameScore/p.nameTokens.length:0;
-        const producerCoverage=p.producerTokens.length?producerScore/p.producerTokens.length:0;
-
-        // Pequena evidência auxiliar, nunca suficiente sozinha para confirmar.
-        const allText=this.scannerWineText(w), qSet=new Set(ocrTokens);
+        for(const t of e.producerTokens){const m=this.scannerBestTokenMatch(t,ocrTokens);if(m.score>0){producerMatched++;producerScore+=m.score;}}
+        const nameCoverage=e.nameTokens.length?nameScore/e.nameTokens.length:0;
+        const coreCoverage=e.coreTokens.length?coreScore/e.coreTokens.length:0;
+        const producerCoverage=e.producerTokens.length?producerScore/e.producerTokens.length:0;
         let metaHits=0;
-        for(const t of qSet){if(allText.includes(t) && !p.nameTokens.includes(t) && !p.producerTokens.includes(t)) metaHits++;}
-
-        // O vinho só entra se o NOME do rótulo foi realmente reconhecido (exato ou fuzzy).
+        for(const t of ocrTokens){if(e.allText.includes(t)&&!e.nameTokens.includes(t)&&!e.producerTokens.includes(t)) metaHits++;}
         let eligible=false;
-        if(exactName) eligible=true;
-        else if(compactNear>=0.80) eligible=true;
-        else if(p.nameTokens.length===1 && nameCoverage>=0.72) eligible=true;
-        else if(p.nameTokens.length===2 && nameCoverage>=0.48 && nameMatched>=1) eligible=true;
-        else if(p.nameTokens.length>=3 && nameCoverage>=0.40 && nameMatched>=2) eligible=true;
+        if(exactName||bestAliasExact) eligible=true;
+        else if(bestAliasNear>=.78) eligible=true;
+        else if(coreMatched>=1 && coreCoverage>=.60) eligible=true;
+        else if(e.nameTokens.length===1 && nameCoverage>=.68) eligible=true;
+        else if(nameMatched>=2 && nameCoverage>=.40) eligible=true;
+        else if(exactProducer && e.uniqueProducer && producerCompact.length>=5) eligible=true;
+        else if(producerCoverage>=.75 && coreMatched>=1) eligible=true;
         if(!eligible) continue;
-
         let score=0;
-        if(exactName) score+=180;
-        if(exactProducer) score+=45;
-        score+=Math.max(0,compactNear)*50;
-        score+=nameCoverage*120;
-        score+=Math.min(nameMatched,4)*16;
-        score+=Math.min(nameExact,3)*10;
-        score+=producerCoverage*34;
-        score+=Math.min(metaHits,2)*4;
-        if(fromOCR && !exactName && nameCoverage<0.58) score-=18;
-
-        ranked.push({wine:w,score,nameCoverage,producerCoverage,nameMatched,producerMatched,exactName,exactProducer,compactNear});
+        if(exactName) score+=190;
+        if(bestAliasExact) score+=165;
+        if(exactProducer) score+=50;
+        score+=Math.max(0,bestAliasNear)*72;
+        score+=coreCoverage*120;
+        score+=nameCoverage*82;
+        score+=Math.min(coreMatched,3)*22;
+        score+=Math.min(nameExact,3)*8;
+        score+=producerCoverage*38;
+        score+=Math.min(metaHits,2)*5;
+        if(exactProducer&&e.uniqueProducer) score+=40;
+        if(fromOCR&&!exactName&&!bestAliasExact&&coreCoverage<.52&&producerCoverage<.65) score-=12;
+        ranked.push({wine:w,score,nameCoverage:Math.max(nameCoverage,coreCoverage),producerCoverage,exactName:exactName||bestAliasExact,alias:bestAlias,aliasNear:bestAliasNear});
       }
-      ranked.sort((a,b)=>b.score-a.score || b.nameCoverage-a.nameCoverage || b.producerCoverage-a.producerCoverage || Number(a.wine.id)-Number(b.wine.id));
+      ranked.sort((a,b)=>b.score-a.score||b.nameCoverage-a.nameCoverage||b.producerCoverage-a.producerCoverage||Number(a.wine.id)-Number(b.wine.id));
       return ranked.slice(0,5).map(x=>({
         wine:x.wine,score:x.score,nameCoverage:x.nameCoverage,producerCoverage:x.producerCoverage,exactName:x.exactName,
-        confidence:(x.exactName||x.score>=170||x.nameCoverage>=.82)?'Alta confiança':x.score>=105?'Boa correspondência':'Conferir',
-        reason:x.exactName?'nome do rótulo reconhecido':`nome do rótulo ${Math.round(x.nameCoverage*100)}% compatível${x.producerCoverage>=.45?' + produtor compatível':''}`
+        confidence:(x.exactName||x.score>=165||x.nameCoverage>=.78)?'Alta confiança':x.score>=100?'Boa correspondência':'Conferir',
+        reason:x.exactName?'nome/linha do rótulo reconhecido':`nome do rótulo ${Math.round(x.nameCoverage*100)}% compatível${x.producerCoverage>=.45?' + produtor compatível':''}`
       }));
     },
     scannerAcceptOCRText(raw,auto=true){
@@ -7514,8 +7548,8 @@ function wineApp(){
       const ranked=this.scannerRank(clean,true);
       const top=ranked[0], second=ranked[1];
       const margin=!second?999:top.score-second.score;
-      const veryStrong=!!top && (top.exactName || top.nameCoverage>=.86 || top.score>=178) && margin>=12;
-      const strong=!!top && (top.nameCoverage>=.58 || top.score>=118) && margin>=10;
+      const veryStrong=!!top && (top.exactName || top.nameCoverage>=.78 || top.score>=165) && margin>=10;
+      const strong=!!top && (top.nameCoverage>=.50 || top.score>=100 || top.producerCoverage>=.78) && margin>=8;
 
       if(!ranked.length){
         this.scannerMatches=[];
@@ -7549,7 +7583,7 @@ function wineApp(){
         return true;
       }
       this.scannerMatches=[];
-      this.scannerMessage='Nome encontrado. Confirmando automaticamente… mantenha o rótulo parado.';
+      this.scannerMessage='Nome encontrado. Confirmando automaticamente… mantenha o rótulo parado por um instante.';
       return false;
     },
     async scannerLoadTesseract(){
@@ -7574,8 +7608,8 @@ function wineApp(){
         this.scannerOcrWorker=await Tesseract.createWorker('eng');
         try{await this.scannerOcrWorker.setParameters({
           preserve_interword_spaces:'1',
-          user_defined_dpi:'300',
-          tessedit_pageseg_mode:'11'
+          user_defined_dpi:'180',
+          tessedit_pageseg_mode:'6'
         });}catch(e){}
         this.scannerOcrReady=!!this.scannerOcrWorker;
         return this.scannerOcrReady;
@@ -7586,33 +7620,26 @@ function wineApp(){
     scannerPrepareCanvas(video,variant=0){
       const canvas=this.$refs?.scannerCanvas;
       if(!canvas || !video?.videoWidth) return null;
-      const vw=video.videoWidth, vh=video.videoHeight;
-      const portrait=vh>=vw;
-      // Mantém uma janela vertical grande, mas alterna entre rótulo inteiro e região central do nome.
-      const sw=Math.round(vw*(portrait?(variant===1?0.84:0.96):(variant===1?0.54:0.70)));
-      const sh=Math.round(vh*(portrait?(variant===1?0.70:0.90):(variant===1?0.90:0.98)));
-      const sx=Math.max(0,Math.round((vw-sw)/2)), sy=Math.max(0,Math.round((vh-sh)/2));
-      const outW=Math.min(variant===1?1180:1080,Math.max(640,sw));
+      const vw=video.videoWidth, vh=video.videoHeight, portrait=vh>=vw;
+      // V181: primeiro passe pequeno e focado no nome (rápido); segundo passe abre a área quando necessário.
+      const fast=variant===0;
+      const sw=Math.round(vw*(portrait?(fast?.82:.94):(fast?.58:.72)));
+      const sh=Math.round(vh*(portrait?(fast?.56:.82):(fast?.82:.96)));
+      const sx=Math.max(0,Math.round((vw-sw)/2));
+      // Em rótulos verticais, desloca levemente para cima: marca/nome costuma estar do centro para cima.
+      const sy=Math.max(0,Math.min(vh-sh,Math.round((vh-sh)*(portrait?.42:.50))));
+      const targetW=fast?680:800;
+      const outW=Math.min(targetW,Math.max(480,sw));
       const outH=Math.max(1,Math.round(outW*sh/sw));
       canvas.width=outW; canvas.height=outH;
       const ctx=canvas.getContext('2d',{willReadFrequently:true});
       ctx.drawImage(video,sx,sy,sw,sh,0,0,outW,outH);
-
-      // variant 0 = imagem natural (muitos rótulos funcionam melhor sem filtro)
-      // variant 1 = cinza + contraste moderado para letras de baixo contraste.
-      if(variant===1){
+      if(!fast){
         try{
-          const img=ctx.getImageData(0,0,outW,outH), d=img.data;
-          let sum=0;
+          const img=ctx.getImageData(0,0,outW,outH), d=img.data; let sum=0;
           for(let i=0;i<d.length;i+=4) sum+=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-          const mean=sum/(d.length/4||1);
-          const gain=mean<105?1.28:mean>190?1.18:1.38;
-          const lift=mean<105?150:136;
-          for(let i=0;i<d.length;i+=4){
-            const g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-            const c=Math.max(0,Math.min(255,(g-128)*gain+lift));
-            d[i]=d[i+1]=d[i+2]=c;
-          }
+          const mean=sum/(d.length/4||1), gain=mean<105?1.20:mean>190?1.12:1.28, lift=mean<105?146:134;
+          for(let i=0;i<d.length;i+=4){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2],c=Math.max(0,Math.min(255,(g-128)*gain+lift));d[i]=d[i+1]=d[i+2]=c;}
           ctx.putImageData(img,0,0);
         }catch(e){}
       }
@@ -7647,23 +7674,18 @@ function wineApp(){
             return false;
           }
           this.scannerOcrStatus='Lendo nome do rótulo…';
-          const variant=force?0:((this.scannerLiveLoopCount||0)%2);
+          // Passe 1: rápido, focado no nome. Só amplia depois de falhas consecutivas.
+          const needBroad=force || (this.scannerUnreadableHits||0)>=1 || (this.scannerUnavailableHits||0)>=1 || ((this.scannerLiveLoopCount||0)%4===0);
+          const variant=needBroad?1:0;
           const canvas=this.scannerPrepareCanvas(video,variant);
           if(!canvas) return false;
-          try{await this.scannerOcrWorker.setParameters({tessedit_pageseg_mode:'11'});}catch(e){}
+          try{await this.scannerOcrWorker.setParameters({tessedit_pageseg_mode:needBroad?'11':'6'});}catch(e){}
+          const t0=performance.now();
           const r1=await this.scannerOcrWorker.recognize(canvas);
+          this.scannerLastRecognizeMs=Math.round(performance.now()-t0);
           const t1=String(r1?.data?.text||'').trim();
           if(t1) texts.push(t1);
-
-          // Em captura forçada, tenta também a versão contrastada/fechada.
-          if(force){
-            const canvas2=this.scannerPrepareCanvas(video,1);
-            if(canvas2){
-              const r2=await this.scannerOcrWorker.recognize(canvas2);
-              const t2=String(r2?.data?.text||'').trim();
-              if(t2) texts.push(t2);
-            }
-          }
+          this.scannerFastPasses=(this.scannerFastPasses||0)+1;
         }
 
         const current=texts.filter(Boolean).join(' ');
@@ -10604,6 +10626,7 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 <!-- checkpoint-v178-scanner-rotulo-resiliente: OCR multi-pass, fuzzy nome/produtor, estados repetir/indisponivel -->
 <script type="application/json" id="checkpoint-v179-scanner-auto-vertical">{"version":"V179","date":"2026-09-05","scope":"Scanner de rótulos","changes":["visor vertical 3:4 ampliado","área de foco vertical 86%x60% no mobile","captura central adaptada à orientação real do sensor","preferência de câmera portrait 1080x1920","reconhecimento contínuo automático","botão manual removido do fluxo principal","crops OCR alternados automaticamente","intervalo OCR reduzido","falha não abre vinho e mantém estados repetir/indisponível"],"barcodeUsed":false,"dataPreserved":true}</script>
 <!-- checkpoint-v180-scanner-ocr-evidence -->
+<script type="application/json" id="checkpoint-v181-scanner-fast-match">{"version":"V181","date":"2026-09-05","scope":"scanner automático de rótulos","changes":["OCR fast-pass 680px antes do passe amplo","PSM 6 rápido e PSM 11 somente quando necessário","índice de catálogo precomputado","aliases de nome removendo safra/uva/tipo para cruzar o texto que aparece na frente do rótulo","produtor único pode confirmar com segurança","limiares ajustados para reduzir falsos negativos sem fallback aleatório","intervalo de tentativa reduzido"],"barcodeUsed":false,"dataPreserved":true}</script>
 </body>
 </html>
 
