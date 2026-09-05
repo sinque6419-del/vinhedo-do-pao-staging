@@ -3451,7 +3451,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
             </section>
 
             <section x-show="scannerMatches.length>1" class="vp-scanner-candidates">
-              <p class="vp-scanner-kicker">CONFIRA AS POSSÍVEIS CORRESPONDÊNCIAS</p>
+              <p class="vp-scanner-kicker">RESULTADOS DA BUSCA MANUAL</p>
               <template x-for="m in scannerMatches" :key="m.wine.id">
                 <button type="button" @click="scannerSelectCandidate(m)" class="vp-scanner-candidate">
                   <img :src="wineImage(m.wine)" :alt="m.wine.name" loading="lazy" @error="nextWineImage($event,m.wine)">
@@ -3466,7 +3466,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
               <div class="vp-scanner-how-grid">
                 <article><span>▯</span><b>1. Rótulo de frente</b><p>Enquadre principalmente o nome e o produtor, sem inclinar a garrafa.</p></article>
                 <article><span>☼</span><b>2. Evite reflexo</b><p>Use boa luz, mas sem brilho forte sobre as letras.</p></article>
-                <article><span>✓</span><b>3. Confirmação segura</b><p>Se a leitura não for forte, mostramos candidatos em vez de chutar outro vinho.</p></article>
+                <article><span>✓</span><b>3. Confirmação segura</b><p>O scanner só abre um vinho quando encontra uma correspondência única e segura.</p></article>
               </div>
             </section>
           </section>
@@ -7438,12 +7438,14 @@ function wineApp(){
       a=String(a||''); b=String(b||'');
       if(!a||!b) return false;
       if(a===b) return true;
-      if(a.length>=5 && b.includes(a)) return true;
-      if(b.length>=5 && a.includes(b)) return true;
-      const m=Math.max(a.length,b.length);
-      if(m<4) return false;
+      const m=Math.max(a.length,b.length), n=Math.min(a.length,b.length);
+      if(m<4 || n<3) return false;
+      // V182: evita que palavras genéricas/ruído do OCR aproximem vinhos diferentes.
+      if(Math.abs(a.length-b.length)>2) return false;
       const d=this.scannerEditDistance(a,b);
-      return d<=1 || (m>=7 && d<=2) || (m>=11 && d<=3);
+      if(m<=6) return d<=1;
+      if(m<=10) return d<=1;
+      return d<=2;
     },
     scannerBestTokenMatch(target,ocrTokens){
       let best=0, exact=false;
@@ -7498,13 +7500,15 @@ function wineApp(){
         let metaHits=0;
         for(const t of ocrTokens){if(e.allText.includes(t)&&!e.nameTokens.includes(t)&&!e.producerTokens.includes(t)) metaHits++;}
         let eligible=false;
+        const singleCore=(e.coreTokens.length===1?e.coreTokens[0]:'');
+        const singleCoreMatch=singleCore?this.scannerBestTokenMatch(singleCore,ocrTokens):{score:0,exact:false};
         if(exactName||bestAliasExact) eligible=true;
-        else if(bestAliasNear>=.78) eligible=true;
-        else if(coreMatched>=1 && coreCoverage>=.60) eligible=true;
-        else if(e.nameTokens.length===1 && nameCoverage>=.68) eligible=true;
-        else if(nameMatched>=2 && nameCoverage>=.40) eligible=true;
-        else if(exactProducer && e.uniqueProducer && producerCompact.length>=5) eligible=true;
-        else if(producerCoverage>=.75 && coreMatched>=1) eligible=true;
+        else if(bestAliasNear>=.90 && bestAlias.length>=5) eligible=true;
+        else if(e.coreTokens.length>=2 && coreMatched>=2 && coreCoverage>=.66) eligible=true;
+        else if(e.coreTokens.length===1 && singleCore.length>=5 && singleCoreMatch.score>=.90) eligible=true;
+        else if(e.nameTokens.length>=2 && nameMatched>=2 && nameCoverage>=.62) eligible=true;
+        else if(producerCoverage>=.86 && coreMatched>=1 && coreCoverage>=.72) eligible=true;
+        // Produtor sozinho, país, uva ou região nunca qualificam um vinho.
         if(!eligible) continue;
         let score=0;
         if(exactName) score+=190;
@@ -7548,8 +7552,9 @@ function wineApp(){
       const ranked=this.scannerRank(clean,true);
       const top=ranked[0], second=ranked[1];
       const margin=!second?999:top.score-second.score;
-      const veryStrong=!!top && (top.exactName || top.nameCoverage>=.78 || top.score>=165) && margin>=10;
-      const strong=!!top && (top.nameCoverage>=.50 || top.score>=100 || top.producerCoverage>=.78) && margin>=8;
+      // V182: o scanner só pode sugerir/abrir quando existe UM vencedor claro.
+      const veryStrong=!!top && (top.exactName || top.nameCoverage>=.90 || top.score>=190) && margin>=30;
+      const strong=!!top && (top.nameCoverage>=.70 || top.score>=135) && margin>=24;
 
       if(!ranked.length){
         this.scannerMatches=[];
@@ -7563,21 +7568,31 @@ function wineApp(){
       }
 
       if(!strong){
-        this.scannerUnavailableHits=0; this.scannerUnreadableHits=0;
-        this.scannerMatches=ranked.slice(0,Math.min(3,ranked.length));
-        this.scannerMessage='Li parte do rótulo, mas ainda não há segurança para abrir um vinho. Continue apontando para o nome principal.';
+        this.scannerUnreadableHits=0;
+        this.scannerMatches=[];
+        this.scannerStableWineId=null; this.scannerStableHits=0;
+        this.scannerVoteMap={};
+        this.scannerUnavailableHits=(this.scannerUnavailableHits||0)+1;
+        this.scannerMessage=this.scannerUnavailableHits>=3
+          ? 'RÓTULO INDISPONÍVEL NO SCANNER. Não encontrei uma correspondência única e segura na base. Reenquadre o nome do rótulo e tente novamente.'
+          : 'Ainda não consegui confirmar este rótulo com segurança. Centralize somente o nome principal e mantenha a garrafa parada.';
         return false;
       }
 
       this.scannerUnavailableHits=0; this.scannerUnreadableHits=0;
       const id=String(top.wine.id);
+      if(this.scannerStableWineId===id){
+        this.scannerStableHits++;
+      }else{
+        this.scannerStableWineId=id;
+        this.scannerStableHits=1;
+        this.scannerVoteMap={};
+      }
       this.scannerVoteMap=this.scannerVoteMap||{};
       this.scannerVoteMap[id]=(this.scannerVoteMap[id]||0)+1;
-      if(this.scannerStableWineId===id) this.scannerStableHits++;
-      else {this.scannerStableWineId=id;this.scannerStableHits=1;}
 
-      // Correspondência muito forte pode abrir em um único frame. As demais exigem 2 confirmações.
-      if(!auto || veryStrong || this.scannerStableHits>=2 || this.scannerVoteMap[id]>=2){
+      // Automático: exige estabilidade em 2 leituras; só nome completo exato pode confirmar em 1.
+      if(!auto || (top.exactName && veryStrong) || this.scannerStableHits>=2){
         this.scannerMatches=[top];
         this.scannerMessage='Rótulo identificado pelo nome e cruzado com os vinhos cadastrados no site.';
         return true;
@@ -7690,17 +7705,12 @@ function wineApp(){
 
         const current=texts.filter(Boolean).join(' ');
         const norm=this.scannerNormalizeOCR(current);
-        if(norm){
-          this.scannerOcrHistory=(this.scannerOcrHistory||[]).filter(Boolean);
-          // Mantém até 3 leituras recentes: o nome pode aparecer em um frame e o produtor em outro.
-          const prevNorms=new Set(this.scannerOcrHistory.map(x=>this.scannerNormalizeOCR(x)));
-          if(!prevNorms.has(norm)) this.scannerOcrHistory.push(current);
-          if(this.scannerOcrHistory.length>3) this.scannerOcrHistory.shift();
-        }
-        const combined=[...(this.scannerOcrHistory||[]),current].filter(Boolean).join(' ');
+        // V182: não mistura textos de frames diferentes. Ruído antigo podia contaminar a leitura atual
+        // e produzir vários vinhos aparentemente plausíveis.
+        this.scannerOcrHistory=norm?[current]:[];
         this.scannerLastOcrSignature=norm.slice(0,260);
         this.scannerOcrStatus='';
-        return this.scannerAcceptOCRText(combined,!force);
+        return this.scannerAcceptOCRText(current,!force);
       }catch(e){
         this.scannerOcrStatus='';
         if(force){this.scannerSearched=true;this.scannerMessage='Não consegui ler este rótulo. Aproxime a câmera, deixe o nome reto e evite reflexo.';}
@@ -10627,6 +10637,8 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 <script type="application/json" id="checkpoint-v179-scanner-auto-vertical">{"version":"V179","date":"2026-09-05","scope":"Scanner de rótulos","changes":["visor vertical 3:4 ampliado","área de foco vertical 86%x60% no mobile","captura central adaptada à orientação real do sensor","preferência de câmera portrait 1080x1920","reconhecimento contínuo automático","botão manual removido do fluxo principal","crops OCR alternados automaticamente","intervalo OCR reduzido","falha não abre vinho e mantém estados repetir/indisponível"],"barcodeUsed":false,"dataPreserved":true}</script>
 <!-- checkpoint-v180-scanner-ocr-evidence -->
 <script type="application/json" id="checkpoint-v181-scanner-fast-match">{"version":"V181","date":"2026-09-05","scope":"scanner automático de rótulos","changes":["OCR fast-pass 680px antes do passe amplo","PSM 6 rápido e PSM 11 somente quando necessário","índice de catálogo precomputado","aliases de nome removendo safra/uva/tipo para cruzar o texto que aparece na frente do rótulo","produtor único pode confirmar com segurança","limiares ajustados para reduzir falsos negativos sem fallback aleatório","intervalo de tentativa reduzido"],"barcodeUsed":false,"dataPreserved":true}</script>
+
+  <!-- checkpoint-v182-scanner-sem-chutes: auto OCR nunca exibe múltiplos candidatos; exige vencedor único e estável -->
 </body>
 </html>
 
