@@ -4757,6 +4757,9 @@ function wineApp(){
     scannerReadLocked:false,
     scannerUnreadableHits:0,
     scannerUnavailableHits:0,
+    scannerOcrHistory:[],
+    scannerVoteMap:{},
+    scannerOcrStatus:'',
     wineVideoOpen:false,
     wineVideoInlineOpen:false,
     wineAudioMap:{"2":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=903b21d6-b2a5-4bf8-be4a-014e1bda1175.wav","duration":42.39673469387755,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"6":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c76d1771-ac68-4544-80a2-fe3fe035f1d3.wav","duration":42.266122448979594,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"7":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=42bf7958-f580-46d3-8fad-6caf3f3b92a3.wav","duration":43.07591836734694,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"9":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ce9044a5-2072-4a3d-b71d-3d754cb7dd60.wav","duration":39.88897959183674,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"11":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=4c6828a5-e01d-4119-9c17-a0fdccbb488a.wav","duration":42.21387755102041,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"12":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c85f6413-f463-4382-a645-c060f324b086.wav","duration":41.6130612244898,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"13":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ed0eb5f3-fe79-4ec7-a0a9-eeb0d29fef60.wav","duration":38.50448979591837,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"14":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=83ea4640-3b78-4426-9aa7-2cab284f935e.wav","duration":41.48244897959184,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"15":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=f82e1682-96c4-425c-b335-8d682aeb59aa.wav","duration":40.333061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"16":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=b444d427-77b2-4eb3-b15f-58f15d1dec26.wav","duration":38.53061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"20":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=a78f2494-0c0a-4e00-9045-d7ff85a4cd06.wav","duration":39.053061224489795,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"21":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=51c64f38-e395-4576-ad57-9039a418b1c1.wav","duration":39.20979591836735,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"22":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=3b017629-e23b-436d-bac2-3f40b80ef065.wav","duration":36.96326530612245,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"25":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=14130435-cc40-4b03-8a77-ec501e87b6c6.wav","duration":38.21714285714286,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"}},
@@ -7231,8 +7234,9 @@ function wineApp(){
       this.scannerLastScanAt=0;
       this.scannerUnreadableHits=0;
       this.scannerUnavailableHits=0;
-      this.scannerUnreadableHits=0;
-      this.scannerUnavailableHits=0;
+      this.scannerOcrHistory=[];
+      this.scannerVoteMap={};
+      this.scannerOcrStatus='';
 
       if(!window.isSecureContext){
         this.scannerSearched=true;
@@ -7293,11 +7297,11 @@ function wineApp(){
           this.scannerLiveLoopCount++;
           try{
             const now=performance.now();
-            const interval=this.scannerTextDetector?360:1050;
+            const interval=this.scannerTextDetector?300:850;
             if(!this.scannerOcrBusy && now-this.scannerLastScanAt>=interval && video.readyState>=2){
               this.scannerLastScanAt=now;
               await this.scannerReadVideoFrame(false);
-              if(this.scannerMatches.length===1 && this.scannerStableHits>=2){
+              if(this.scannerMatches.length===1){
                 this.stopScanner();
                 return;
               }
@@ -7334,6 +7338,9 @@ function wineApp(){
       this.scannerStableHits=0;
       this.scannerLastOcrSignature='';
       this.scannerLastScanAt=0;
+      this.scannerOcrHistory=[];
+      this.scannerVoteMap={};
+      this.scannerOcrStatus='';
     },
     async scannerToggleTorch(){
       if(!this.scannerStream) return;
@@ -7488,7 +7495,7 @@ function wineApp(){
       }));
     },
     scannerAcceptOCRText(raw,auto=true){
-      const clean=String(raw||'').replace(/\s+/g,' ').trim().slice(0,1800);
+      const clean=String(raw||'').replace(/\s+/g,' ').trim().slice(0,2600);
       this.scannerOcrText=clean;
       this.scannerSearched=true;
       const useful=this.scannerTokens(clean);
@@ -7499,48 +7506,50 @@ function wineApp(){
         this.scannerUnreadableHits=(this.scannerUnreadableHits||0)+1;
         this.scannerUnavailableHits=0;
         this.scannerMessage=this.scannerUnreadableHits>=2
-          ? 'Não consegui ler o nome do rótulo. Tente novamente aproximando a câmera, deixando o nome principal centralizado e evitando reflexos.'
-          : 'Ainda não consegui ler o nome. Aproxime o rótulo até o nome principal ocupar boa parte do quadro e evite reflexo.';
+          ? 'Não consegui ler o nome do rótulo. Aproxime a garrafa, deixe o nome principal reto e evite reflexos.'
+          : 'Procurando o nome do rótulo… aproxime um pouco e mantenha a garrafa parada.';
         return false;
       }
 
       const ranked=this.scannerRank(clean,true);
       const top=ranked[0], second=ranked[1];
       const margin=!second?999:top.score-second.score;
-      const strong=!!top && (top.exactName || top.nameCoverage>=.72 || top.score>=145) && margin>=15;
+      const veryStrong=!!top && (top.exactName || top.nameCoverage>=.86 || top.score>=178) && margin>=12;
+      const strong=!!top && (top.nameCoverage>=.58 || top.score>=118) && margin>=10;
 
       if(!ranked.length){
         this.scannerMatches=[];
         this.scannerStableWineId=null;this.scannerStableHits=0;
         this.scannerUnavailableHits=(this.scannerUnavailableHits||0)+1;
         this.scannerUnreadableHits=0;
-        this.scannerMessage=this.scannerUnavailableHits>=2
-          ? 'RÓTULO INDISPONÍVEL NO SCANNER. O texto foi lido, mas não corresponde com segurança a nenhum vinho cadastrado no site. Tente ler novamente; se continuar, este rótulo provavelmente não está na base.'
-          : 'Li o rótulo, mas não encontrei correspondência segura na base. Tente novamente com o nome do vinho bem centralizado.';
+        this.scannerMessage=this.scannerUnavailableHits>=3
+          ? 'RÓTULO INDISPONÍVEL NO SCANNER. O texto foi lido, mas não corresponde com segurança a nenhum vinho cadastrado no site.'
+          : 'Estou lendo o rótulo, mas ainda não encontrei o nome na base. Mantenha o nome principal centralizado.';
         return false;
       }
 
       if(!strong){
-        this.scannerStableWineId=null; this.scannerStableHits=0;
         this.scannerUnavailableHits=0; this.scannerUnreadableHits=0;
         this.scannerMatches=ranked.slice(0,Math.min(3,ranked.length));
-        this.scannerMessage='Reconheci parte do nome, mas não há segurança suficiente para confirmar. Tente ler novamente mais perto ou confira os candidatos abaixo.';
+        this.scannerMessage='Li parte do rótulo, mas ainda não há segurança para abrir um vinho. Continue apontando para o nome principal.';
         return false;
       }
 
       this.scannerUnavailableHits=0; this.scannerUnreadableHits=0;
       const id=String(top.wine.id);
+      this.scannerVoteMap=this.scannerVoteMap||{};
+      this.scannerVoteMap[id]=(this.scannerVoteMap[id]||0)+1;
       if(this.scannerStableWineId===id) this.scannerStableHits++;
       else {this.scannerStableWineId=id;this.scannerStableHits=1;}
 
-      // Clique/foto aceita uma leitura forte; leitura automática confirma apenas após repetição consistente.
-      if(!auto || this.scannerStableHits>=2){
+      // Correspondência muito forte pode abrir em um único frame. As demais exigem 2 confirmações.
+      if(!auto || veryStrong || this.scannerStableHits>=2 || this.scannerVoteMap[id]>=2){
         this.scannerMatches=[top];
         this.scannerMessage='Rótulo identificado pelo nome e cruzado com os vinhos cadastrados no site.';
         return true;
       }
       this.scannerMatches=[];
-      this.scannerMessage='Nome reconhecido — mantenha o rótulo parado só mais um instante para confirmar.';
+      this.scannerMessage='Nome encontrado. Confirmando automaticamente… mantenha o rótulo parado.';
       return false;
     },
     async scannerLoadTesseract(){
@@ -7566,7 +7575,7 @@ function wineApp(){
         try{await this.scannerOcrWorker.setParameters({
           preserve_interword_spaces:'1',
           user_defined_dpi:'300',
-          tessedit_pageseg_mode:'6'
+          tessedit_pageseg_mode:'11'
         });}catch(e){}
         this.scannerOcrReady=!!this.scannerOcrWorker;
         return this.scannerOcrReady;
@@ -7578,26 +7587,35 @@ function wineApp(){
       const canvas=this.$refs?.scannerCanvas;
       if(!canvas || !video?.videoWidth) return null;
       const vw=video.videoWidth, vh=video.videoHeight;
-      // Duas janelas: uma mais ampla e uma mais fechada no nome principal.
       const portrait=vh>=vw;
-      // Garrafa/rótulo é vertical. Em sensores que entregam vídeo landscape, usa faixa central estreita e alta.
-      const sw=Math.round(vw*(portrait?(variant===1?0.78:0.92):(variant===1?0.46:0.62)));
-      const sh=Math.round(vh*(portrait?(variant===1?0.62:0.84):(variant===1?0.86:0.96)));
-      const sx=Math.round((vw-sw)/2), sy=Math.round((vh-sh)/2);
-      const outW=Math.min(variant===1?1050:950,sw), outH=Math.max(1,Math.round(outW*sh/sw));
+      // Mantém uma janela vertical grande, mas alterna entre rótulo inteiro e região central do nome.
+      const sw=Math.round(vw*(portrait?(variant===1?0.84:0.96):(variant===1?0.54:0.70)));
+      const sh=Math.round(vh*(portrait?(variant===1?0.70:0.90):(variant===1?0.90:0.98)));
+      const sx=Math.max(0,Math.round((vw-sw)/2)), sy=Math.max(0,Math.round((vh-sh)/2));
+      const outW=Math.min(variant===1?1180:1080,Math.max(640,sw));
+      const outH=Math.max(1,Math.round(outW*sh/sw));
       canvas.width=outW; canvas.height=outH;
       const ctx=canvas.getContext('2d',{willReadFrequently:true});
       ctx.drawImage(video,sx,sy,sw,sh,0,0,outW,outH);
-      try{
-        const img=ctx.getImageData(0,0,outW,outH), d=img.data;
-        for(let i=0;i<d.length;i+=4){
-          const g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-          // contraste moderado + leve clareamento ajuda rótulos escuros sem estourar fundos claros
-          const c=Math.max(0,Math.min(255,(g-128)*1.45+136));
-          d[i]=d[i+1]=d[i+2]=c;
-        }
-        ctx.putImageData(img,0,0);
-      }catch(e){}
+
+      // variant 0 = imagem natural (muitos rótulos funcionam melhor sem filtro)
+      // variant 1 = cinza + contraste moderado para letras de baixo contraste.
+      if(variant===1){
+        try{
+          const img=ctx.getImageData(0,0,outW,outH), d=img.data;
+          let sum=0;
+          for(let i=0;i<d.length;i+=4) sum+=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+          const mean=sum/(d.length/4||1);
+          const gain=mean<105?1.28:mean>190?1.18:1.38;
+          const lift=mean<105?150:136;
+          for(let i=0;i<d.length;i+=4){
+            const g=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+            const c=Math.max(0,Math.min(255,(g-128)*gain+lift));
+            d[i]=d[i+1]=d[i+2]=c;
+          }
+          ctx.putImageData(img,0,0);
+        }catch(e){}
+      }
       return canvas;
     },
     async scannerReadVideoFrame(force=false){
@@ -7605,43 +7623,65 @@ function wineApp(){
       if(!video || video.readyState<2 || this.scannerOcrBusy) return false;
       this.scannerOcrBusy=true;
       try{
-        let text='';
+        let texts=[];
         if(this.scannerTextDetector){
-          const vw=video.videoWidth, vh=video.videoHeight;
-          const portrait=vh>=vw;
-          const sw=Math.round(vw*(portrait?.92:.62)), sh=Math.round(vh*(portrait?.84:.96)), sx=Math.round((vw-sw)/2), sy=Math.round((vh-sh)/2);
-          const bmp=await createImageBitmap(video,sx,sy,sw,sh);
-          const blocks=await this.scannerTextDetector.detect(bmp);
-          try{bmp.close();}catch(e){}
-          text=(blocks||[]).map(x=>x.rawValue||'').join(' ');
-        }else{
+          try{
+            const vw=video.videoWidth, vh=video.videoHeight;
+            const portrait=vh>=vw;
+            const sw=Math.round(vw*(portrait?.96:.70)), sh=Math.round(vh*(portrait?.90:.98)), sx=Math.round((vw-sw)/2), sy=Math.round((vh-sh)/2);
+            const bmp=await createImageBitmap(video,sx,sy,sw,sh);
+            const blocks=await this.scannerTextDetector.detect(bmp);
+            try{bmp.close();}catch(e){}
+            const t=(blocks||[]).map(x=>x.rawValue||'').join(' ').trim();
+            if(t) texts.push(t);
+          }catch(e){}
+        }
+
+        // TextDetector não existe na maioria dos Androids. Tesseract é o caminho principal.
+        if(!texts.length){
+          this.scannerOcrStatus='Preparando leitura do rótulo…';
           const ok=await this.scannerLoadTesseract();
           if(!ok){
-            if(force){this.scannerSearched=true;this.scannerMessage='O módulo de leitura de texto não conseguiu carregar. Tente novamente com internet ativa ou use uma foto da galeria.';}
+            this.scannerSearched=true;
+            this.scannerMessage='O leitor de texto não conseguiu carregar. Verifique a internet e tente novamente.';
             return false;
           }
-          const autoVariant=force?0:((this.scannerLiveLoopCount||0)%2);
-          const canvas=this.scannerPrepareCanvas(video,autoVariant);
+          this.scannerOcrStatus='Lendo nome do rótulo…';
+          const variant=force?0:((this.scannerLiveLoopCount||0)%2);
+          const canvas=this.scannerPrepareCanvas(video,variant);
           if(!canvas) return false;
-          const result=await this.scannerOcrWorker.recognize(canvas);
-          text=result?.data?.text||'';
+          try{await this.scannerOcrWorker.setParameters({tessedit_pageseg_mode:'11'});}catch(e){}
+          const r1=await this.scannerOcrWorker.recognize(canvas);
+          const t1=String(r1?.data?.text||'').trim();
+          if(t1) texts.push(t1);
 
-          // Em uma tentativa manual, se a primeira janela não gerar candidato, tenta uma janela mais fechada no nome.
-          if(force && !this.scannerRank(text,true).length){
+          // Em captura forçada, tenta também a versão contrastada/fechada.
+          if(force){
             const canvas2=this.scannerPrepareCanvas(video,1);
             if(canvas2){
-              const result2=await this.scannerOcrWorker.recognize(canvas2);
-              const t2=result2?.data?.text||'';
-              if(t2) text=[text,t2].filter(Boolean).join(' ');
+              const r2=await this.scannerOcrWorker.recognize(canvas2);
+              const t2=String(r2?.data?.text||'').trim();
+              if(t2) texts.push(t2);
             }
           }
         }
-        const sig=this.scannerNormalizeOCR(text).slice(0,260);
-        if(!force && sig && sig===this.scannerLastOcrSignature) return false;
-        this.scannerLastOcrSignature=sig;
-        return this.scannerAcceptOCRText(text,!force);
+
+        const current=texts.filter(Boolean).join(' ');
+        const norm=this.scannerNormalizeOCR(current);
+        if(norm){
+          this.scannerOcrHistory=(this.scannerOcrHistory||[]).filter(Boolean);
+          // Mantém até 3 leituras recentes: o nome pode aparecer em um frame e o produtor em outro.
+          const prevNorms=new Set(this.scannerOcrHistory.map(x=>this.scannerNormalizeOCR(x)));
+          if(!prevNorms.has(norm)) this.scannerOcrHistory.push(current);
+          if(this.scannerOcrHistory.length>3) this.scannerOcrHistory.shift();
+        }
+        const combined=[...(this.scannerOcrHistory||[]),current].filter(Boolean).join(' ');
+        this.scannerLastOcrSignature=norm.slice(0,260);
+        this.scannerOcrStatus='';
+        return this.scannerAcceptOCRText(combined,!force);
       }catch(e){
-        if(force){this.scannerSearched=true;this.scannerMessage='Não consegui ler este rótulo. Tente novamente com a câmera mais perto, reta e sem reflexo.';}
+        this.scannerOcrStatus='';
+        if(force){this.scannerSearched=true;this.scannerMessage='Não consegui ler este rótulo. Aproxime a câmera, deixe o nome reto e evite reflexo.';}
         return false;
       }finally{this.scannerOcrBusy=false;}
     },
@@ -10563,6 +10603,7 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 
 <!-- checkpoint-v178-scanner-rotulo-resiliente: OCR multi-pass, fuzzy nome/produtor, estados repetir/indisponivel -->
 <script type="application/json" id="checkpoint-v179-scanner-auto-vertical">{"version":"V179","date":"2026-09-05","scope":"Scanner de rótulos","changes":["visor vertical 3:4 ampliado","área de foco vertical 86%x60% no mobile","captura central adaptada à orientação real do sensor","preferência de câmera portrait 1080x1920","reconhecimento contínuo automático","botão manual removido do fluxo principal","crops OCR alternados automaticamente","intervalo OCR reduzido","falha não abre vinho e mantém estados repetir/indisponível"],"barcodeUsed":false,"dataPreserved":true}</script>
+<!-- checkpoint-v180-scanner-ocr-evidence -->
 </body>
 </html>
 
