@@ -2610,6 +2610,159 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
 }
 </style>
 
+
+<style id="v164-wine-detail-mobile-width-fix">
+/* V164 — correção visual confirmada pela captura real:
+   a navegação inferior da ficha não pode herdar max-width/margens do layout antigo. */
+.v150-wine-page .v150-wine-bottom{
+  position:sticky!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+  box-sizing:border-box!important;
+  z-index:120!important;
+}
+.v150-wine-page .v150-wine-bottom > nav,
+.v150-wine-page .v150-wine-bottom > div{
+  width:100%!important;
+  max-width:none!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+@media(max-width:699px){
+  .v150-wine-page,
+  .v150-wine-page .v150-wine-shell,
+  .v150-wine-page .v150-wine-main,
+  .v150-wine-page .v150-wine-bottom{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+  .v150-wine-page .v150-wine-bottom{
+    min-width:100%!important;
+  }
+}
+</style>
+
+
+<style id="v165-master-stability">
+/* V165 — camada final de estabilidade após auditoria master */
+.v150-wine-page .v150-wine-bottom{
+  position:sticky!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  min-width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  transform:none!important;
+  box-sizing:border-box!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  z-index:140!important;
+}
+.v150-wine-page .v150-wine-bottom button{
+  min-width:0!important;
+  width:100%!important;
+  overflow:hidden;
+}
+.v150-wine-page .v150-wine-bottom small{
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.v150-wine-page .v150-wine-shell,
+.v150-wine-page .v150-wine-main{
+  width:100%!important;
+  max-width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+.v150-wine-page .v150-wine-copy,
+.v150-wine-page .v150-wine-copy h1,
+.v150-wine-page .v150-wine-copy p{
+  min-width:0!important;
+  overflow-wrap:anywhere;
+}
+@media(max-width:699px){
+  .v150-wine-page{
+    width:100vw!important;
+    max-width:100vw!important;
+  }
+  .v150-wine-page .v150-wine-bottom{
+    width:100vw!important;
+    max-width:100vw!important;
+  }
+}
+</style>
+
+
+<style id="v166-final-audit-hardening">
+/* V166 — override final absoluto dos elementos críticos da ficha de vinho */
+.v150-wine-page{
+  position:fixed!important;
+  inset:0!important;
+  width:100vw!important;
+  max-width:100vw!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  margin:0!important;
+  padding:0!important;
+  transform:none!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  z-index:2147483000!important;
+  background:#f5f0e5!important;
+}
+.v150-wine-page .v150-wine-shell,
+.v150-wine-page .v150-wine-main{
+  width:100%!important;
+  max-width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  transform:none!important;
+}
+.v150-wine-page .v150-wine-bottom{
+  position:sticky!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100vw!important;
+  max-width:100vw!important;
+  min-width:100vw!important;
+  margin:0!important;
+  padding:0!important;
+  transform:none!important;
+  display:grid!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
+  z-index:2147483001!important;
+}
+.v150-wine-page .v150-wine-bottom button{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  margin:0!important;
+}
+.v150-wine-page .v150-wine-topbar{
+  width:100%!important;
+  max-width:100%!important;
+  margin:0!important;
+  left:0!important;
+  right:0!important;
+  transform:none!important;
+}
+@supports not (height:100dvh){
+  .v150-wine-page{height:100vh!important;max-height:100vh!important}
+}
+</style>
+
 </head>
 <!-- V95 CONTINUIDADE: evidencias ZIP associadas=185; imagens faltantes preenchidas=39; preços despriorizados/ocultos na UI pública. -->
 <!-- V96: recuperacao de fotos pendentes + novos rotulos confirmados visualmente; sem exclusao insegura de rotulos duvidosos. -->
@@ -3194,7 +3347,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
       <p class="v119-kicker">Me conta o momento</p>
       <h2 class="v119-question">QUAL É O MOMENTO?</h2>
       <div class="v119-option-grid">
-        <template x-for="o in findOccasions" :key="o.value">
+        <template x-for="o in findOccasions" :key="o.value+'|'+o.label">
           <button type="button" @click="findWizard.occasion=o.value; findWizard.step=2"
             :class="findWizard.occasion===o.value?'selected':''" class="v119-option">
             <span class="v119-option-icon" x-html="findIcon(o.icon)"></span><b x-text="o.label"></b>
@@ -3207,7 +3360,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
       <p class="v119-kicker">Agora a mesa</p>
       <h2 class="v119-question">VAI COMER ALGUMA COISA?</h2>
       <div class="v119-option-grid">
-        <template x-for="o in findFoods" :key="o.value">
+        <template x-for="o in findFoods" :key="o.value+'|'+o.label">
           <button type="button" @click="findWizard.food=o.value; findWizard.step=3"
             :class="findWizard.food===o.value?'selected':''" class="v119-option">
             <span class="v119-option-icon" x-html="findIcon(o.icon)"></span><b x-text="o.label"></b>
@@ -3220,7 +3373,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
       <p class="v119-kicker">Seu jeito de beber vinho</p>
       <h2 class="v119-question">COMO VOCÊ GOSTA DO VINHO?</h2>
       <div class="v119-option-grid">
-        <template x-for="o in findStyles" :key="o.value">
+        <template x-for="o in findStyles" :key="o.value+'|'+o.label">
           <button type="button" @click="findWizard.style=o.value; findWizard.step=4"
             :class="findWizard.style===o.value?'selected':''" class="v119-option v119-option-text">
             <b x-text="o.label"></b><small x-text="o.help"></small>
@@ -3276,7 +3429,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
             <p class="v119-why" x-text="findResults[0]?.reason"></p>
             <div class="v119-actions">
               <button type="button" @click="openWine(findResults[0].wine)">VER VINHO</button>
-              <button type="button" @click="toggleCompare(findResults[0].wine); openTool('compare')">COMPARAR</button>
+              <button type="button" @click="openCompareWith(findResults[0].wine)">COMPARAR</button>
               <button type="button" @click="toggleFavorite('wine',findResults[0].wine.id)" :class="isFavorite('wine',findResults[0].wine.id)?'is-on':''" :aria-pressed="isFavorite('wine',findResults[0].wine.id)" x-text="isFavorite('wine',findResults[0].wine.id)?'♥ SALVO':'♡ FAVORITAR'"></button>
               
             </div>
@@ -3665,10 +3818,10 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
 
           <section x-show="recipeTab==='ingredients'" x-transition class="vp-recipe-panel vp-recipe-ingredients-panel">
             <div class="vp-recipe-panel-head"><p>INGREDIENTES</p><label>Porções <select x-model.number="portion" aria-label="Número de porções"><option :value="2">2</option><option :value="4">4</option><option :value="6">6</option><option :value="8">8</option></select></label></div>
-            <div class="vp-recipe-ingredients-layout"><ul><template x-for="ing in recipeIngredients(dish,portion)" :key="ing"><li><span>•</span><b x-text="ing"></b></li></template></ul><aside><div class="vp-recipe-ingredients-art" aria-hidden="true"><svg viewBox="0 0 80 80"><path d="M20 54h40c-2 13-10 20-20 20s-18-7-20-20Z"/><path d="M28 54c2-12 7-18 14-23M42 54c1-15 5-24 13-30M50 54c4-11 8-17 16-21"/></svg></div><h3>Já tem os ingredientes?</h3><p>Descubra outras receitas e vinhos a partir do que você tem em casa.</p><button type="button" @click="recipeOpenId='';openTool('ingredients')">TENHO INGREDIENTES</button></aside></div>
+            <div class="vp-recipe-ingredients-layout"><ul><template x-for="(ing,i) in recipeIngredients(dish,portion)" :key="'ingredient-'+i"><li><span>•</span><b x-text="ing"></b></li></template></ul><aside><div class="vp-recipe-ingredients-art" aria-hidden="true"><svg viewBox="0 0 80 80"><path d="M20 54h40c-2 13-10 20-20 20s-18-7-20-20Z"/><path d="M28 54c2-12 7-18 14-23M42 54c1-15 5-24 13-30M50 54c4-11 8-17 16-21"/></svg></div><h3>Já tem os ingredientes?</h3><p>Descubra outras receitas e vinhos a partir do que você tem em casa.</p><button type="button" @click="recipeOpenId='';openTool('ingredients')">TENHO INGREDIENTES</button></aside></div>
           </section>
 
-          <section x-show="recipeTab==='prep'" x-transition class="vp-recipe-panel"><p class="vp-recipes-kicker">MODO DE PREPARO</p><div class="vp-recipe-steps"><template x-for="(step,i) in recipeSteps(dish)" :key="i"><article><span x-text="i+1"></span><p x-text="step"></p></article></template></div><div class="vp-recipe-tips"><h3>Dicas para acertar</h3><template x-for="tip in recipeTips(dish)" :key="tip"><p>✓ <span x-text="tip"></span></p></template></div></section>
+          <section x-show="recipeTab==='prep'" x-transition class="vp-recipe-panel"><p class="vp-recipes-kicker">MODO DE PREPARO</p><div class="vp-recipe-steps"><template x-for="(step,i) in recipeSteps(dish)" :key="i"><article><span x-text="i+1"></span><p x-text="step"></p></article></template></div><div class="vp-recipe-tips"><h3>Dicas para acertar</h3><template x-for="(tip,i) in recipeTips(dish)" :key="'tip-'+i"><p>✓ <span x-text="tip"></span></p></template></div></section>
 
           <section x-show="recipeTab==='pairing'" x-transition class="vp-recipe-panel"><p class="vp-recipes-kicker">HARMONIZAÇÃO SUGERIDA</p><h2>Vinhos que combinam</h2><p class="vp-pairing-method-note">Critério estrutural inspirado em WSET, Wine Folly e Decanter: acidez, doçura, tanino, álcool, intensidade, gordura, molho e picância.</p><details class="vp-pairing-sources"><summary>COMO CHEGAMOS ÀS RECOMENDAÇÕES</summary><p>As referências orientam os princípios gastronômicos; a pontuação 0–100 continua sendo um índice editorial interno do Vinhedo do Pão e não uma nota publicada por essas fontes.</p><a href="https://www.wsetglobal.com/knowledge-centre/blog/2023/july/13/four-rules-to-masterful-food-and-wine-pairing/" target="_blank" rel="noopener noreferrer">WSET — Wine food matching essentials</a><a href="https://www.wsetglobal.com/knowledge-centre/blog/2026/how-to-pair-drinks-with-spice" target="_blank" rel="noopener noreferrer">WSET — How to pair drinks with spice</a><a href="https://winefolly.com/wine-pairing/getting-started-with-food-and-wine-pairing/" target="_blank" rel="noopener noreferrer">Wine Folly — Food and Wine Pairing Basics</a><a href="https://www.decanter.com/learn/advice/what-s-the-wine-style-for-spicy-foods-51397/" target="_blank" rel="noopener noreferrer">Decanter — Wines with spicy food</a></details><div class="vp-recipe-pairing-list"><template x-for="rec in topWinesForDish(dish,4)" :key="rec.wine.id"><article><button type="button" class="vp-recipe-wine-image" @click="openWine(rec.wine)" :aria-label="'Abrir detalhes de '+rec.wine.name"><img :src="wineImage(rec.wine)" :alt="rec.wine.name" loading="lazy" @error="nextWineImage($event,rec.wine)"></button><div><div class="vp-recipe-wine-title"><h3 x-text="rec.wine.name"></h3><button type="button" @click="toggleFavorite('wine',rec.wine.id)" :class="isFavorite('wine',rec.wine.id)?'is-on':''" x-text="isFavorite('wine',rec.wine.id)?'♥':'♡'" :aria-label="isFavorite('wine',rec.wine.id)?'Remover dos favoritos':'Adicionar aos favoritos'"></button></div><p class="vp-recipe-wine-meta" x-text="[rec.wine.producer||rec.wine.vinicola,rec.wine.region,rec.wine.country].filter(Boolean).join(' • ')"></p><p x-text="pairingReasonSpecific(rec.wine,dish)"></p><span x-text="pairingLevel(rec.score)"></span><button type="button" class="vp-recipe-see-wine" @click="openWine(rec.wine)">VER VINHO</button></div></article></template></div></section>
 
@@ -3741,7 +3894,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
     </header>
     <nav class="v150-recipe-tabs" role="tablist"><button type="button" @click="recipeTab='ingredients'" :class="recipeTab==='ingredients'?'active':''" :aria-selected="recipeTab==='ingredients'">INGREDIENTES</button><button type="button" @click="recipeTab='prep'" :class="recipeTab==='prep'?'active':''" :aria-selected="recipeTab==='prep'">PREPARO</button><button type="button" @click="recipeTab='pairing'" :class="recipeTab==='pairing'?'active':''" :aria-selected="recipeTab==='pairing'">HARMONIZAÇÃO</button></nav>
     <div class="v150-recipe-body">
-      <section x-show="recipeTab==='ingredients'" x-transition><div class="v150-portion"><h3>Ingredientes</h3><select x-model.number="portion" aria-label="Número de porções"><option :value="2">2 pessoas</option><option :value="4">4 pessoas</option><option :value="6">6 pessoas</option><option :value="8">8 pessoas</option></select></div><ul class="v150-ingredients"><template x-for="ing in recipeIngredients(dish,portion)" :key="ing"><li><span>•</span><b x-text="ing"></b></li></template></ul><div class="v150-tips"><h4>Dicas para acertar</h4><template x-for="tip in recipeTips(dish)" :key="tip"><p>✓ <span x-text="tip"></span></p></template></div></section>
+      <section x-show="recipeTab==='ingredients'" x-transition><div class="v150-portion"><h3>Ingredientes</h3><select x-model.number="portion" aria-label="Número de porções"><option :value="2">2 pessoas</option><option :value="4">4 pessoas</option><option :value="6">6 pessoas</option><option :value="8">8 pessoas</option></select></div><ul class="v150-ingredients"><template x-for="(ing,i) in recipeIngredients(dish,portion)" :key="'ingredient-'+i"><li><span>•</span><b x-text="ing"></b></li></template></ul><div class="v150-tips"><h4>Dicas para acertar</h4><template x-for="(tip,i) in recipeTips(dish)" :key="'tip-'+i"><p>✓ <span x-text="tip"></span></p></template></div></section>
       <section x-show="recipeTab==='prep'" x-transition><h3>Modo de preparo</h3><div class="v150-steps"><template x-for="(step,i) in recipeSteps(dish)" :key="i"><article><span x-text="i+1"></span><p x-text="step"></p></article></template></div></section>
       <section x-show="recipeTab==='pairing'" x-transition><p class="v150-kicker">Vinhos que combinam</p><h3>Melhores escolhas para este prato</h3><p class="vp-pairing-method-note">Critério estrutural inspirado em WSET, Wine Folly e Decanter: acidez, doçura, tanino, álcool, intensidade, gordura, molho e picância.</p><div class="v150-recipe-wines"><template x-for="rec in topWinesForDish(dish,5)" :key="rec.wine.id"><article><div><img :src="wineImage(rec.wine)" :alt="rec.wine.name" @error="nextWineImage($event,rec.wine)"></div><h4 x-text="rec.wine.name"></h4><small x-text="pairingBand(rec.wine,dish)+' • '+Math.round(rec.score)+'/100'"></small><p x-text="pairingReasonSpecific(rec.wine,dish)"></p><button type="button" @click="openWine(rec.wine)">VER VINHO</button></article></template></div></section>
     </div>
@@ -4280,11 +4433,11 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
       </div>
 
       <nav class="v150-wine-bottom" aria-label="Navegação inferior do vinho">
-        <button type="button" @click="closeWine();goHome()"><span>⌂</span><small>INÍCIO</small></button>
-        <button type="button" @click="closeWine();openTool('scanner')"><span>▯</span><small>LER CÓDIGO</small></button>
-        <button type="button" @click="closeWine();openTool('recipes')"><span>♨</span><small>RECEITAS</small></button>
-        <button type="button" @click="closeWine();openMenu()"><span>⌘</span><small>FERRAMENTAS</small></button>
-        <button type="button" @click="closeWine();openLibrary('favorites')"><span>♡</span><small>FAVORITOS</small></button>
+        <button type="button" @click="leaveWineTo('home')"><span>⌂</span><small>INÍCIO</small></button>
+        <button type="button" @click="leaveWineTo('scanner')"><span>▯</span><small>LER CÓDIGO</small></button>
+        <button type="button" @click="leaveWineTo('recipes')"><span>♨</span><small>RECEITAS</small></button>
+        <button type="button" @click="leaveWineTo('menu')"><span>⌘</span><small>FERRAMENTAS</small></button>
+        <button type="button" @click="leaveWineTo('favorites')"><span>♡</span><small>FAVORITOS</small></button>
       </nav>
     </article>
   </template>
@@ -6275,10 +6428,25 @@ function wineApp(){
     },
     openMenu(){ this.setScreen('menu'); },
     openTool(tabName,mode=''){
-      if(this.screen==='menu'){
+      const freshEntry=this.screen==='menu';
+      if(freshEntry){
         try{ this.toolReturnFocus=document.activeElement; }catch(e){ this.toolReturnFocus=null; }
       }
       if(tabName!=='scanner') this.stopScanner();
+
+      if(freshEntry && tabName==='pizza'){
+        this.selectedPizzaId='';
+        this.pizzaWineModeFilter='TODOS';
+      }
+      if(freshEntry && tabName==='cheese'){
+        this.selectedCheeseId='';
+      }
+      if(freshEntry && tabName==='ingredients'){
+        this.ingredientResultsOpen=false;
+      }
+      if(freshEntry && tabName==='recipes'){
+        this.recipeOpenId='';
+      }
 
       // Ferramentas de escolha devem abrir limpas quando o usuário entra novamente pela Central.
       // O retorno da ficha do vinho usa o histórico e não passa por openTool(), portanto preserva o contexto.
@@ -7365,6 +7533,40 @@ function wineApp(){
       try{
         history.pushState({vinhedo:true,kind:'wine',wineId:Number(wine.id),returnHash},'','#vinho/'+wine.id);
       }catch(e){}
+    },
+    leaveWineTo(destination){
+      this.closeWineVideo();
+      this.stopWineAudio();
+      this.stopWineMini(true);
+      this.showWineDetail=false;
+      this.selectedWine=null;
+      this.setWineDetailScrollLock(false);
+      this.wineReturnFocus=null;
+
+      if(destination==='home'){
+        this.setScreen('home','','',false);
+        return;
+      }
+      if(destination==='menu'){
+        this.setScreen('menu','','',false);
+        return;
+      }
+      if(destination==='favorites'){
+        this.favoritesView=this.favoritesView||'wines';
+        this.setScreen('tool','favorites','',false);
+        return;
+      }
+      if(destination==='scanner'){
+        this.setScreen('tool','scanner','',false);
+        this.scannerReset();
+        this.startLiveLabelScanner();
+        return;
+      }
+      if(destination==='recipes'){
+        this.recipeOpenId='';
+        this.setScreen('tool','recipes','',false);
+        return;
+      }
     },
     restoreWineFocus(){
       const el=this.wineReturnFocus;
@@ -8844,6 +9046,7 @@ function wineApp(){
       this.releaseRecipeWakeLock();
       this.showWineDetail=false;
       this.selectedWine=null;
+      this.setWineDetailScrollLock(false);
       this.utilityPanel='';
       const returnHash=location.hash||'#tool/recipes';
       this.recipeOpenId=key;
@@ -8977,6 +9180,16 @@ function wineApp(){
         seen.add(id);
         return true;
       }).slice(0,3);
+    },
+    openCompareWith(w){
+      const id=Number(w?.id);
+      if(!Number.isFinite(id)) return;
+      this.normalizeCompareState();
+      if(!this.compareHasWine(id)){
+        const current=[...this.compareSelected];
+        this.compareSelected=current.length>=3 ? [...current.slice(0,2),w] : [...current,w];
+      }
+      this.openTool('compare');
     },
     toggleCompare(w){
       const id=Number(w?.id);
@@ -9906,6 +10119,68 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
     "Home e arte oficial",
     "Favoritos e Minha Seleção"
   ]
+}
+</script>
+
+
+<script type="application/json" id="checkpoint-v164-real-device-width-fix">
+{
+  "version":"V164",
+  "evidence":"real Android screenshot supplied by user",
+  "confirmedBug":"wine detail bottom navigation rendered at partial viewport width",
+  "rootCause":"historical max-width/margin rules survived inside the new fullscreen wine overlay",
+  "fix":"explicit full-width override for wine detail bottom navigation and mobile shell"
+}
+</script>
+
+
+<script type="application/json" id="checkpoint-v165-master-audit">
+{
+  "version":"V165",
+  "scope":"auditoria master de todas as abas e regressões pós-produção",
+  "confirmedFixes":[
+    "transform herdado removido da barra inferior da ficha",
+    "navegação inferior da ficha tornada atômica e sem corrida de histórico",
+    "receita aberta a partir da ficha libera o scroll do overlay",
+    "chaves duplicadas do x-for em Encontre seu Vinho corrigidas",
+    "chaves frágeis de ingredientes e dicas de receita estabilizadas",
+    "Pizza, Queijo, Ingredientes e Receitas abrem limpos quando acessados novamente pela Central",
+    "Comparar a partir do resultado sempre inclui o vinho clicado"
+  ]
+}
+</script>
+
+
+<script type="application/json" id="checkpoint-v166-final-audit">
+{
+  "version":"V166",
+  "scope":"auditoria final de segurança e regressão",
+  "focus":[
+    "fullscreen real da ficha de vinho",
+    "scroll lock e unlock",
+    "Escape/back/history",
+    "rotas das 13 ferramentas",
+    "Favoritos e Minha Seleção",
+    "Comparador",
+    "Receitas",
+    "Pizza e Queijo",
+    "persistência",
+    "chaves Alpine",
+    "integridade de dados e imagens"
+  ]
+}
+</script>
+
+
+<script type="application/json" id="checkpoint-v167-certification-audit">
+{
+  "version":"V167",
+  "scope":"certificação final após auditoria master",
+  "changes":[
+    "keys de findOccasions estabilizadas com value+label",
+    "keys de findStyles estabilizadas com value+label"
+  ],
+  "note":"Favoritos e Minha Seleção revalidados usando as estruturas reais favorites.wines e mySelection."
 }
 </script>
 
