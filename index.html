@@ -2820,6 +2820,148 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
 }
 </style>
 
+
+<style id="v174-pizza-hero-redesign">
+/* V174 — topo Vinho & Pizza: mais compacto, editorial e premium */
+.pizza-wine-page .pizza-wine-home-hero{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,58%) minmax(0,42%)!important;
+  min-height:258px!important;
+  height:258px!important;
+  margin:12px 20px 18px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border:1px solid rgba(199,146,53,.58)!important;
+  border-radius:24px!important;
+  background:#103f2d!important;
+  box-shadow:0 12px 30px rgba(16,63,45,.10)!important;
+}
+.pizza-wine-page .vdp-pizza-hero-copy{
+  position:relative!important;
+  z-index:3!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  min-width:0!important;
+  padding:26px 18px 24px 26px!important;
+  background:
+    radial-gradient(circle at 18% 18%,rgba(199,146,53,.10) 0 1px,transparent 1.5px) 0 0/22px 22px,
+    linear-gradient(135deg,#123f2e 0%,#0d3527 100%)!important;
+}
+.pizza-wine-page .vdp-pizza-hero-copy:before,
+.pizza-wine-page .vdp-pizza-hero-copy:after{
+  display:none!important;
+}
+.pizza-wine-page .vdp-pizza-hero-copy h1{
+  margin:0!important;
+  color:#fbf4e4!important;
+  font-family:Georgia,"Times New Roman",serif!important;
+  font-size:clamp(40px,10.3vw,54px)!important;
+  line-height:.88!important;
+  letter-spacing:-.035em!important;
+  font-weight:700!important;
+}
+.pizza-wine-page .vdp-pizza-rule{
+  width:min(190px,88%)!important;
+  margin:18px 0 15px!important;
+  gap:7px!important;
+  color:#d4a348!important;
+}
+.pizza-wine-page .vdp-pizza-rule i{
+  background:#d4a348!important;
+  opacity:.82!important;
+}
+.pizza-wine-page .vdp-pizza-rule b{
+  color:#d4a348!important;
+  font-size:13px!important;
+}
+.pizza-wine-page .vdp-pizza-hero-copy p{
+  max-width:230px!important;
+  margin:0!important;
+  color:#f4ead6!important;
+  font-size:14px!important;
+  line-height:1.42!important;
+  font-weight:400!important;
+}
+.pizza-wine-page .vdp-pizza-hero-copy p strong{
+  color:#e2b55a!important;
+  font-weight:800!important;
+}
+.pizza-wine-page .vdp-pizza-hero-photo{
+  position:relative!important;
+  z-index:1!important;
+  min-width:0!important;
+  background:
+    linear-gradient(90deg,rgba(13,53,39,.42) 0%,rgba(13,53,39,.06) 28%,rgba(13,53,39,0) 56%),
+    url("assets/media/img_0002_b3ae6c790e9f.jpg") 58% center/cover no-repeat!important;
+}
+.pizza-wine-page .vdp-pizza-hero-photo:before{
+  content:""!important;
+  position:absolute!important;
+  left:0!important;
+  top:18px!important;
+  bottom:18px!important;
+  width:1px!important;
+  background:rgba(224,181,90,.72)!important;
+  z-index:2!important;
+}
+.pizza-wine-page .vdp-pizza-hero-photo:after{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  box-shadow:inset 18px 0 26px rgba(13,53,39,.16)!important;
+  pointer-events:none!important;
+}
+
+@media(max-width:520px){
+  .pizza-wine-page .pizza-wine-home-hero{
+    grid-template-columns:minmax(0,60%) minmax(0,40%)!important;
+    min-height:242px!important;
+    height:242px!important;
+    margin:10px 20px 16px!important;
+    border-radius:22px!important;
+  }
+  .pizza-wine-page .vdp-pizza-hero-copy{
+    padding:22px 10px 21px 22px!important;
+  }
+  .pizza-wine-page .vdp-pizza-hero-copy h1{
+    font-size:clamp(38px,10.7vw,48px)!important;
+    line-height:.9!important;
+  }
+  .pizza-wine-page .vdp-pizza-rule{
+    width:86%!important;
+    margin:16px 0 13px!important;
+  }
+  .pizza-wine-page .vdp-pizza-hero-copy p{
+    max-width:205px!important;
+    font-size:13px!important;
+    line-height:1.38!important;
+  }
+  .pizza-wine-page .vdp-pizza-hero-photo{
+    background-position:56% center!important;
+  }
+}
+@media(max-width:360px){
+  .pizza-wine-page .pizza-wine-home-hero{
+    grid-template-columns:minmax(0,62%) minmax(0,38%)!important;
+    min-height:228px!important;
+    height:228px!important;
+    margin-left:16px!important;
+    margin-right:16px!important;
+  }
+  .pizza-wine-page .vdp-pizza-hero-copy{
+    padding:20px 8px 19px 18px!important;
+  }
+  .pizza-wine-page .vdp-pizza-hero-copy h1{
+    font-size:37px!important;
+  }
+  .pizza-wine-page .vdp-pizza-hero-copy p{
+    font-size:12px!important;
+  }
+}
+</style>
+
 </head>
 <!-- V95 CONTINUIDADE: evidencias ZIP associadas=185; imagens faltantes preenchidas=39; preços despriorizados/ocultos na UI pública. -->
 <!-- V96: recuperacao de fotos pendentes + novos rotulos confirmados visualmente; sem exclusao insegura de rotulos duvidosos. -->
@@ -3230,7 +3372,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
           <section x-show="scannerMatches.length!==1" class="vp-scanner-intro">
             <p class="vp-scanner-kicker">LER CÓDIGO</p>
             <h2>Identifique seu vinho</h2>
-            <p class="vp-scanner-lead">Aponte a câmera para o código de barras do rótulo e descubra todas as informações e harmonizações.</p>
+            <p class="vp-scanner-lead">Aponte a câmera para o código de barras da garrafa. O sistema só confirma um vinho quando o código corresponde exatamente.</p>
 
             <section class="vp-scanner-camera-card">
               <div class="vp-scanner-camera-frame">
@@ -3297,7 +3439,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
             <section x-show="scannerMatches.length>1" class="vp-scanner-candidates">
               <p class="vp-scanner-kicker">POSSÍVEIS CORRESPONDÊNCIAS</p>
               <template x-for="m in scannerMatches" :key="m.wine.id">
-                <button type="button" @click="scannerMatches=[m]; scannerSearched=true" class="vp-scanner-candidate">
+                <button type="button" @click="scannerSelectCandidate(m)" class="vp-scanner-candidate">
                   <img :src="wineImage(m.wine)" :alt="m.wine.name" loading="lazy" @error="nextWineImage($event,m.wine)">
                   <span><b x-text="m.wine.name"></b><small x-text="m.wine.producer || m.wine.vinicola || ''"></small></span>
                   <strong>›</strong>
@@ -4628,6 +4770,8 @@ function wineApp(){
     scannerTorchOn:false,
     scannerLastBarcode:'',
     scannerReadLocked:false,
+    scannerBarcodeMap:{},
+    scannerLastDetectAt:0,
     wineVideoOpen:false,
     wineVideoInlineOpen:false,
     wineAudioMap:{"2":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=903b21d6-b2a5-4bf8-be4a-014e1bda1175.wav","duration":42.39673469387755,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"6":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c76d1771-ac68-4544-80a2-fe3fe035f1d3.wav","duration":42.266122448979594,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"7":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=42bf7958-f580-46d3-8fad-6caf3f3b92a3.wav","duration":43.07591836734694,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"9":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ce9044a5-2072-4a3d-b71d-3d754cb7dd60.wav","duration":39.88897959183674,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"11":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=4c6828a5-e01d-4119-9c17-a0fdccbb488a.wav","duration":42.21387755102041,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"12":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c85f6413-f463-4382-a645-c060f324b086.wav","duration":41.6130612244898,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"13":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ed0eb5f3-fe79-4ec7-a0a9-eeb0d29fef60.wav","duration":38.50448979591837,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"14":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=83ea4640-3b78-4426-9aa7-2cab284f935e.wav","duration":41.48244897959184,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"15":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=f82e1682-96c4-425c-b335-8d682aeb59aa.wav","duration":40.333061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"16":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=b444d427-77b2-4eb3-b15f-58f15d1dec26.wav","duration":38.53061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"20":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=a78f2494-0c0a-4e00-9045-d7ff85a4cd06.wav","duration":39.053061224489795,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"21":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=51c64f38-e395-4576-ad57-9039a418b1c1.wav","duration":39.20979591836735,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"22":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=3b017629-e23b-436d-bac2-3f40b80ef065.wav","duration":36.96326530612245,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"25":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=14130435-cc40-4b03-8a77-ec501e87b6c6.wav","duration":38.21714285714286,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"}},
@@ -6588,6 +6732,11 @@ function wineApp(){
           else if(h==='#home'||h==='') history.replaceState({vinhedo:true,screen:'home'},'','#home');
         }
       }catch(e){}
+      try{
+        const stored=JSON.parse(localStorage.getItem('vinhedoBarcodeMap')||'{}');
+        const validIds=new Set(this.wines.map(w=>Number(w.id)));
+        this.scannerBarcodeMap=Object.fromEntries(Object.entries(stored||{}).filter(([code,id])=>this.scannerBarcodeIsPlausible(code)&&validIds.has(Number(id))));
+      }catch(e){ this.scannerBarcodeMap={}; }
       if(this.screen==='tool' && this.tab==='scanner'){ this.scannerReset(); this.$nextTick(()=>this.startLiveLabelScanner()); }
       this.auditRecipes(true);
       try{ this.seenSurprises=JSON.parse(sessionStorage.getItem('vinhedoSeen')||sessionStorage.getItem('vinhedoSeenSurprises')||'[]'); }catch(e){ this.seenSurprises=[]; }
@@ -7089,7 +7238,7 @@ function wineApp(){
     },
     async startLiveLabelScanner(){
       this.stopScanner();
-      this.scannerMode='label';
+      this.scannerMode='barcode';
       this.scannerMessage='';
       this.scannerMatches=[];
       this.scannerOcrText='';
@@ -7097,6 +7246,10 @@ function wineApp(){
       this.scannerStableWineId=null;
       this.scannerStableHits=0;
       this.scannerLiveLoopCount=0;
+      this.scannerReadLocked=false;
+      this.scannerLastBarcode='';
+      this.scannerBarcode='';
+      this.scannerLastDetectAt=0;
 
       if(!window.isSecureContext){
         this.scannerSearched=true;
@@ -7105,21 +7258,29 @@ function wineApp(){
       }
       if(!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia!=='function'){
         this.scannerSearched=true;
-        this.scannerMessage='Este navegador não liberou acesso à câmera. Use o botão ABRIR CÂMERA abaixo ou a busca pelo nome.';
+        this.scannerMessage='Este navegador não liberou acesso à câmera. Use a busca manual pelo nome do vinho.';
+        return;
+      }
+      if(!('BarcodeDetector' in window)){
+        this.scannerSearched=true;
+        this.scannerMessage='Este navegador não oferece leitura nativa de código de barras. No Android, abra o site no Chrome atualizado ou use a busca manual.';
         return;
       }
 
       let stream=null;
       try{
-        // Primeira tentativa: câmera traseira com resolução adequada.
+        // Prioriza câmera traseira e resolução suficiente para barras finas, sem pedir 4K.
         try{
           stream=await navigator.mediaDevices.getUserMedia({
-            video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:960}},
+            video:{
+              facingMode:{ideal:'environment'},
+              width:{ideal:1920,min:960},
+              height:{ideal:1080,min:540}
+            },
             audio:false
           });
         }catch(firstError){
-          // Segunda tentativa: evita falha em aparelhos que rejeitam constraints específicas.
-          stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+          stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
         }
 
         this.scannerStream=stream;
@@ -7132,10 +7293,9 @@ function wineApp(){
         video.autoplay=true;
         video.srcObject=stream;
 
-        // Aguarda metadados antes do play; alguns Android/iOS não exibem imagem antes disso.
         if(video.readyState<1){
           await new Promise((resolve,reject)=>{
-            const timer=setTimeout(resolve,1800);
+            const timer=setTimeout(resolve,1200);
             const ok=()=>{clearTimeout(timer);cleanup();resolve();};
             const bad=()=>{clearTimeout(timer);cleanup();reject(new Error('VIDEO_METADATA_ERROR'));};
             const cleanup=()=>{video.removeEventListener('loadedmetadata',ok);video.removeEventListener('error',bad);};
@@ -7143,101 +7303,56 @@ function wineApp(){
             video.addEventListener('error',bad,{once:true});
           });
         }
-        try{ await video.play(); }catch(playError){
-          // Em navegadores com política de autoplay, a stream continua pronta e o botão ATIVAR CÂMERA mantém gesto direto.
-          if(video.paused) throw playError;
-        }
+        try{ await video.play(); }catch(playError){ if(video.paused) throw playError; }
+
         this.scannerCameraOn=true;
         this.scannerMessage='';
+        const track=stream.getVideoTracks?.()[0];
         try{
-          const track=stream.getVideoTracks?.()[0];
           const caps=track?.getCapabilities?.()||{};
           this.scannerTorchSupported=!!caps.torch;
           this.scannerTorchOn=false;
-        }catch(e){this.scannerTorchSupported=false;}
+          // Autofoco contínuo quando o aparelho oferece essa capacidade.
+          if(track?.applyConstraints && Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')){
+            try{ await track.applyConstraints({advanced:[{focusMode:'continuous'}]}); }catch(e){}
+          }
+        }catch(e){ this.scannerTorchSupported=false; }
 
-        if('TextDetector' in window){
-          try{this.scannerTextDetector=new TextDetector();}catch(e){this.scannerTextDetector=null;}
-        }
-        if('BarcodeDetector' in window){
-          try{
-            const formats=await BarcodeDetector.getSupportedFormats();
-            const preferred=['qr_code','data_matrix','ean_13','ean_8','upc_a','upc_e','code_128'].filter(x=>formats.includes(x));
-            this.scannerDetector=new BarcodeDetector(preferred.length?{formats:preferred}:undefined);
-          }catch(e){this.scannerDetector=null;}
-        }
+        const formats=await BarcodeDetector.getSupportedFormats();
+        // Varejo de vinho usa majoritariamente GTIN/EAN/UPC. Menos formatos = detecção mais rápida e menos falso positivo.
+        const preferred=['ean_13','ean_8','upc_a','upc_e'].filter(x=>formats.includes(x));
+        this.scannerDetector=new BarcodeDetector(preferred.length?{formats:preferred}:undefined);
 
         const loop=async()=>{
-          if(!this.scannerCameraOn)return;
+          if(!this.scannerCameraOn || !this.scannerDetector || this.scannerReadLocked) return;
           this.scannerLiveLoopCount++;
           try{
-            if(this.scannerDetector){
+            const now=performance.now();
+            // ~5 leituras/s: suficiente para resposta rápida sem sobrecarregar celulares Android.
+            if(now-this.scannerLastDetectAt>=180 && video.readyState>=2){
+              this.scannerLastDetectAt=now;
               const codes=await this.scannerDetector.detect(video);
               if(codes?.length){
-                const raw=String(codes[0].rawValue||'');
-                const exact=this.wines.find(w=>this.scannerBarcodeValue(w)===raw.replace(/\D/g,''));
-                if(exact){
-                  if(this.scannerReadLocked) return;
+                const candidates=codes
+                  .map(c=>String(c?.rawValue||'').replace(/\D/g,''))
+                  .filter(v=>this.scannerBarcodeIsPlausible(v));
+                const raw=candidates[0]||'';
+                if(raw){
                   this.scannerReadLocked=true;
-                  this.scannerLastBarcode=raw.replace(/\D/g,'');
-                  this.scannerBarcode=this.scannerLastBarcode;
-                  this.scannerMatches=[{wine:exact,score:100,confidence:'Correspondência alta',reason:'Código identificado na database',"originAuditBatch":"AUDITORIA_309_FINAL_LOTE_17_2026-09-04","originAuditStatus":"REVISADO_309_309"}];
-                  this.scannerMessage='';
-                  this.scannerSearched=true;
+                  this.scannerLastBarcode=raw;
+                  this.scannerBarcode=raw;
+                  const found=this.lookupBarcode(raw,true);
                   this.stopScanner();
+                  if(!found){
+                    this.scannerManualOpen=true;
+                    this.scannerMessage='Código lido corretamente, mas ele ainda não está associado a um vinho. Busque o vinho pelo nome abaixo para vincular este código neste aparelho.';
+                  }
                   return;
                 }
-              }
-            }
-
-            let txt='';
-            if(this.scannerTextDetector){
-              const bmp=await createImageBitmap(video);
-              const blocks=await this.scannerTextDetector.detect(bmp);
-              txt=blocks.map(x=>x.rawValue||'').join(' ');
-              try{bmp.close();}catch(e){}
-            }else if(this.scannerLiveLoopCount%4===0 && !this.scannerWorking && video.videoWidth>0){
-              const canvas=this.$refs.scannerCanvas;
-              const ctx=canvas.getContext('2d',{willReadFrequently:true});
-              const w=Math.min(960,video.videoWidth||960), h=Math.round(w*((video.videoHeight||720)/(video.videoWidth||1280)));
-              canvas.width=w;canvas.height=h;
-              ctx.drawImage(video,0,0,w,h);
-              const ok=await this.scannerLoadTesseract();
-              if(ok){
-                this.scannerWorking=true;
-                try{
-                  const result=await Tesseract.recognize(canvas,'por+eng');
-                  txt=result?.data?.text||'';
-                }finally{this.scannerWorking=false;}
-              }
-            }
-
-            if(txt.trim()){
-              this.scannerOcrText=String(txt).replace(/\s+/g,' ').trim().slice(0,700);
-              this.scannerSearched=true;
-              this.scannerMatches=this.scannerRank(this.scannerOcrText,true).slice(0,3);
-              const top=this.scannerMatches[0], second=this.scannerMatches[1];
-              if(top?.score>=88 && top.coverage!==0 && (!second || top.score-second.score>=14)){
-                const id=String(top.wine.id);
-                if(this.scannerStableWineId===id)this.scannerStableHits++;
-                else{this.scannerStableWineId=id;this.scannerStableHits=1;}
-                this.scannerMessage=`Correspondência alta: ${top.wine.name}`;
-                if(this.scannerStableHits>=2){
-                  const wine=top.wine;
-                  this.stopScanner();
-                  this.scannerMessage='ENCONTREI. Abrindo o vinho correto.';
-                  setTimeout(()=>this.openWine(wine),700);
-                  return;
-                }
-              }else if(top){
-                this.scannerStableWineId=null;this.scannerStableHits=0;
-                this.scannerMessage='Encontrei candidatos. Mantenha o rótulo centralizado para aumentar a confiança.';
-              }else{
-                this.scannerMessage='Ainda não encontrei. Aproxime o rótulo e mantenha a garrafa reta.';
               }
             }
           }catch(e){}
-          this.scannerTimer=setTimeout(loop,850);
+          this.scannerTimer=setTimeout(loop,90);
         };
         loop();
       }catch(e){
@@ -7245,19 +7360,15 @@ function wineApp(){
         this.scannerSearched=true;
         const name=String(e?.name||'');
         if(name==='NotAllowedError' || name==='PermissionDeniedError'){
-          this.scannerMessage='A câmera foi negada para este site. Toque no cadeado/ícone de permissões do navegador, libere Câmera e depois toque em ABRIR CÂMERA.';
-        }else if(name==='NotFoundError' || name==='DevicesNotFoundError'){
-          this.scannerMessage='Nenhuma câmera foi encontrada neste aparelho. Use a busca pelo nome.';
-        }else if(name==='NotReadableError' || name==='TrackStartError'){
-          this.scannerMessage='A câmera está sendo usada por outro aplicativo. Feche outros apps que usam a câmera e toque em ABRIR CÂMERA.';
+          this.scannerMessage='A câmera foi negada para este site. Libere a permissão de Câmera no Chrome e tente novamente.';
         }else{
-          this.scannerMessage='Não foi possível abrir a câmera. Verifique a permissão do navegador e toque em ABRIR CÂMERA novamente.';
+          this.scannerMessage='Não foi possível abrir a câmera. Verifique a permissão do navegador e tente novamente.';
         }
       }
     },
     scannerReset(){
       this.stopScanner();
-      this.scannerMode='label';
+      this.scannerMode='barcode';
       this.scannerQuery='';
       this.scannerBarcode='';
       this.scannerMatches=[];
@@ -7270,6 +7381,7 @@ function wineApp(){
       this.scannerTorchOn=false;
       this.scannerLastBarcode='';
       this.scannerReadLocked=false;
+      this.scannerLastDetectAt=0;
     },
     async scannerToggleTorch(){
       if(!this.scannerStream) return;
@@ -7294,29 +7406,41 @@ function wineApp(){
       this.scannerMatches=[];
       this.scannerMessage='';
       this.scannerLastBarcode='';
+      this.scannerBarcode='';
+      this.scannerSearched=false;
+      this.scannerReadLocked=false;
       try{
-        if('BarcodeDetector' in window){
-          const formats=await BarcodeDetector.getSupportedFormats();
-          const preferred=['ean_13','ean_8','upc_a','upc_e','code_128','qr_code','data_matrix'].filter(x=>formats.includes(x));
-          const det=new BarcodeDetector(preferred.length?{formats:preferred}:undefined);
-          const bmp=await createImageBitmap(file);
-          const codes=await det.detect(bmp);
-          try{bmp.close();}catch(e){}
-          if(codes?.length){
-            const raw=String(codes[0].rawValue||'').replace(/\D/g,'');
-            if(raw){
-              this.scannerLastBarcode=raw;
-              this.scannerBarcode=raw;
-              this.lookupBarcode(raw);
-              this.scannerWorking=false;
-              if(ev?.target) ev.target.value='';
-              return;
-            }
-          }
+        if(!('BarcodeDetector' in window)){
+          this.scannerSearched=true;
+          this.scannerMessage='Este navegador não oferece leitura de código de barras em fotos. Use o Chrome atualizado no Android ou a busca manual.';
+          return;
         }
-      }catch(e){}
-      this.scannerWorking=false;
-      await this.handleLabelImage(ev);
+        const formats=await BarcodeDetector.getSupportedFormats();
+        const preferred=['ean_13','ean_8','upc_a','upc_e'].filter(x=>formats.includes(x));
+        const det=new BarcodeDetector(preferred.length?{formats:preferred}:undefined);
+        const bmp=await createImageBitmap(file);
+        const codes=await det.detect(bmp);
+        try{bmp.close();}catch(e){}
+        const raw=(codes||[]).map(c=>String(c?.rawValue||'').replace(/\D/g,'')).find(v=>this.scannerBarcodeIsPlausible(v))||'';
+        this.scannerSearched=true;
+        if(raw){
+          this.scannerLastBarcode=raw;
+          this.scannerBarcode=raw;
+          const found=this.lookupBarcode(raw,true);
+          if(!found){
+            this.scannerManualOpen=true;
+            this.scannerMessage='Código lido corretamente, mas ele ainda não está associado a um vinho. Busque pelo nome para vincular este código neste aparelho.';
+          }
+        }else{
+          this.scannerMessage='Não consegui localizar um código EAN/UPC válido nesta foto. Fotografe o código de barras de frente, ocupando boa parte da imagem.';
+        }
+      }catch(e){
+        this.scannerSearched=true;
+        this.scannerMessage='Não foi possível ler o código desta foto. Tente outra imagem mais próxima e sem reflexo.';
+      }finally{
+        this.scannerWorking=false;
+        if(ev?.target) ev.target.value='';
+      }
     },
     scannerRestart(){
       this.scannerReset();
@@ -7452,65 +7576,66 @@ function wineApp(){
     scannerBarcodeValue(w){
       return String(w?.ean||w?.barcode||w?.gtin||w?.ean13||'').replace(/\D/g,'');
     },
-    lookupBarcode(code=''){
+    scannerBarcodeIsPlausible(code=''){
+      const raw=String(code||'').replace(/\D/g,'');
+      if(![8,12,13,14].includes(raw.length)) return false;
+      const digits=[...raw].map(Number);
+      const check=digits.pop();
+      let sum=0, weight=3;
+      for(let i=digits.length-1;i>=0;i--){ sum+=digits[i]*weight; weight=weight===3?1:3; }
+      return ((10-(sum%10))%10)===check;
+    },
+    scannerFindByBarcode(code=''){
+      const raw=String(code||'').replace(/\D/g,'');
+      if(!raw) return null;
+      const direct=this.wines.find(w=>this.scannerBarcodeValue(w)===raw);
+      if(direct) return direct;
+      const mappedId=Number(this.scannerBarcodeMap?.[raw]);
+      if(Number.isFinite(mappedId)) return this.wines.find(w=>Number(w.id)===mappedId)||null;
+      return null;
+    },
+    scannerSaveBarcodeMap(){
+      try{ localStorage.setItem('vinhedoBarcodeMap',JSON.stringify(this.scannerBarcodeMap||{})); }catch(e){}
+    },
+    scannerRememberBarcode(wine){
+      const raw=String(this.scannerLastBarcode||this.scannerBarcode||'').replace(/\D/g,'');
+      const id=Number(wine?.id);
+      if(!this.scannerBarcodeIsPlausible(raw) || !Number.isFinite(id)) return false;
+      this.scannerBarcodeMap={...(this.scannerBarcodeMap||{}),[raw]:id};
+      this.scannerSaveBarcodeMap();
+      return true;
+    },
+    scannerSelectCandidate(m){
+      const wine=m?.wine;
+      if(!wine) return;
+      const learned=this.scannerLastBarcode ? this.scannerRememberBarcode(wine) : false;
+      this.scannerMatches=[{wine,score:learned?100:Number(m.score||0),confidence:learned?'Código vinculado':'Selecionado manualmente',reason:learned?'Código confirmado manualmente neste aparelho':(m.reason||'Selecionado manualmente')}];
+      this.scannerSearched=true;
+      this.scannerMessage='';
+      this.stopScanner();
+    },
+    lookupBarcode(code='',fromCamera=false){
       const raw=String(code||this.scannerBarcode||'').replace(/\D/g,'');
       this.scannerBarcode=raw;
       this.scannerLastBarcode=raw;
       this.scannerSearched=true;
       this.scannerMatches=[];
-      if(raw.length<8){
-        this.scannerMessage='Digite ou leia um código de barras válido.';
-        return;
+      if(!this.scannerBarcodeIsPlausible(raw)){
+        this.scannerMessage='O código lido não passou na validação EAN/UPC. Reposicione a câmera e tente novamente.';
+        return null;
       }
-      const wine=this.wines.find(w=>this.scannerBarcodeValue(w)===raw);
+      const wine=this.scannerFindByBarcode(raw);
       if(wine){
-        this.scannerMatches=[{wine,score:100,confidence:'Código exato',reason:'EAN/UPC associado a este wineId'}];
+        this.scannerMatches=[{wine,score:100,confidence:'Código exato',reason:'EAN/UPC associado exatamente a este wineId'}];
         this.scannerMessage='';
-        this.stopScanner();
-      }else{
-        this.scannerMessage='O código é válido, mas ainda não está associado a um vinho cadastrado.';
+        if(!fromCamera) this.stopScanner();
+        return wine;
       }
+      this.scannerMessage='Código válido, mas ainda não associado a um vinho cadastrado.';
+      return null;
     },
     async startBarcodeScanner(){
-      this.stopScanner();
-      this.scannerMessage='';
-      this.scannerMatches=[];
-      this.scannerSearched=false;
-      if(!navigator.mediaDevices?.getUserMedia){
-        this.scannerMessage='Este navegador não liberou acesso à câmera. Você pode digitar o código manualmente.';
-        return;
-      }
-      if(!('BarcodeDetector' in window)){
-        this.scannerMessage='A leitura automática de código de barras não está disponível neste navegador. Digite o número abaixo.';
-        return;
-      }
-      try{
-        const formats=await BarcodeDetector.getSupportedFormats();
-        const preferred=['qr_code','data_matrix','ean_13','ean_8','upc_a','upc_e','code_128'].filter(x=>formats.includes(x));
-        this.scannerDetector=new BarcodeDetector(preferred.length?{formats:preferred}:undefined);
-        this.scannerStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
-        const video=this.$refs.scannerVideo;
-        video.srcObject=this.scannerStream;
-        await video.play();
-        this.scannerCameraOn=true;
-        const loop=async()=>{
-          if(!this.scannerCameraOn || !this.scannerDetector) return;
-          try{
-            const codes=await this.scannerDetector.detect(video);
-            if(codes?.length){
-              const value=String(codes[0].rawValue||'');
-              this.scannerBarcode=value;
-              this.lookupBarcode(value);
-              if(this.scannerMatches.length) return;
-            }
-          }catch(e){}
-          this.scannerTimer=setTimeout(loop,450);
-        };
-        loop();
-      }catch(e){
-        this.stopScanner();
-        this.scannerMessage='Não foi possível abrir a câmera. Verifique a permissão do navegador ou digite o código manualmente.';
-      }
+      return this.startLiveLabelScanner();
     },
     stopScanner(){
       if(this.scannerTimer){ clearTimeout(this.scannerTimer); this.scannerTimer=null; }
@@ -10355,6 +10480,13 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 }
 </script>
 
+
+<script type="application/json" id="checkpoint-v174-pizza-hero">
+{"version":"V174","scope":"redesign exclusivo do topo Vinho & Pizza","preserved":["200 pizzas","recomendacoes","busca","filtros","rotas","IDs","imagens","demais ferramentas"]}
+</script>
+
+
+<script type="application/json" id="checkpoint-v175-scanner">{"version":"V175","date":"2026-09-05","scope":"Ler Código","changes":["leitura ao vivo somente por EAN/UPC nativo","remoção do OCR como fallback de código para impedir rótulo errado","validação de dígito verificador GTIN","reset completo entre leituras","loop ~5 leituras/s","autofoco contínuo quando suportado","mapeamento local código→wineId após confirmação manual","galeria sem chute por OCR"],"dataPreserved":true}</script>
 </body>
 </html>
 
