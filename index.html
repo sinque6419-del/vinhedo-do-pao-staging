@@ -3398,7 +3398,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
                 <canvas x-ref="scannerCanvas" class="hidden"></canvas>
 
                 <div class="vp-scanner-camera-overlay">
-                  <p x-show="scannerCameraOn">Centralize o rótulo inteiro na vertical<br>O reconhecimento é automático</p>
+                  <p x-show="scannerCameraOn">Centralize o NOME do vinho na moldura<br>O reconhecimento é automático</p>
                   <div class="vp-scanner-focus" :class="scannerWorking||scannerOcrBusy?'is-processing':''">
                     <i></i><i></i><i></i><i></i>
                   </div>
@@ -3414,7 +3414,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
                 <div x-show="scannerCameraOn && (scannerWorking||scannerOcrBusy)" class="vp-scanner-processing">LENDO RÓTULO…</div>
               </div>
 
-              <div x-show="scannerCameraOn" class="v179-auto-note">AUTOMÁTICO • mantenha o rótulo centralizado por alguns instantes</div>
+              <div x-show="scannerCameraOn" class="v179-auto-note">AUTOMÁTICO • aproxime até o nome ocupar boa parte da moldura</div>
               <div x-show="scannerCameraOn && scannerTorchSupported" style="display:flex;justify-content:center;margin-top:8px">
                 <button type="button" @click="scannerToggleTorch()" class="vp-scanner-open-wine" x-text="scannerTorchOn?'DESLIGAR LUZ':'LIGAR LUZ'"></button>
               </div>
@@ -7280,7 +7280,7 @@ function wineApp(){
         }
         try{await video.play();}catch(e){if(video.paused) throw e;}
         this.scannerCameraOn=true;
-        this.scannerMessage='Scanner automático ativo. Centralize o rótulo inteiro e mantenha a garrafa parada.';
+        this.scannerMessage='Scanner automático ativo. Centralize principalmente o nome do vinho dentro da moldura e mantenha a garrafa parada.';
         const track=stream.getVideoTracks?.()[0];
         try{
           const caps=track?.getCapabilities?.()||{};
@@ -7407,15 +7407,21 @@ function wineApp(){
     },
     scannerEnsureCatalogIndex(){
       if(Array.isArray(this.scannerCatalogIndex) && this.scannerCatalogIndex.length===this.wines.length) return this.scannerCatalogIndex;
-      const producerCount=new Map();
-      for(const w of this.wines){
+      const producerCount=new Map(), tokenFreq=new Map();
+      const prepared=this.wines.map(w=>{
+        const a=this.scannerNameAliases(w);
+        const nameTokens=this.scannerTokens(a.name), producerTokens=this.scannerTokens(a.producer);
+        [...new Set(nameTokens)].forEach(t=>tokenFreq.set(t,(tokenFreq.get(t)||0)+1));
         const p=this.scannerNormalize(w?.producer||w?.vinicola||'');
         if(p) producerCount.set(p,(producerCount.get(p)||0)+1);
-      }
-      this.scannerCatalogIndex=this.wines.map(w=>{
-        const a=this.scannerNameAliases(w);
-        return {wine:w,...a,nameTokens:this.scannerTokens(a.name),producerTokens:this.scannerTokens(a.producer),uniqueProducer:!!a.producer&&producerCount.get(a.producer)===1,allText:this.scannerWineText(w)};
+        return {w,a,nameTokens,producerTokens};
       });
+      this.scannerCatalogTokenFreq=tokenFreq;
+      this.scannerCatalogIndex=prepared.map(({w,a,nameTokens,producerTokens})=>({
+        wine:w,...a,nameTokens,producerTokens,
+        uniqueProducer:!!a.producer&&producerCount.get(a.producer)===1,
+        allText:this.scannerWineText(w)
+      }));
       return this.scannerCatalogIndex;
     },
     scannerDistinctiveParts(w){
@@ -7465,6 +7471,9 @@ function wineApp(){
       const qCompact=q.replace(/\s+/g,'');
       const ranked=[];
       const index=this.scannerEnsureCatalogIndex();
+      const tokenFreq=this.scannerCatalogTokenFreq||new Map();
+      const ocrSet=new Set(ocrTokens);
+
       for(const e of index){
         const w=e.wine;
         const nameCompact=e.name.replace(/\s+/g,'');
@@ -7473,11 +7482,10 @@ function wineApp(){
         for(const alias of e.aliases){
           const ac=alias.replace(/\s+/g,'');
           if(alias.length>=4 && (q.includes(alias)||(ac.length>=5&&qCompact.includes(ac)))){bestAliasExact=true;bestAlias=alias;break;}
-          if(ac.length>=5 && qCompact.length>=4){
-            // Compara a forma compacta contra janelas do OCR; tolera 1–3 erros típicos sem virar chute livre.
-            const min=Math.max(4,ac.length-3), max=Math.min(qCompact.length,ac.length+3);
+          if(ac.length>=6 && qCompact.length>=5){
+            const min=Math.max(5,ac.length-2), max=Math.min(qCompact.length,ac.length+2);
             for(let len=min;len<=max;len++){
-              const step=Math.max(1,Math.floor(ac.length/3));
+              const step=Math.max(1,Math.floor(ac.length/4));
               for(let i=0;i<=qCompact.length-len;i+=step){
                 const part=qCompact.slice(i,i+len), d=this.scannerEditDistance(ac,part);
                 const sim=1-d/Math.max(ac.length,part.length||1);
@@ -7488,48 +7496,51 @@ function wineApp(){
         }
         const exactName=e.name.length>=4 && (q.includes(e.name)||(nameCompact.length>=6&&qCompact.includes(nameCompact)));
         const exactProducer=e.producer.length>=4 && (q.includes(e.producer)||(producerCompact.length>=6&&qCompact.includes(producerCompact)));
-        let nameScore=0,nameExact=0,nameMatched=0;
-        for(const t of e.nameTokens){const m=this.scannerBestTokenMatch(t,ocrTokens);if(m.score>0){nameMatched++;nameScore+=m.score;if(m.exact)nameExact++;}}
-        let coreScore=0,coreMatched=0;
-        for(const t of e.coreTokens){const m=this.scannerBestTokenMatch(t,ocrTokens);if(m.score>0){coreMatched++;coreScore+=m.score;}}
-        let producerScore=0,producerMatched=0;
-        for(const t of e.producerTokens){const m=this.scannerBestTokenMatch(t,ocrTokens);if(m.score>0){producerMatched++;producerScore+=m.score;}}
+
+        let nameScore=0,nameExact=0,nameMatched=0,coreScore=0,coreMatched=0,producerScore=0,producerMatched=0;
+        const matchedNameTokens=[];
+        for(const t of e.nameTokens){
+          const mm=this.scannerBestTokenMatch(t,ocrTokens);
+          if(mm.score>0){nameMatched++;nameScore+=mm.score;if(mm.exact)nameExact++;matchedNameTokens.push({t,...mm});}
+        }
+        for(const t of e.coreTokens){const mm=this.scannerBestTokenMatch(t,ocrTokens);if(mm.score>0){coreMatched++;coreScore+=mm.score;}}
+        for(const t of e.producerTokens){const mm=this.scannerBestTokenMatch(t,ocrTokens);if(mm.score>0){producerMatched++;producerScore+=mm.score;}}
         const nameCoverage=e.nameTokens.length?nameScore/e.nameTokens.length:0;
         const coreCoverage=e.coreTokens.length?coreScore/e.coreTokens.length:0;
         const producerCoverage=e.producerTokens.length?producerScore/e.producerTokens.length:0;
-        let metaHits=0;
-        for(const t of ocrTokens){if(e.allText.includes(t)&&!e.nameTokens.includes(t)&&!e.producerTokens.includes(t)) metaHits++;}
+
+        // Distinctive tokens: a long exact word that appears in only one/two wine names is far safer than loose fuzzy matching.
+        const distinctiveExact=matchedNameTokens.filter(x=>x.exact && x.t.length>=6 && (tokenFreq.get(x.t)||999)<=2);
+        const distinctiveNear=matchedNameTokens.filter(x=>!x.exact && x.score>=.88 && x.t.length>=7 && (tokenFreq.get(x.t)||999)<=2);
+        const corroborated=matchedNameTokens.filter(x=>x.score>=.86 && x.t.length>=4).length>=2 || producerCoverage>=.72;
+
         let eligible=false;
-        const singleCore=(e.coreTokens.length===1?e.coreTokens[0]:'');
-        const singleCoreMatch=singleCore?this.scannerBestTokenMatch(singleCore,ocrTokens):{score:0,exact:false};
         if(exactName||bestAliasExact) eligible=true;
-        else if(bestAliasNear>=.90 && bestAlias.length>=5) eligible=true;
-        else if(e.coreTokens.length>=2 && coreMatched>=2 && coreCoverage>=.66) eligible=true;
-        else if(e.coreTokens.length===1 && singleCore.length>=5 && singleCoreMatch.score>=.90) eligible=true;
-        else if(e.nameTokens.length>=2 && nameMatched>=2 && nameCoverage>=.62) eligible=true;
-        else if(producerCoverage>=.86 && coreMatched>=1 && coreCoverage>=.72) eligible=true;
-        // Produtor sozinho, país, uva ou região nunca qualificam um vinho.
+        else if(distinctiveExact.length>=1) eligible=true;
+        else if(distinctiveNear.length>=1 && corroborated) eligible=true;
+        else if(e.coreTokens.length>=2 && coreMatched>=2 && coreCoverage>=.72) eligible=true;
+        else if(e.nameTokens.length>=2 && nameMatched>=2 && nameCoverage>=.68) eligible=true;
+        else if(exactProducer && coreMatched>=1 && coreCoverage>=.78) eligible=true;
         if(!eligible) continue;
+
         let score=0;
-        if(exactName) score+=190;
-        if(bestAliasExact) score+=165;
-        if(exactProducer) score+=50;
-        score+=Math.max(0,bestAliasNear)*72;
-        score+=coreCoverage*120;
-        score+=nameCoverage*82;
-        score+=Math.min(coreMatched,3)*22;
-        score+=Math.min(nameExact,3)*8;
-        score+=producerCoverage*38;
-        score+=Math.min(metaHits,2)*5;
-        if(exactProducer&&e.uniqueProducer) score+=40;
-        if(fromOCR&&!exactName&&!bestAliasExact&&coreCoverage<.52&&producerCoverage<.65) score-=12;
-        ranked.push({wine:w,score,nameCoverage:Math.max(nameCoverage,coreCoverage),producerCoverage,exactName:exactName||bestAliasExact,alias:bestAlias,aliasNear:bestAliasNear});
+        if(exactName) score+=220;
+        if(bestAliasExact) score+=190;
+        if(exactProducer) score+=45;
+        score+=bestAliasNear>=.90?bestAliasNear*55:0;
+        score+=coreCoverage*115 + nameCoverage*75 + producerCoverage*32;
+        score+=Math.min(nameExact,3)*10;
+        score+=distinctiveExact.length*145;
+        score+=distinctiveNear.length*55;
+        if(distinctiveExact.length && corroborated) score+=45;
+        ranked.push({wine:w,score,nameCoverage:Math.max(nameCoverage,coreCoverage),producerCoverage,exactName:exactName||bestAliasExact,distinctiveExact:distinctiveExact.length,distinctiveNear:distinctiveNear.length,corroborated});
       }
-      ranked.sort((a,b)=>b.score-a.score||b.nameCoverage-a.nameCoverage||b.producerCoverage-a.producerCoverage||Number(a.wine.id)-Number(b.wine.id));
+      ranked.sort((a,b)=>b.score-a.score||b.distinctiveExact-a.distinctiveExact||b.nameCoverage-a.nameCoverage||Number(a.wine.id)-Number(b.wine.id));
       return ranked.slice(0,5).map(x=>({
         wine:x.wine,score:x.score,nameCoverage:x.nameCoverage,producerCoverage:x.producerCoverage,exactName:x.exactName,
-        confidence:(x.exactName||x.score>=165||x.nameCoverage>=.78)?'Alta confiança':x.score>=100?'Boa correspondência':'Conferir',
-        reason:x.exactName?'nome/linha do rótulo reconhecido':`nome do rótulo ${Math.round(x.nameCoverage*100)}% compatível${x.producerCoverage>=.45?' + produtor compatível':''}`
+        distinctiveExact:x.distinctiveExact,distinctiveNear:x.distinctiveNear,corroborated:x.corroborated,
+        confidence:(x.exactName||x.distinctiveExact||x.score>=190)?'Alta confiança':x.score>=135?'Boa correspondência':'Conferir',
+        reason:x.exactName?'nome/linha reconhecido':x.distinctiveExact?'palavra distintiva do nome reconhecida':`nome do rótulo ${Math.round(x.nameCoverage*100)}% compatível`
       }));
     },
     scannerAcceptOCRText(raw,auto=true){
@@ -7553,8 +7564,8 @@ function wineApp(){
       const top=ranked[0], second=ranked[1];
       const margin=!second?999:top.score-second.score;
       // V182: o scanner só pode sugerir/abrir quando existe UM vencedor claro.
-      const veryStrong=!!top && (top.exactName || top.nameCoverage>=.90 || top.score>=190) && margin>=30;
-      const strong=!!top && (top.nameCoverage>=.70 || top.score>=135) && margin>=24;
+      const veryStrong=!!top && (top.exactName || (top.distinctiveExact>=1 && top.corroborated) || top.score>=230) && margin>=38;
+      const strong=!!top && (top.exactName || top.distinctiveExact>=1 || (top.nameCoverage>=.74 && top.corroborated) || top.score>=175) && margin>=32;
 
       if(!ranked.length){
         this.scannerMatches=[];
@@ -7591,8 +7602,8 @@ function wineApp(){
       this.scannerVoteMap=this.scannerVoteMap||{};
       this.scannerVoteMap[id]=(this.scannerVoteMap[id]||0)+1;
 
-      // Automático: exige estabilidade em 2 leituras; só nome completo exato pode confirmar em 1.
-      if(!auto || (top.exactName && veryStrong) || this.scannerStableHits>=2){
+      // Automático: um nome exato ou palavra realmente distintiva + confirmação pode abrir em 1 frame; caso contrário exige 2 leituras estáveis.
+      if(!auto || (veryStrong && (top.exactName || (top.distinctiveExact>=1 && top.corroborated))) || this.scannerStableHits>=2){
         this.scannerMatches=[top];
         this.scannerMessage='Rótulo identificado pelo nome e cruzado com os vinhos cadastrados no site.';
         return true;
@@ -7624,7 +7635,7 @@ function wineApp(){
         try{await this.scannerOcrWorker.setParameters({
           preserve_interword_spaces:'1',
           user_defined_dpi:'180',
-          tessedit_pageseg_mode:'6'
+          tessedit_pageseg_mode:'11'
         });}catch(e){}
         this.scannerOcrReady=!!this.scannerOcrWorker;
         return this.scannerOcrReady;
@@ -7634,26 +7645,34 @@ function wineApp(){
     },
     scannerPrepareCanvas(video,variant=0){
       const canvas=this.$refs?.scannerCanvas;
-      if(!canvas || !video?.videoWidth) return null;
-      const vw=video.videoWidth, vh=video.videoHeight, portrait=vh>=vw;
-      // V181: primeiro passe pequeno e focado no nome (rápido); segundo passe abre a área quando necessário.
-      const fast=variant===0;
-      const sw=Math.round(vw*(portrait?(fast?.82:.94):(fast?.58:.72)));
-      const sh=Math.round(vh*(portrait?(fast?.56:.82):(fast?.82:.96)));
-      const sx=Math.max(0,Math.round((vw-sw)/2));
-      // Em rótulos verticais, desloca levemente para cima: marca/nome costuma estar do centro para cima.
-      const sy=Math.max(0,Math.min(vh-sh,Math.round((vh-sh)*(portrait?.42:.50))));
-      const targetW=fast?680:800;
-      const outW=Math.min(targetW,Math.max(480,sw));
+      if(!canvas || !video?.videoWidth || !video?.videoHeight) return null;
+      const vw=video.videoWidth, vh=video.videoHeight;
+
+      // V183: recorta exatamente uma janela vertical 3:4 no centro do sensor, independentemente
+      // de o Android entregar o stream como 1920x1080. Isso faz o OCR analisar o que o usuário vê.
+      const targetAspect=.75; // largura/altura
+      let baseW,baseH,baseX,baseY;
+      if(vw/vh>targetAspect){baseH=vh;baseW=Math.round(vh*targetAspect);baseX=Math.round((vw-baseW)/2);baseY=0;}
+      else{baseW=vw;baseH=Math.round(vw/targetAspect);baseX=0;baseY=Math.round((vh-baseH)/2);}
+
+      // Alterna zonas sem multiplicar OCR no mesmo frame: inteiro, topo/meio e centro.
+      const mode=((this.scannerLiveLoopCount||0)+variant)%3;
+      let sx=baseX, sy=baseY, sw=baseW, sh=baseH;
+      if(mode===1){sh=Math.round(baseH*.68);sy=baseY+Math.round(baseH*.08);}
+      else if(mode===2){sh=Math.round(baseH*.62);sy=baseY+Math.round(baseH*.20);}
+
+      const outW=variant===0?560:680;
       const outH=Math.max(1,Math.round(outW*sh/sw));
-      canvas.width=outW; canvas.height=outH;
+      canvas.width=outW;canvas.height=outH;
       const ctx=canvas.getContext('2d',{willReadFrequently:true});
       ctx.drawImage(video,sx,sy,sw,sh,0,0,outW,outH);
-      if(!fast){
+
+      // Tratamento leve só no passe amplo. Mantém letras finas e douradas no passe normal.
+      if(variant!==0){
         try{
-          const img=ctx.getImageData(0,0,outW,outH), d=img.data; let sum=0;
-          for(let i=0;i<d.length;i+=4) sum+=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-          const mean=sum/(d.length/4||1), gain=mean<105?1.20:mean>190?1.12:1.28, lift=mean<105?146:134;
+          const img=ctx.getImageData(0,0,outW,outH),d=img.data;let sum=0;
+          for(let i=0;i<d.length;i+=4)sum+=.299*d[i]+.587*d[i+1]+.114*d[i+2];
+          const mean=sum/(d.length/4||1),gain=mean<100?1.12:1.18,lift=mean<100?142:132;
           for(let i=0;i<d.length;i+=4){const g=.299*d[i]+.587*d[i+1]+.114*d[i+2],c=Math.max(0,Math.min(255,(g-128)*gain+lift));d[i]=d[i+1]=d[i+2]=c;}
           ctx.putImageData(img,0,0);
         }catch(e){}
@@ -7694,11 +7713,12 @@ function wineApp(){
           const variant=needBroad?1:0;
           const canvas=this.scannerPrepareCanvas(video,variant);
           if(!canvas) return false;
-          try{await this.scannerOcrWorker.setParameters({tessedit_pageseg_mode:needBroad?'11':'6'});}catch(e){}
+          try{await this.scannerOcrWorker.setParameters({tessedit_pageseg_mode:'11',preserve_interword_spaces:'1'});}catch(e){}
           const t0=performance.now();
           const r1=await this.scannerOcrWorker.recognize(canvas);
           this.scannerLastRecognizeMs=Math.round(performance.now()-t0);
-          const t1=String(r1?.data?.text||'').trim();
+          const goodWords=(r1?.data?.words||[]).filter(w=>Number(w?.confidence||0)>=38 && String(w?.text||'').trim().length>=2).map(w=>String(w.text).trim());
+          const t1=(goodWords.length?goodWords.join(' '):String(r1?.data?.text||'')).trim();
           if(t1) texts.push(t1);
           this.scannerFastPasses=(this.scannerFastPasses||0)+1;
         }
@@ -10639,6 +10659,7 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 <script type="application/json" id="checkpoint-v181-scanner-fast-match">{"version":"V181","date":"2026-09-05","scope":"scanner automático de rótulos","changes":["OCR fast-pass 680px antes do passe amplo","PSM 6 rápido e PSM 11 somente quando necessário","índice de catálogo precomputado","aliases de nome removendo safra/uva/tipo para cruzar o texto que aparece na frente do rótulo","produtor único pode confirmar com segurança","limiares ajustados para reduzir falsos negativos sem fallback aleatório","intervalo de tentativa reduzido"],"barcodeUsed":false,"dataPreserved":true}</script>
 
   <!-- checkpoint-v182-scanner-sem-chutes: auto OCR nunca exibe múltiplos candidatos; exige vencedor único e estável -->
+<!-- checkpoint-v183-scanner-portrait-distinctive-ocr -->
 </body>
 </html>
 
