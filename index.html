@@ -3422,6 +3422,9 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
               <div x-show="scannerMessage" class="vp-scanner-message" role="status">
                 <span>ⓘ</span><p x-text="scannerMessage"></p>
               </div>
+              <div x-show="scannerCameraOn && scannerOcrText" class="v179-auto-note" style="margin-top:6px;opacity:.78;line-height:1.35">
+                <span>Texto lido: </span><strong x-text="scannerOcrText.slice(0,110)"></strong>
+              </div>
             </section>
 
             <div class="vp-scanner-actions">
@@ -3502,7 +3505,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
             </template>
           </section>
 
-          <section x-show="scannerSearched && !scannerWorking && !scannerOcrBusy && scannerMatches.length===0 && scannerMessage"
+          <section x-show="scannerSearched && !scannerCameraOn && !scannerWorking && !scannerOcrBusy && scannerMatches.length===0 && scannerMessage"
             class="vp-scanner-not-found">
             <h3>Não conseguimos confirmar este rótulo.</h3>
             <p x-text="scannerMessage"></p>
@@ -4742,6 +4745,7 @@ function wineApp(){
     scannerOcrLibLoading:false,
     scannerOcrWorker:null,
     scannerOcrReady:false,
+    scannerOcrLoadPromise:null,
     scannerOcrBusy:false,
     scannerLastOcrSignature:'',
     scannerLastScanAt:0,
@@ -7465,123 +7469,117 @@ function wineApp(){
       return {score:best,exact};
     },
     scannerRank(query,fromOCR=false){
-      // V184: reconhecimento fechado pelo NOME do vinho.
-      // O OCR lê o rótulo e esta função procura SOMENTE nos nomes/aliases dos 309 vinhos.
-      // País, uva, região, safra e outros metadados nunca identificam um vinho por conta própria.
+      // V185: cruza o TEXTO LIDO diretamente com os NOMES da database.
+      // Prioridade absoluta: nome completo/sem safra. Aliases curtos só contam se forem únicos.
       const q=this.scannerNormalizeOCR(query);
-      const ocrTokens=this.scannerTokens(q);
-      if(!q || !ocrTokens.length) return [];
-      const ocrSet=new Set(ocrTokens);
+      if(!q) return [];
       const qCompact=q.replace(/\s+/g,'');
+      const ocrTokens=this.scannerTokens(q);
+      if(!ocrTokens.length) return [];
+      const ocrSet=new Set(ocrTokens);
       const index=this.scannerEnsureCatalogIndex();
 
-      // Frequência apenas dos tokens centrais dos NOMES: uma palavra rara vale muito mais.
-      const coreFreq=new Map();
+      const stripVintage=v=>this.scannerNormalize(String(v||'').replace(/\b(?:19|20)\d{2}\b/g,' '));
+      const aliasFreq=new Map();
       for(const e of index){
-        for(const t of new Set(e.coreTokens||[])) coreFreq.set(t,(coreFreq.get(t)||0)+1);
+        const vals=new Set([
+          ...(e.aliases||[]),
+          stripVintage(e.name)
+        ].filter(Boolean));
+        for(const a of vals) aliasFreq.set(a,(aliasFreq.get(a)||0)+1);
       }
 
+      // 1) Se o OCR contém o nome completo exatamente, este resultado vence imediatamente.
+      const exactFull=[];
+      for(const e of index){
+        const full=this.scannerNormalize(e.name||'');
+        const noYear=stripVintage(e.name||'');
+        const fullCompact=full.replace(/\s+/g,'');
+        const noYearCompact=noYear.replace(/\s+/g,'');
+        let exact=0;
+        if(full && full.length>=5 && (q.includes(full) || qCompact.includes(fullCompact))) exact=2;
+        else if(noYear && noYear.length>=5 && (q.includes(noYear) || qCompact.includes(noYearCompact))) exact=1;
+        if(exact) exactFull.push({wine:e.wine,score: exact===2?1200:1100,nameCoverage:1,producerCoverage:0,exactName:true,distinctiveExact:2,distinctiveNear:0,corroborated:true,exactCore:99,fuzzyCore:0,matchedNameTokens:this.scannerTokens(exact===2?full:noYear),confidence:'Alta confiança',reason:'nome completo encontrado na database'});
+      }
+      if(exactFull.length===1) return exactFull;
+      if(exactFull.length>1){
+        exactFull.sort((a,b)=>String(b.wine.name||'').length-String(a.wine.name||'').length);
+        const longest=String(exactFull[0].wine.name||'').length;
+        const tied=exactFull.filter(x=>String(x.wine.name||'').length===longest);
+        if(tied.length===1) return [tied[0]];
+      }
+
+      // 2) Parcial: usa somente partes realmente distintivas do NOME.
+      // Aliases compartilhados (ex.: apenas "Santa Helena") não podem escolher uma variante.
       const ranked=[];
       for(const e of index){
-        const core=(e.coreTokens||[]).filter(t=>t.length>=3);
-        const aliases=(e.aliases||[]).filter(Boolean);
-        let exactPhrase=false, phraseWords=0;
+        const name=this.scannerNormalize(e.name||'');
+        const nameNoYear=stripVintage(name);
+        const nameTokens=this.scannerTokens(nameNoYear);
+        const uniqueAliases=[...new Set([...(e.aliases||[]),nameNoYear])]
+          .filter(a=>a && a.length>=4 && aliasFreq.get(a)===1);
 
-        for(const alias of aliases){
-          const at=this.scannerTokens(alias);
-          if(!at.length) continue;
+        let bestPhraseWords=0, bestPhraseLen=0, exactPhrase=false;
+        for(const alias of uniqueAliases){
           const ac=alias.replace(/\s+/g,'');
-          if((alias.length>=4 && q.includes(alias)) || (ac.length>=6 && qCompact.includes(ac))){
+          if(q.includes(alias) || (ac.length>=7 && qCompact.includes(ac))){
             exactPhrase=true;
-            phraseWords=Math.max(phraseWords,at.length);
+            bestPhraseWords=Math.max(bestPhraseWords,this.scannerTokens(alias).length);
+            bestPhraseLen=Math.max(bestPhraseLen,alias.length);
           }
         }
 
-        let exactCore=0, fuzzyCore=0, weighted=0;
-        let uniqueExact=0, uniqueFuzzy=0;
+        // Token rarity calculada dentro dos próprios nomes.
+        let exact=0, fuzzy=0, rareExact=0, weighted=0;
         const matched=[];
-        for(const t of core){
+        for(const t of nameTokens){
+          if(t.length<4) continue;
+          let freq=0;
+          for(const z of index){ if((z.nameTokens||[]).includes(t)) freq++; }
           if(ocrSet.has(t)){
-            exactCore++;
-            const freq=coreFreq.get(t)||999;
-            const rare=freq===1;
-            if(rare && t.length>=5) uniqueExact++;
-            weighted += rare ? 4 : (freq<=3 ? 2.2 : 1);
-            matched.push(t);
+            exact++; matched.push(t);
+            if(freq===1 && t.length>=5) rareExact++;
+            weighted += freq===1?5:(freq<=3?2.3:1);
             continue;
           }
-          // Fuzzy extremamente controlado: somente palavras longas do NOME.
-          // Nada de aproximar palavras curtas/genéricas.
-          if(t.length>=6){
+          if(t.length>=7){
             let best=0;
             for(const o of ocrTokens){
-              if(o.length<5 || Math.abs(o.length-t.length)>1) continue;
+              if(o.length<6 || Math.abs(o.length-t.length)>1) continue;
               const d=this.scannerEditDistance(t,o);
-              const limit=t.length>=10?2:1;
-              if(d<=limit) best=Math.max(best,1-d/Math.max(t.length,o.length));
+              const lim=t.length>=11?2:1;
+              if(d<=lim) best=Math.max(best,1-d/Math.max(t.length,o.length));
             }
-            if(best>=.82){
-              fuzzyCore++;
-              const freq=coreFreq.get(t)||999;
-              if(freq===1 && t.length>=7) uniqueFuzzy++;
-              weighted += (freq===1?2.5:1.1)*best;
-              matched.push(t);
-            }
+            if(best>=.84){ fuzzy++; weighted += (freq===1?2.6:1)*best; matched.push(t); }
           }
         }
 
-        const coreCount=Math.max(1,core.length);
-        const coverage=(exactCore + fuzzyCore*.72)/coreCount;
-
-        // Elegibilidade fechada pelo nome.
-        // 1) frase/alias do nome lida; ou
-        // 2) palavra rara exata do nome; ou
-        // 3) duas palavras do nome; ou
-        // 4) palavra rara longa com fuzzy + outra evidência do próprio nome.
-        const eligible = exactPhrase || uniqueExact>=1 || exactCore>=2 ||
-          (uniqueFuzzy>=1 && (exactCore>=1 || fuzzyCore>=2));
+        const denom=Math.max(1,nameTokens.filter(t=>t.length>=4).length);
+        const coverage=(exact+fuzzy*.7)/denom;
+        const eligible=exactPhrase || rareExact>=1 || exact>=2 || (exact>=1 && coverage>=.45);
         if(!eligible) continue;
 
         let score=0;
-        if(exactPhrase) score += phraseWords>=2 ? 320 : 250;
-        score += uniqueExact*190;
-        score += uniqueFuzzy*80;
-        score += exactCore*55 + fuzzyCore*24 + weighted*18 + coverage*70;
-
-        ranked.push({
-          wine:e.wine,score,coverage,exactPhrase,phraseWords,
-          exactCore,fuzzyCore,uniqueExact,uniqueFuzzy,matched
-        });
+        if(exactPhrase) score += 500 + bestPhraseWords*70 + Math.min(100,bestPhraseLen*2);
+        score += rareExact*210 + exact*65 + fuzzy*22 + weighted*18 + coverage*90;
+        ranked.push({wine:e.wine,score,nameCoverage:coverage,producerCoverage:0,exactName:exactPhrase,distinctiveExact:rareExact,distinctiveNear:0,corroborated:exactPhrase||exact>=2,exactCore:exact,fuzzyCore:fuzzy,matchedNameTokens:matched,confidence:(exactPhrase||rareExact>=1||score>=300)?'Alta confiança':'Boa correspondência',reason:exactPhrase?'trecho único do nome encontrado na database':rareExact?'palavra exclusiva do nome encontrada na database':'duas palavras do nome encontradas na database'});
       }
 
-      ranked.sort((a,b)=>b.score-a.score || b.uniqueExact-a.uniqueExact || b.exactCore-a.exactCore || Number(a.wine.id)-Number(b.wine.id));
-      return ranked.slice(0,5).map(x=>({
-        wine:x.wine,
-        score:x.score,
-        nameCoverage:x.coverage,
-        producerCoverage:0,
-        exactName:x.exactPhrase,
-        distinctiveExact:x.uniqueExact,
-        distinctiveNear:x.uniqueFuzzy,
-        corroborated:(x.exactCore>=2 || x.exactPhrase),
-        exactCore:x.exactCore,
-        fuzzyCore:x.fuzzyCore,
-        matchedNameTokens:x.matched,
-        confidence:(x.exactPhrase||x.uniqueExact>=1||x.score>=260)?'Alta confiança':'Boa correspondência',
-        reason:x.exactPhrase?'nome/linha do rótulo encontrado na base':x.uniqueExact?'palavra exclusiva do nome encontrada na base':'palavras do nome encontradas na base'
-      }));
+      ranked.sort((a,b)=>b.score-a.score || b.nameCoverage-a.nameCoverage || String(b.wine.name||'').length-String(a.wine.name||'').length);
+      return ranked.slice(0,5);
     },
     scannerAcceptOCRText(raw,auto=true){
-      const clean=String(raw||'').replace(/\s+/g,' ').trim().slice(0,2600);
+      const clean=String(raw||'').replace(/\s+/g,' ').trim().slice(0,3200);
       this.scannerOcrText=clean;
       this.scannerSearched=true;
       const useful=this.scannerTokens(clean);
 
       if(!clean || useful.length<1){
         this.scannerMatches=[];
-        this.scannerStableWineId=null; this.scannerStableHits=0;
         this.scannerUnreadableHits=(this.scannerUnreadableHits||0)+1;
         this.scannerUnavailableHits=0;
+        // Uma zona do rótulo pode falhar; não apaga imediatamente um candidato forte visto no frame anterior.
+        if(this.scannerVoteMap){for(const k of Object.keys(this.scannerVoteMap))this.scannerVoteMap[k]=Math.max(0,(this.scannerVoteMap[k]||0)-.35);}
         this.scannerMessage=this.scannerUnreadableHits>=2
           ? 'Não consegui ler o nome. Aproxime o rótulo, deixe a marca/nome principal reto e evite reflexos.'
           : 'Lendo o nome do rótulo… mantenha a garrafa centralizada.';
@@ -7594,23 +7592,22 @@ function wineApp(){
 
       if(!top){
         this.scannerMatches=[];
-        this.scannerStableWineId=null; this.scannerStableHits=0;
         this.scannerUnavailableHits=(this.scannerUnavailableHits||0)+1;
         this.scannerUnreadableHits=0;
+        if(this.scannerVoteMap){for(const k of Object.keys(this.scannerVoteMap))this.scannerVoteMap[k]=Math.max(0,(this.scannerVoteMap[k]||0)-.25);}
         this.scannerMessage=this.scannerUnavailableHits>=3
           ? 'RÓTULO INDISPONÍVEL NO SCANNER. Li o texto, mas não encontrei esse nome entre os 309 vinhos cadastrados.'
           : 'Li parte do rótulo, mas ainda não encontrei o nome na database. Mantenha a marca/nome principal no centro.';
         return false;
       }
 
-      // Nunca mostra uma lista de palpites. Se o 1º não estiver claramente à frente do 2º, continua lendo.
       const clearWinner = margin>=55 || !second;
       const nameStrong = top.exactName || top.distinctiveExact>=1 || top.exactCore>=2 || top.score>=260;
       if(!clearWinner || !nameStrong){
         this.scannerMatches=[];
-        this.scannerStableWineId=null; this.scannerStableHits=0;
         this.scannerUnavailableHits=(this.scannerUnavailableHits||0)+1;
         this.scannerUnreadableHits=0;
+        if(this.scannerVoteMap){for(const k of Object.keys(this.scannerVoteMap))this.scannerVoteMap[k]=Math.max(0,(this.scannerVoteMap[k]||0)-.2);}
         this.scannerMessage=this.scannerUnavailableHits>=3
           ? 'Ainda não consegui confirmar um nome único na database. Reenquadre somente a frente do rótulo.'
           : 'Nome parcialmente lido. Confirmando na database… mantenha a garrafa parada.';
@@ -7619,13 +7616,14 @@ function wineApp(){
 
       this.scannerUnavailableHits=0; this.scannerUnreadableHits=0;
       const id=String(top.wine.id);
-      if(this.scannerStableWineId===id) this.scannerStableHits++;
-      else { this.scannerStableWineId=id; this.scannerStableHits=1; }
+      this.scannerVoteMap=this.scannerVoteMap||{};
+      for(const k of Object.keys(this.scannerVoteMap)) if(k!==id) this.scannerVoteMap[k]=Math.max(0,(this.scannerVoteMap[k]||0)-.5);
+      this.scannerVoteMap[id]=(this.scannerVoteMap[id]||0)+1;
+      this.scannerStableWineId=id;
+      this.scannerStableHits=Math.floor(this.scannerVoteMap[id]);
 
-      // Frase completa com 2+ palavras pode abrir já no primeiro quadro.
-      // Palavra isolada, mesmo exclusiva, precisa repetir em 2 leituras para evitar falso positivo de OCR.
       const immediate = top.exactName && (top.matchedNameTokens?.length>=2 || top.nameCoverage>=.60);
-      if(!auto || immediate || this.scannerStableHits>=2){
+      if(!auto || immediate || (this.scannerVoteMap[id]||0)>=2){
         this.scannerMatches=[top];
         this.scannerMessage='Nome identificado e encontrado na database do Vinhedo do Pão.';
         return true;
@@ -7635,36 +7633,49 @@ function wineApp(){
       this.scannerMessage='Nome encontrado na database. Confirmando mais uma leitura…';
       return false;
     },
+    
     async scannerLoadTesseract(){
       if(this.scannerOcrWorker){this.scannerOcrReady=true;return true;}
-      if(this.scannerOcrLibLoading){
-        for(let i=0;i<24 && this.scannerOcrLibLoading;i++) await new Promise(r=>setTimeout(r,100));
-        return !!this.scannerOcrWorker;
+      // V186: uma única Promise compartilhada evita a corrida entre o preload e o primeiro frame.
+      // Na V185, a segunda chamada desistia após ~2,4 s, antes do worker terminar de carregar em muitos Androids.
+      if(this.scannerOcrLoadPromise){
+        try{return await this.scannerOcrLoadPromise;}catch(e){return false;}
       }
       this.scannerOcrLibLoading=true;
-      try{
-        if(!window.Tesseract){
-          await new Promise((resolve,reject)=>{
-            const existing=document.querySelector('script[data-vp-tesseract]');
-            if(existing){existing.addEventListener('load',resolve,{once:true});existing.addEventListener('error',reject,{once:true});return;}
-            const sc=document.createElement('script');
-            sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-            sc.async=true; sc.dataset.vpTesseract='1'; sc.onload=resolve; sc.onerror=reject; document.head.appendChild(sc);
-          });
+      this.scannerOcrLoadPromise=(async()=>{
+        try{
+          if(!window.Tesseract){
+            // Se uma tentativa antiga deixou uma tag quebrada, remove e tenta de novo.
+            const stale=document.querySelector('script[data-vp-tesseract]');
+            if(stale && !window.Tesseract){try{stale.remove();}catch(e){}}
+            await new Promise((resolve,reject)=>{
+              const sc=document.createElement('script');
+              let settled=false;
+              const timer=setTimeout(()=>{if(settled)return;settled=true;try{sc.remove();}catch(e){};reject(new Error('TESSERACT_SCRIPT_TIMEOUT'));},12000);
+              const done=(ok)=>{if(settled)return;settled=true;clearTimeout(timer);ok?resolve():reject(new Error('TESSERACT_SCRIPT_ERROR'));};
+              sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+              sc.async=true; sc.dataset.vpTesseract='1';
+              sc.onload=()=>done(true); sc.onerror=()=>done(false);
+              document.head.appendChild(sc);
+            });
+          }
+          if(!window.Tesseract) return false;
+          this.scannerOcrWorker=await window.Tesseract.createWorker('eng');
+          try{await this.scannerOcrWorker.setParameters({
+            preserve_interword_spaces:'1',
+            user_defined_dpi:'180',
+            tessedit_pageseg_mode:'11'
+          });}catch(e){}
+          this.scannerOcrReady=!!this.scannerOcrWorker;
+          return this.scannerOcrReady;
+        }catch(e){
+          this.scannerOcrWorker=null; this.scannerOcrReady=false; return false;
+        }finally{
+          this.scannerOcrLibLoading=false;
         }
-        if(!window.Tesseract) return false;
-        // Worker persistente: carrega uma vez e reutiliza nas próximas leituras, muito mais rápido que Tesseract.recognize a cada quadro.
-        this.scannerOcrWorker=await Tesseract.createWorker('eng');
-        try{await this.scannerOcrWorker.setParameters({
-          preserve_interword_spaces:'1',
-          user_defined_dpi:'180',
-          tessedit_pageseg_mode:'11'
-        });}catch(e){}
-        this.scannerOcrReady=!!this.scannerOcrWorker;
-        return this.scannerOcrReady;
-      }catch(e){
-        this.scannerOcrWorker=null; this.scannerOcrReady=false; return false;
-      }finally{this.scannerOcrLibLoading=false;}
+      })();
+      try{return await this.scannerOcrLoadPromise;}
+      finally{this.scannerOcrLoadPromise=null;}
     },
     scannerPrepareCanvas(video,variant=0){
       const canvas=this.$refs?.scannerCanvas;
@@ -7684,7 +7695,7 @@ function wineApp(){
       if(mode===1){sh=Math.round(baseH*.68);sy=baseY+Math.round(baseH*.08);}
       else if(mode===2){sh=Math.round(baseH*.62);sy=baseY+Math.round(baseH*.20);}
 
-      const outW=variant===0?560:680;
+      const outW=variant===0?900:1080;
       const outH=Math.max(1,Math.round(outW*sh/sw));
       canvas.width=outW;canvas.height=outH;
       const ctx=canvas.getContext('2d',{willReadFrequently:true});
@@ -7708,6 +7719,7 @@ function wineApp(){
       this.scannerOcrBusy=true;
       try{
         let texts=[];
+        let nativeUseful=false;
         if(this.scannerTextDetector){
           try{
             const vw=video.videoWidth, vh=video.videoHeight;
@@ -7717,12 +7729,18 @@ function wineApp(){
             const blocks=await this.scannerTextDetector.detect(bmp);
             try{bmp.close();}catch(e){}
             const t=(blocks||[]).map(x=>x.rawValue||'').join(' ').trim();
-            if(t) texts.push(t);
+            if(t){
+              texts.push(t);
+              // V186: TextDetector só encerra a leitura se o texto já tiver um candidato forte na database.
+              // Antes, qualquer texto nativo (até ruído) impedia o Tesseract de rodar.
+              const nr=this.scannerRank(t,true);
+              const a=nr[0], b=nr[1];
+              nativeUseful=!!a && (!b || a.score-b.score>=55) && (a.exactName || a.distinctiveExact>=1 || a.exactCore>=2 || a.score>=260);
+            }
           }catch(e){}
         }
 
-        // TextDetector não existe na maioria dos Androids. Tesseract é o caminho principal.
-        if(!texts.length){
+        if(!nativeUseful){
           this.scannerOcrStatus='Preparando leitura do rótulo…';
           const ok=await this.scannerLoadTesseract();
           if(!ok){
@@ -7731,7 +7749,6 @@ function wineApp(){
             return false;
           }
           this.scannerOcrStatus='Lendo nome do rótulo…';
-          // Passe 1: rápido, focado no nome. Só amplia depois de falhas consecutivas.
           const needBroad=force || (this.scannerUnreadableHits||0)>=1 || (this.scannerUnavailableHits||0)>=1 || ((this.scannerLiveLoopCount||0)%4===0);
           const variant=needBroad?1:0;
           const canvas=this.scannerPrepareCanvas(video,variant);
@@ -7740,16 +7757,20 @@ function wineApp(){
           const t0=performance.now();
           const r1=await this.scannerOcrWorker.recognize(canvas);
           this.scannerLastRecognizeMs=Math.round(performance.now()-t0);
-          const goodWords=(r1?.data?.words||[]).filter(w=>Number(w?.confidence||0)>=38 && String(w?.text||'').trim().length>=2).map(w=>String(w.text).trim());
-          const t1=(goodWords.length?goodWords.join(' '):String(r1?.data?.text||'')).trim();
-          if(t1) texts.push(t1);
+          const rawText=String(r1?.data?.text||'').trim();
+          const goodWords=(r1?.data?.words||[])
+            .filter(w=>Number(w?.confidence||0)>=30 && String(w?.text||'').trim().length>=2)
+            .map(w=>String(w.text).trim());
+          const wordText=goodWords.join(' ').trim();
+          // V186: não descarta o nome principal só porque o Tesseract deu confiança baixa nele.
+          // Mantém também o texto bruto; o cruzamento fechado dos 309 nomes filtra o ruído depois.
+          if(wordText) texts.push(wordText);
+          if(rawText && this.scannerNormalizeOCR(rawText)!==this.scannerNormalizeOCR(wordText)) texts.push(rawText);
           this.scannerFastPasses=(this.scannerFastPasses||0)+1;
         }
 
-        const current=texts.filter(Boolean).join(' ');
+        const current=[...new Set(texts.filter(Boolean))].join(' ');
         const norm=this.scannerNormalizeOCR(current);
-        // V182: não mistura textos de frames diferentes. Ruído antigo podia contaminar a leitura atual
-        // e produzir vários vinhos aparentemente plausíveis.
         this.scannerOcrHistory=norm?[current]:[];
         this.scannerLastOcrSignature=norm.slice(0,260);
         this.scannerOcrStatus='';
@@ -7790,7 +7811,7 @@ function wineApp(){
           if(!ok){this.scannerSearched=true;this.scannerMessage='Não consegui carregar o leitor de texto. Verifique a internet e tente novamente.';return;}
           // Redimensiona fotos enormes antes do OCR para acelerar no Android.
           const bmp=await createImageBitmap(file);
-          const maxW=1200, scale=Math.min(1,maxW/bmp.width);
+          const maxW=1800, scale=Math.min(1,maxW/bmp.width);
           const canvas=this.$refs?.scannerCanvas||document.createElement('canvas');
           canvas.width=Math.max(1,Math.round(bmp.width*scale));canvas.height=Math.max(1,Math.round(bmp.height*scale));
           const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(bmp,0,0,canvas.width,canvas.height);try{bmp.close();}catch(e){}
@@ -10684,6 +10705,10 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
   <!-- checkpoint-v182-scanner-sem-chutes: auto OCR nunca exibe múltiplos candidatos; exige vencedor único e estável -->
 <!-- checkpoint-v183-scanner-portrait-distinctive-ocr -->
 <!-- checkpoint-v184-scanner-nome-database -->
+<div id="checkpoint-v185-scanner-name-direct-db" hidden></div>
+<!-- checkpoint-v186-scanner-deep-audit: shared OCR loader; native fallback; raw OCR preserved; vote confirmation; active-scan UI fixed -->
+
+<script type="application/json" id="checkpoint-v187-fotos-vinho-alta-resolucao">{"version":"V187","date":"2026-09-06","scope":"309 fotos de vinhos + resolução OCR","changes":["309 fotos oficiais preservadas com mesmos nomes/caminhos/proporções","upscale conservador 1.5x","sem recorte/recolorização/substituição","OCR ao vivo elevado de 560/680px para 900/1080px","galeria OCR elevada de 1200px para 1800px"],"wineCount":309,"wineImageCount":309,"dataPreserved":true}</script>
 </body>
 </html>
 
