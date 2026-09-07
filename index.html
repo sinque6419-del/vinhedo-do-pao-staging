@@ -4767,6 +4767,10 @@ function wineApp(){
     scannerCatalogIndex:null,
     scannerFastPasses:0,
     scannerLastRecognizeMs:0,
+    scannerCloudLastAt:0,
+    scannerCloudAttempts:0,
+    scannerCloudAvailable:true,
+    scannerCloudError:'',
     wineVideoOpen:false,
     wineVideoInlineOpen:false,
     wineAudioMap:{"2":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=903b21d6-b2a5-4bf8-be4a-014e1bda1175.wav","duration":42.39673469387755,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"6":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c76d1771-ac68-4544-80a2-fe3fe035f1d3.wav","duration":42.266122448979594,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"7":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=42bf7958-f580-46d3-8fad-6caf3f3b92a3.wav","duration":43.07591836734694,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"9":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ce9044a5-2072-4a3d-b71d-3d754cb7dd60.wav","duration":39.88897959183674,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"11":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=4c6828a5-e01d-4119-9c17-a0fdccbb488a.wav","duration":42.21387755102041,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"12":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c85f6413-f463-4382-a645-c060f324b086.wav","duration":41.6130612244898,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"13":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ed0eb5f3-fe79-4ec7-a0a9-eeb0d29fef60.wav","duration":38.50448979591837,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"14":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=83ea4640-3b78-4426-9aa7-2cab284f935e.wav","duration":41.48244897959184,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"15":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=f82e1682-96c4-425c-b335-8d682aeb59aa.wav","duration":40.333061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"16":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=b444d427-77b2-4eb3-b15f-58f15d1dec26.wav","duration":38.53061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"20":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=a78f2494-0c0a-4e00-9045-d7ff85a4cd06.wav","duration":39.053061224489795,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"21":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=51c64f38-e395-4576-ad57-9039a418b1c1.wav","duration":39.20979591836735,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"22":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=3b017629-e23b-436d-bac2-3f40b80ef065.wav","duration":36.96326530612245,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"25":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=14130435-cc40-4b03-8a77-ec501e87b6c6.wav","duration":38.21714285714286,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"}},
@@ -7246,6 +7250,10 @@ function wineApp(){
       this.scannerOcrStatus='';
       this.scannerFastPasses=0;
       this.scannerLastRecognizeMs=0;
+      this.scannerCloudLastAt=0;
+      this.scannerCloudAttempts=0;
+      this.scannerCloudAvailable=true;
+      this.scannerCloudError='';
 
       if(!window.isSecureContext){
         this.scannerSearched=true;
@@ -7284,7 +7292,7 @@ function wineApp(){
         }
         try{await video.play();}catch(e){if(video.paused) throw e;}
         this.scannerCameraOn=true;
-        this.scannerMessage='Scanner automático ativo. Centralize principalmente o nome do vinho dentro da moldura e mantenha a garrafa parada.';
+        this.scannerMessage='Scanner automático ativo. Centralize o nome do vinho. O reconhecimento avançado tenta ler o rótulo e cruza o texto somente com os 309 vinhos cadastrados.';
         const track=stream.getVideoTracks?.()[0];
         try{
           const caps=track?.getCapabilities?.()||{};
@@ -7306,7 +7314,7 @@ function wineApp(){
           this.scannerLiveLoopCount++;
           try{
             const now=performance.now();
-            const interval=this.scannerTextDetector?250:450;
+            const interval=this.scannerCloudAvailable!==false?2200:(this.scannerTextDetector?350:650);
             if(!this.scannerOcrBusy && now-this.scannerLastScanAt>=interval && video.readyState>=2){
               this.scannerLastScanAt=now;
               await this.scannerReadVideoFrame(false);
@@ -7634,6 +7642,68 @@ function wineApp(){
       return false;
     },
     
+
+    scannerPrepareCloudCanvas(video){
+      const canvas=document.createElement('canvas');
+      if(!video?.videoWidth || !video?.videoHeight) return null;
+      const vw=video.videoWidth, vh=video.videoHeight;
+      const targetAspect=.75;
+      let sw,sh,sx,sy;
+      if(vw/vh>targetAspect){sh=vh;sw=Math.round(vh*targetAspect);sx=Math.round((vw-sw)/2);sy=0;}
+      else{sw=vw;sh=Math.round(vw/targetAspect);sx=0;sy=Math.round((vh-sh)/2);}
+      // Mantém resolução alta para leitura de letras pequenas, mas limita payload.
+      const outW=Math.min(1400,Math.max(1000,sw));
+      const outH=Math.round(outW*sh/sw);
+      canvas.width=outW; canvas.height=outH;
+      const ctx=canvas.getContext('2d',{alpha:false});
+      ctx.drawImage(video,sx,sy,sw,sh,0,0,outW,outH);
+      return canvas;
+    },
+    async scannerCloudReadLabel(video,force=false){
+      if(!navigator.onLine) return {ok:false,unavailable:true,error:'OFFLINE'};
+      const now=Date.now();
+      if(!force && now-(this.scannerCloudLastAt||0)<2200) return {ok:false,skipped:true};
+      this.scannerCloudLastAt=now;
+      this.scannerCloudAttempts=(this.scannerCloudAttempts||0)+1;
+      const canvas=this.scannerPrepareCloudCanvas(video);
+      if(!canvas) return {ok:false,unavailable:true,error:'NO_FRAME'};
+      let dataUrl='';
+      try{dataUrl=canvas.toDataURL('image/jpeg',.86);}catch(e){return {ok:false,unavailable:true,error:'ENCODE_FAILED'};}
+      if(!dataUrl || dataUrl.length<100) return {ok:false,unavailable:true,error:'EMPTY_IMAGE'};
+      const ctl=new AbortController();
+      const timer=setTimeout(()=>ctl.abort(),12000);
+      try{
+        this.scannerOcrStatus='Lendo rótulo com reconhecimento avançado…';
+        const res=await fetch('/api/scan-label',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({image:dataUrl}),
+          signal:ctl.signal,
+          cache:'no-store'
+        });
+        let payload={};
+        try{payload=await res.json();}catch(e){}
+        if(!res.ok || !payload?.ok){
+          const code=payload?.error || ('HTTP_'+res.status);
+          this.scannerCloudError=code;
+          // Configuração ausente/rota inexistente: não insiste a cada frame.
+          if(res.status===404 || res.status===501 || code==='VISION_NOT_CONFIGURED') this.scannerCloudAvailable=false;
+          return {ok:false,unavailable:true,error:code};
+        }
+        this.scannerCloudAvailable=true;
+        this.scannerCloudError='';
+        const text=String(payload.text||'').trim();
+        return {ok:true,text,provider:'google-vision',latencyMs:Number(payload.latencyMs||0)};
+      }catch(e){
+        const code=e?.name==='AbortError'?'VISION_TIMEOUT':'VISION_NETWORK_ERROR';
+        this.scannerCloudError=code;
+        return {ok:false,unavailable:true,error:code};
+      }finally{
+        clearTimeout(timer);
+        this.scannerOcrStatus='';
+      }
+    },
+
     async scannerLoadTesseract(){
       if(this.scannerOcrWorker){this.scannerOcrReady=true;return true;}
       // V186: uma única Promise compartilhada evita a corrida entre o preload e o primeiro frame.
@@ -7718,6 +7788,25 @@ function wineApp(){
       if(!video || video.readyState<2 || this.scannerOcrBusy) return false;
       this.scannerOcrBusy=true;
       try{
+        // V188: PRIMEIRO tenta OCR de visão no servidor. O Tesseract local vira fallback.
+        if(this.scannerCloudAvailable!==false){
+          const cloud=await this.scannerCloudReadLabel(video,force);
+          if(cloud?.ok){
+            this.scannerLastRecognizeMs=cloud.latencyMs||0;
+            const text=String(cloud.text||'').trim();
+            if(text){
+              this.scannerOcrHistory=[text];
+              this.scannerLastOcrSignature=this.scannerNormalizeOCR(text).slice(0,260);
+              const accepted=this.scannerAcceptOCRText(text,!force);
+              if(accepted || this.scannerMatches.length===1) return accepted;
+              // Se o Vision leu texto mas ainda não fechou o nome, aguardamos novo frame.
+              return false;
+            }
+          }
+        }
+
+        // Fallback local: só entra quando a API não está disponível/configurada,
+        // está offline ou falhou. Não é mais o motor principal.
         let texts=[];
         let nativeUseful=false;
         if(this.scannerTextDetector){
@@ -7731,8 +7820,6 @@ function wineApp(){
             const t=(blocks||[]).map(x=>x.rawValue||'').join(' ').trim();
             if(t){
               texts.push(t);
-              // V186: TextDetector só encerra a leitura se o texto já tiver um candidato forte na database.
-              // Antes, qualquer texto nativo (até ruído) impedia o Tesseract de rodar.
               const nr=this.scannerRank(t,true);
               const a=nr[0], b=nr[1];
               nativeUseful=!!a && (!b || a.score-b.score>=55) && (a.exactName || a.distinctiveExact>=1 || a.exactCore>=2 || a.score>=260);
@@ -7741,14 +7828,17 @@ function wineApp(){
         }
 
         if(!nativeUseful){
-          this.scannerOcrStatus='Preparando leitura do rótulo…';
+          this.scannerOcrStatus=this.scannerCloudAvailable===false
+            ? 'Reconhecimento online não configurado. Usando leitor local…'
+            : 'Usando leitor local como alternativa…';
           const ok=await this.scannerLoadTesseract();
           if(!ok){
             this.scannerSearched=true;
-            this.scannerMessage='O leitor de texto não conseguiu carregar. Verifique a internet e tente novamente.';
+            this.scannerMessage=this.scannerCloudAvailable===false
+              ? 'O reconhecimento avançado ainda não está configurado no servidor e o leitor local não conseguiu carregar.'
+              : 'O leitor não conseguiu carregar. Verifique a internet e tente novamente.';
             return false;
           }
-          this.scannerOcrStatus='Lendo nome do rótulo…';
           const needBroad=force || (this.scannerUnreadableHits||0)>=1 || (this.scannerUnavailableHits||0)>=1 || ((this.scannerLiveLoopCount||0)%4===0);
           const variant=needBroad?1:0;
           const canvas=this.scannerPrepareCanvas(video,variant);
@@ -7762,11 +7852,8 @@ function wineApp(){
             .filter(w=>Number(w?.confidence||0)>=30 && String(w?.text||'').trim().length>=2)
             .map(w=>String(w.text).trim());
           const wordText=goodWords.join(' ').trim();
-          // V186: não descarta o nome principal só porque o Tesseract deu confiança baixa nele.
-          // Mantém também o texto bruto; o cruzamento fechado dos 309 nomes filtra o ruído depois.
           if(wordText) texts.push(wordText);
           if(rawText && this.scannerNormalizeOCR(rawText)!==this.scannerNormalizeOCR(wordText)) texts.push(rawText);
-          this.scannerFastPasses=(this.scannerFastPasses||0)+1;
         }
 
         const current=[...new Set(texts.filter(Boolean))].join(' ');
@@ -7777,9 +7864,14 @@ function wineApp(){
         return this.scannerAcceptOCRText(current,!force);
       }catch(e){
         this.scannerOcrStatus='';
-        if(force){this.scannerSearched=true;this.scannerMessage='Não consegui ler este rótulo. Aproxime a câmera, deixe o nome reto e evite reflexo.';}
+        if(force){
+          this.scannerSearched=true;
+          this.scannerMessage='Não consegui ler este rótulo. Tente manter o nome centralizado e sem reflexo.';
+        }
         return false;
-      }finally{this.scannerOcrBusy=false;}
+      }finally{
+        this.scannerOcrBusy=false;
+      }
     },
     async scannerCaptureLabel(){
       // Nova tentativa sempre descarta completamente o resultado anterior.
@@ -10709,6 +10801,11 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 <!-- checkpoint-v186-scanner-deep-audit: shared OCR loader; native fallback; raw OCR preserved; vote confirmation; active-scan UI fixed -->
 
 <script type="application/json" id="checkpoint-v187-fotos-vinho-alta-resolucao">{"version":"V187","date":"2026-09-06","scope":"309 fotos de vinhos + resolução OCR","changes":["309 fotos oficiais preservadas com mesmos nomes/caminhos/proporções","upscale conservador 1.5x","sem recorte/recolorização/substituição","OCR ao vivo elevado de 560/680px para 900/1080px","galeria OCR elevada de 1200px para 1800px"],"wineCount":309,"wineImageCount":309,"dataPreserved":true}</script>
+
+<script type="application/json" id="checkpoint-v188-scanner-google-vision">
+{"version":"V188","date":"2026-09-06","scope":"scanner de rótulo","architecture":"Google Cloud Vision via Vercel Function + database fechada de 309 vinhos + Tesseract fallback","security":"chave somente no servidor em GOOGLE_VISION_API_KEY","cloudEndpoint":"/api/scan-label","dataPreserved":true,"wineCount":309}
+</script>
+
 </body>
 </html>
 
