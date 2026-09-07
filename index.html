@@ -4767,10 +4767,11 @@ function wineApp(){
     scannerCatalogIndex:null,
     scannerFastPasses:0,
     scannerLastRecognizeMs:0,
-    scannerCloudLastAt:0,
-    scannerCloudAttempts:0,
-    scannerCloudAvailable:true,
-    scannerCloudError:'',
+    scannerPaddle:null,
+    scannerPaddleLoadPromise:null,
+    scannerPaddleReady:false,
+    scannerPaddleError:'',
+    scannerPaddleLastAt:0,
     wineVideoOpen:false,
     wineVideoInlineOpen:false,
     wineAudioMap:{"2":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=903b21d6-b2a5-4bf8-be4a-014e1bda1175.wav","duration":42.39673469387755,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"6":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c76d1771-ac68-4544-80a2-fe3fe035f1d3.wav","duration":42.266122448979594,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"7":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=42bf7958-f580-46d3-8fad-6caf3f3b92a3.wav","duration":43.07591836734694,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"9":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ce9044a5-2072-4a3d-b71d-3d754cb7dd60.wav","duration":39.88897959183674,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"11":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=4c6828a5-e01d-4119-9c17-a0fdccbb488a.wav","duration":42.21387755102041,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"12":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c85f6413-f463-4382-a645-c060f324b086.wav","duration":41.6130612244898,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"13":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ed0eb5f3-fe79-4ec7-a0a9-eeb0d29fef60.wav","duration":38.50448979591837,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"14":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=83ea4640-3b78-4426-9aa7-2cab284f935e.wav","duration":41.48244897959184,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"15":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=f82e1682-96c4-425c-b335-8d682aeb59aa.wav","duration":40.333061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"16":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=b444d427-77b2-4eb3-b15f-58f15d1dec26.wav","duration":38.53061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"20":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=a78f2494-0c0a-4e00-9045-d7ff85a4cd06.wav","duration":39.053061224489795,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"21":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=51c64f38-e395-4576-ad57-9039a418b1c1.wav","duration":39.20979591836735,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"22":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=3b017629-e23b-436d-bac2-3f40b80ef065.wav","duration":36.96326530612245,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"25":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=14130435-cc40-4b03-8a77-ec501e87b6c6.wav","duration":38.21714285714286,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"}},
@@ -7250,10 +7251,8 @@ function wineApp(){
       this.scannerOcrStatus='';
       this.scannerFastPasses=0;
       this.scannerLastRecognizeMs=0;
-      this.scannerCloudLastAt=0;
-      this.scannerCloudAttempts=0;
-      this.scannerCloudAvailable=true;
-      this.scannerCloudError='';
+      this.scannerPaddleError='';
+      this.scannerPaddleLastAt=0;
 
       if(!window.isSecureContext){
         this.scannerSearched=true;
@@ -7292,7 +7291,7 @@ function wineApp(){
         }
         try{await video.play();}catch(e){if(video.paused) throw e;}
         this.scannerCameraOn=true;
-        this.scannerMessage='Scanner automático ativo. Centralize o nome do vinho. O reconhecimento avançado tenta ler o rótulo e cruza o texto somente com os 309 vinhos cadastrados.';
+        this.scannerMessage='Scanner automático ativo. Centralize o nome do vinho. O PaddleOCR lê o rótulo no próprio celular e cruza o texto somente com os 309 vinhos cadastrados.';
         const track=stream.getVideoTracks?.()[0];
         try{
           const caps=track?.getCapabilities?.()||{};
@@ -7306,15 +7305,15 @@ function wineApp(){
         if('TextDetector' in window){
           try{this.scannerTextDetector=new TextDetector();}catch(e){this.scannerTextDetector=null;}
         }
-        // Prepara o OCR em segundo plano. A câmera abre primeiro; o módulo não bloqueia a interface.
-        if(!this.scannerTextDetector) this.scannerLoadTesseract().catch(()=>{});
+        // Prepara PaddleOCR em segundo plano. A câmera abre primeiro.
+        this.scannerLoadPaddle().catch(()=>{});
 
         const loop=async()=>{
           if(!this.scannerCameraOn) return;
           this.scannerLiveLoopCount++;
           try{
             const now=performance.now();
-            const interval=this.scannerCloudAvailable!==false?2200:(this.scannerTextDetector?350:650);
+            const interval=this.scannerPaddleReady?1150:1700;
             if(!this.scannerOcrBusy && now-this.scannerLastScanAt>=interval && video.readyState>=2){
               this.scannerLastScanAt=now;
               await this.scannerReadVideoFrame(false);
@@ -7643,65 +7642,74 @@ function wineApp(){
     },
     
 
-    scannerPrepareCloudCanvas(video){
-      const canvas=document.createElement('canvas');
+    scannerPreparePaddleCanvas(video,variant=0){
       if(!video?.videoWidth || !video?.videoHeight) return null;
-      const vw=video.videoWidth, vh=video.videoHeight;
-      const targetAspect=.75;
+      const canvas=document.createElement('canvas');
+      const vw=video.videoWidth, vh=video.videoHeight, targetAspect=.75;
       let sw,sh,sx,sy;
       if(vw/vh>targetAspect){sh=vh;sw=Math.round(vh*targetAspect);sx=Math.round((vw-sw)/2);sy=0;}
       else{sw=vw;sh=Math.round(vw/targetAspect);sx=0;sy=Math.round((vh-sh)/2);}
-      // Mantém resolução alta para leitura de letras pequenas, mas limita payload.
-      const outW=Math.min(1400,Math.max(1000,sw));
-      const outH=Math.round(outW*sh/sw);
-      canvas.width=outW; canvas.height=outH;
-      const ctx=canvas.getContext('2d',{alpha:false});
+      if(variant===1){const oldH=sh;sh=Math.round(oldH*.72);sy+=Math.round(oldH*.10);}
+      const outW=variant===0?960:1120, outH=Math.max(1,Math.round(outW*sh/sw));
+      canvas.width=outW;canvas.height=outH;
+      const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:false});
       ctx.drawImage(video,sx,sy,sw,sh,0,0,outW,outH);
       return canvas;
     },
-    async scannerCloudReadLabel(video,force=false){
-      if(!navigator.onLine) return {ok:false,unavailable:true,error:'OFFLINE'};
+    async scannerLoadPaddle(){
+      if(this.scannerPaddle){this.scannerPaddleReady=true;return true;}
+      if(this.scannerPaddleLoadPromise){try{return await this.scannerPaddleLoadPromise;}catch(e){return false;}}
+      this.scannerPaddleLoadPromise=(async()=>{
+        try{
+          this.scannerOcrStatus='Preparando leitor PaddleOCR no celular…';
+          const mod=await import('https://esm.sh/@paddleocr/paddleocr-js?bundle');
+          const PaddleOCR=mod?.PaddleOCR;
+          if(!PaddleOCR) throw new Error('PADDLE_SDK_NOT_FOUND');
+          // PP-OCRv5 multilingual Portuguese. Worker mantém a interface responsiva quando suportado.
+          try{
+            this.scannerPaddle=await PaddleOCR.create({
+              lang:'pt',ocrVersion:'PP-OCRv5',worker:true,
+              ortOptions:{backend:'wasm',wasmPaths:'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/',numThreads:2,simd:true}
+            });
+          }catch(workerError){
+            // Compatibilidade para navegadores que bloqueiam worker de módulo/CDN.
+            this.scannerPaddle=await PaddleOCR.create({
+              lang:'pt',ocrVersion:'PP-OCRv5',
+              ortOptions:{backend:'wasm',wasmPaths:'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/',numThreads:1,simd:true}
+            });
+          }
+          this.scannerPaddleReady=!!this.scannerPaddle;
+          this.scannerPaddleError='';
+          return this.scannerPaddleReady;
+        }catch(e){
+          this.scannerPaddle=null;this.scannerPaddleReady=false;
+          this.scannerPaddleError=String(e?.message||'PADDLE_LOAD_ERROR').slice(0,160);
+          return false;
+        }finally{this.scannerOcrStatus='';}
+      })();
+      try{return await this.scannerPaddleLoadPromise;}finally{this.scannerPaddleLoadPromise=null;}
+    },
+    async scannerPaddleReadLabel(video,force=false){
       const now=Date.now();
-      if(!force && now-(this.scannerCloudLastAt||0)<2200) return {ok:false,skipped:true};
-      this.scannerCloudLastAt=now;
-      this.scannerCloudAttempts=(this.scannerCloudAttempts||0)+1;
-      const canvas=this.scannerPrepareCloudCanvas(video);
+      if(!force && now-(this.scannerPaddleLastAt||0)<1100) return {ok:false,skipped:true};
+      this.scannerPaddleLastAt=now;
+      const ok=await this.scannerLoadPaddle();
+      if(!ok) return {ok:false,unavailable:true,error:this.scannerPaddleError||'PADDLE_UNAVAILABLE'};
+      const variant=((this.scannerLiveLoopCount||0)%3===0)?1:0;
+      const canvas=this.scannerPreparePaddleCanvas(video,variant);
       if(!canvas) return {ok:false,unavailable:true,error:'NO_FRAME'};
-      let dataUrl='';
-      try{dataUrl=canvas.toDataURL('image/jpeg',.86);}catch(e){return {ok:false,unavailable:true,error:'ENCODE_FAILED'};}
-      if(!dataUrl || dataUrl.length<100) return {ok:false,unavailable:true,error:'EMPTY_IMAGE'};
-      const ctl=new AbortController();
-      const timer=setTimeout(()=>ctl.abort(),12000);
       try{
-        this.scannerOcrStatus='Lendo rótulo com reconhecimento avançado…';
-        const res=await fetch('/api/scan-label',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({image:dataUrl}),
-          signal:ctl.signal,
-          cache:'no-store'
-        });
-        let payload={};
-        try{payload=await res.json();}catch(e){}
-        if(!res.ok || !payload?.ok){
-          const code=payload?.error || ('HTTP_'+res.status);
-          this.scannerCloudError=code;
-          // Configuração ausente/rota inexistente: não insiste a cada frame.
-          if(res.status===404 || res.status===501 || code==='VISION_NOT_CONFIGURED') this.scannerCloudAvailable=false;
-          return {ok:false,unavailable:true,error:code};
-        }
-        this.scannerCloudAvailable=true;
-        this.scannerCloudError='';
-        const text=String(payload.text||'').trim();
-        return {ok:true,text,provider:'google-vision',latencyMs:Number(payload.latencyMs||0)};
+        this.scannerOcrStatus='Lendo o nome do rótulo no próprio celular…';
+        const t0=performance.now();
+        const results=await this.scannerPaddle.predict(canvas,{textRecScoreThresh:.30,textDetBoxThresh:.45,textDetLimitSideLen:1120});
+        const result=Array.isArray(results)?results[0]:results;
+        const items=Array.isArray(result?.items)?result.items:[];
+        const text=items.filter(x=>Number(x?.score||0)>=.30).map(x=>String(x?.text||'').trim()).filter(Boolean).join(' ').trim();
+        return {ok:true,text,provider:'paddleocr-local',latencyMs:Math.round(performance.now()-t0)};
       }catch(e){
-        const code=e?.name==='AbortError'?'VISION_TIMEOUT':'VISION_NETWORK_ERROR';
-        this.scannerCloudError=code;
-        return {ok:false,unavailable:true,error:code};
-      }finally{
-        clearTimeout(timer);
-        this.scannerOcrStatus='';
-      }
+        this.scannerPaddleError=String(e?.message||'PADDLE_PREDICT_ERROR').slice(0,160);
+        return {ok:false,unavailable:true,error:this.scannerPaddleError};
+      }finally{this.scannerOcrStatus='';}
     },
 
     async scannerLoadTesseract(){
@@ -7788,25 +7796,21 @@ function wineApp(){
       if(!video || video.readyState<2 || this.scannerOcrBusy) return false;
       this.scannerOcrBusy=true;
       try{
-        // V188: PRIMEIRO tenta OCR de visão no servidor. O Tesseract local vira fallback.
-        if(this.scannerCloudAvailable!==false){
-          const cloud=await this.scannerCloudReadLabel(video,force);
-          if(cloud?.ok){
-            this.scannerLastRecognizeMs=cloud.latencyMs||0;
-            const text=String(cloud.text||'').trim();
-            if(text){
-              this.scannerOcrHistory=[text];
-              this.scannerLastOcrSignature=this.scannerNormalizeOCR(text).slice(0,260);
-              const accepted=this.scannerAcceptOCRText(text,!force);
-              if(accepted || this.scannerMatches.length===1) return accepted;
-              // Se o Vision leu texto mas ainda não fechou o nome, aguardamos novo frame.
-              return false;
-            }
+        // V189: PaddleOCR/PP-OCRv5 é o motor principal e processa o frame no navegador.
+        const paddle=await this.scannerPaddleReadLabel(video,force);
+        if(paddle?.ok){
+          this.scannerLastRecognizeMs=paddle.latencyMs||0;
+          const text=String(paddle.text||'').trim();
+          if(text){
+            this.scannerOcrHistory=[text];
+            this.scannerLastOcrSignature=this.scannerNormalizeOCR(text).slice(0,260);
+            const accepted=this.scannerAcceptOCRText(text,!force);
+            if(accepted || this.scannerMatches.length===1) return accepted;
+            return false;
           }
         }
 
-        // Fallback local: só entra quando a API não está disponível/configurada,
-        // está offline ou falhou. Não é mais o motor principal.
+        // Fallback: Tesseract/TextDetector só entra se o PaddleOCR local não estiver disponível.
         let texts=[];
         let nativeUseful=false;
         if(this.scannerTextDetector){
@@ -7828,15 +7832,11 @@ function wineApp(){
         }
 
         if(!nativeUseful){
-          this.scannerOcrStatus=this.scannerCloudAvailable===false
-            ? 'Reconhecimento online não configurado. Usando leitor local…'
-            : 'Usando leitor local como alternativa…';
+          this.scannerOcrStatus='PaddleOCR indisponível neste navegador. Usando leitor alternativo…';
           const ok=await this.scannerLoadTesseract();
           if(!ok){
             this.scannerSearched=true;
-            this.scannerMessage=this.scannerCloudAvailable===false
-              ? 'O reconhecimento avançado ainda não está configurado no servidor e o leitor local não conseguiu carregar.'
-              : 'O leitor não conseguiu carregar. Verifique a internet e tente novamente.';
+            this.scannerMessage='O PaddleOCR não carregou e o leitor alternativo também não conseguiu iniciar. Verifique a internet e tente novamente.';
             return false;
           }
           const needBroad=force || (this.scannerUnreadableHits||0)>=1 || (this.scannerUnavailableHits||0)>=1 || ((this.scannerLiveLoopCount||0)%4===0);
@@ -7892,28 +7892,23 @@ function wineApp(){
       this.scannerUnreadableHits=0;this.scannerUnavailableHits=0;
       try{
         let text='';
-        if('TextDetector' in window){
+        const ok=await this.scannerLoadPaddle();
+        if(ok){
           const bmp=await createImageBitmap(file);
-          const det=new TextDetector();
-          const blocks=await det.detect(bmp);
-          try{bmp.close();}catch(e){}
-          text=(blocks||[]).map(x=>x.rawValue||'').join(' ');
-        }else{
-          const ok=await this.scannerLoadTesseract();
-          if(!ok){this.scannerSearched=true;this.scannerMessage='Não consegui carregar o leitor de texto. Verifique a internet e tente novamente.';return;}
-          // Redimensiona fotos enormes antes do OCR para acelerar no Android.
-          const bmp=await createImageBitmap(file);
-          const maxW=1800, scale=Math.min(1,maxW/bmp.width);
-          const canvas=this.$refs?.scannerCanvas||document.createElement('canvas');
+          const maxW=1800,scale=Math.min(1,maxW/bmp.width),canvas=document.createElement('canvas');
           canvas.width=Math.max(1,Math.round(bmp.width*scale));canvas.height=Math.max(1,Math.round(bmp.height*scale));
-          const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(bmp,0,0,canvas.width,canvas.height);try{bmp.close();}catch(e){}
-          const result=await this.scannerOcrWorker.recognize(canvas);
-          text=result?.data?.text||'';
+          canvas.getContext('2d',{alpha:false}).drawImage(bmp,0,0,canvas.width,canvas.height);try{bmp.close();}catch(e){}
+          const results=await this.scannerPaddle.predict(canvas,{textRecScoreThresh:.30,textDetBoxThresh:.45,textDetLimitSideLen:1600});
+          const result=Array.isArray(results)?results[0]:results;
+          text=(result?.items||[]).filter(x=>Number(x?.score||0)>=.30).map(x=>String(x?.text||'').trim()).filter(Boolean).join(' ');
+        }else{
+          const tok=await this.scannerLoadTesseract();
+          if(!tok){this.scannerSearched=true;this.scannerMessage='Não consegui carregar o PaddleOCR nem o leitor alternativo.';return;}
+          const result=await this.scannerOcrWorker.recognize(file);text=result?.data?.text||'';
         }
         this.scannerStableWineId=null;this.scannerStableHits=0;
         this.scannerAcceptOCRText(text,false);
-        if(this.scannerMatches.length>1) this.scannerMessage='Li o nome da imagem e cruzei com o catálogo, mas há mais de uma possibilidade. Toque no rótulo correto.';
-      }catch(e){this.scannerSearched=true;this.scannerMessage='Não foi possível ler esta imagem. Tente uma foto mais frontal, próxima e sem reflexo.';}
+      }catch(e){this.scannerSearched=true;this.scannerMessage='Não foi possível ler esta imagem. Tente uma foto frontal, próxima e sem reflexo.';}
       finally{this.scannerWorking=false;this.scannerOcrBusy=false;if(ev?.target)ev.target.value='';}
     },
     scannerSearch(query){
@@ -10802,8 +10797,8 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 
 <script type="application/json" id="checkpoint-v187-fotos-vinho-alta-resolucao">{"version":"V187","date":"2026-09-06","scope":"309 fotos de vinhos + resolução OCR","changes":["309 fotos oficiais preservadas com mesmos nomes/caminhos/proporções","upscale conservador 1.5x","sem recorte/recolorização/substituição","OCR ao vivo elevado de 560/680px para 900/1080px","galeria OCR elevada de 1200px para 1800px"],"wineCount":309,"wineImageCount":309,"dataPreserved":true}</script>
 
-<script type="application/json" id="checkpoint-v188-scanner-google-vision">
-{"version":"V188","date":"2026-09-06","scope":"scanner de rótulo","architecture":"Google Cloud Vision via Vercel Function + database fechada de 309 vinhos + Tesseract fallback","security":"chave somente no servidor em GOOGLE_VISION_API_KEY","cloudEndpoint":"/api/scan-label","dataPreserved":true,"wineCount":309}
+<script type="application/json" id="checkpoint-v189-scanner-paddleocr-local">
+{"version":"V189","date":"2026-09-07","scope":"scanner de rótulo","architecture":"PaddleOCR.js PP-OCRv5 no navegador + database fechada de 309 vinhos + Tesseract fallback","paidApi":false,"cloudEndpoint":null,"dataPreserved":true,"wineCount":309}
 </script>
 
 </body>
