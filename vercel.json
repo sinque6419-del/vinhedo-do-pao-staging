@@ -1,1 +1,7 @@
-
+{
+  "functions": {
+    "api/scan-label.js": {
+      "maxDuration": 30
+    }
+  }
+}
