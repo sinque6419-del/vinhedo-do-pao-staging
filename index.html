@@ -2981,6 +2981,66 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
  .vp-scanner-focus{width:86%!important;height:60%!important}
 }
 </style>
+
+<style id="v192-home-mobile-no-crop">
+/* V192 — Home mobile: preservar a arte oficial inteira, sem cortar logo/topo ou rodapé. */
+@media (max-width:699px){
+  #v116-home{
+    min-height:100dvh!important;
+    height:100dvh!important;
+    display:grid!important;
+    place-items:center!important;
+    overflow:hidden!important;
+    background:#0b3024!important;
+  }
+  #v116-home .v116-home-frame{
+    width:min(100vw, calc(100dvh * 711 / 1536))!important;
+    height:auto!important;
+    max-width:100vw!important;
+    max-height:100dvh!important;
+    aspect-ratio:711 / 1536!important;
+    margin:auto!important;
+    overflow:hidden!important;
+  }
+  #v116-home .v116-home-art{
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+    object-position:center center!important;
+  }
+  #v116-home .v116-home-cta{
+    left:49.1%!important;
+    top:81.7%!important;
+    width:70%!important;
+    height:7.4%!important;
+    transform:translate(-50%,-50%)!important;
+  }
+}
+</style>
+
+<style id="v193-scanner-smart-search">
+/* V193 — Ler Rótulo: abas Câmera / Buscar vinho + busca inteligente nos 309 rótulos */
+.v193-scanner-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:14px 0 16px;padding:5px;border:1px solid #cfbc93;border-radius:14px;background:#efe3c9}
+.v193-scanner-tabs button{min-height:44px;border:0;border-radius:10px;background:transparent;color:#153E2B;font-size:11px;font-weight:900;letter-spacing:.03em}
+.v193-scanner-tabs button.is-active{background:#153E2B;color:#f4d989;box-shadow:0 4px 14px rgba(21,62,43,.16)}
+.v193-search-shell{margin-top:2px}
+.v193-search-head{margin-bottom:12px}.v193-search-head h3{margin:2px 0 5px;font:700 24px/1.08 Georgia,serif;color:#153E2B}.v193-search-head p{margin:0;color:#4d5b52;font-size:11px;line-height:1.5}
+.v193-searchbox{position:relative}.v193-searchbox input{width:100%;height:50px;border:1px solid #bda97e;border-radius:13px;background:#fffdf7;padding:0 44px 0 14px;color:#153E2B;font-size:14px;outline:none;box-shadow:0 5px 18px rgba(64,49,22,.06)}
+.v193-searchbox input:focus{border-color:#7f6a3e;box-shadow:0 0 0 3px rgba(191,157,75,.14)}
+.v193-searchbox span{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:20px;color:#8a713e}
+.v193-search-hint{margin:8px 2px 0;color:#6b736d;font-size:9.5px;line-height:1.45}
+.v193-search-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:17px 1px 8px}.v193-search-summary b{font-size:11px;color:#153E2B}.v193-search-summary span{font-size:9px;color:#806b42}
+.v193-search-list{display:grid;gap:8px}
+.v193-search-item{width:100%;display:grid;grid-template-columns:58px 1fr 22px;gap:10px;align-items:center;padding:9px;border:1px solid #d5c39e;border-radius:13px;background:#fffaf0;text-align:left;color:#153E2B}
+.v193-search-item img{width:58px;height:72px;object-fit:contain;border-radius:8px;background:#f2ead9}
+.v193-search-item-copy{min-width:0;display:block}.v193-search-item-copy b{display:block;font:700 13px/1.2 Georgia,serif;overflow-wrap:anywhere}.v193-search-item-copy small{display:block;margin-top:4px;color:#667168;font-size:9.5px;line-height:1.35}.v193-search-item-copy em{display:block;margin-top:4px;color:#8a713e;font-size:8.5px;font-style:normal;font-weight:800}
+.v193-search-item>strong{font-size:24px;font-weight:400;color:#8c7138}
+.v193-search-more{width:100%;min-height:44px;margin-top:10px;border:1px solid #315642;border-radius:10px;background:#153E2B;color:#f5dda2;font-size:10px;font-weight:900}
+.v193-search-empty{padding:20px 10px;text-align:center;color:#566158}.v193-search-empty b{display:block;color:#153E2B;font:700 17px Georgia,serif}.v193-search-empty p{font-size:10px;line-height:1.5}
+@media(max-width:420px){.v193-scanner-tabs{margin-top:10px}.v193-search-head h3{font-size:22px}.v193-searchbox input{height:48px;font-size:13px}.v193-search-item{grid-template-columns:52px 1fr 18px}.v193-search-item img{width:52px;height:66px}}
+</style>
+
 </head>
 <!-- V95 CONTINUIDADE: evidencias ZIP associadas=185; imagens faltantes preenchidas=39; preços despriorizados/ocultos na UI pública. -->
 <!-- V96: recuperacao de fotos pendentes + novos rotulos confirmados visualmente; sem exclusao insegura de rotulos duvidosos. -->
@@ -3390,8 +3450,15 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
           <section x-show="scannerMatches.length!==1" class="vp-scanner-intro">
             <p class="vp-scanner-kicker">LER RÓTULO</p>
             <h2>Identifique seu vinho pela imagem</h2>
-            <p class="vp-scanner-lead">Aponte a câmera para a frente do rótulo. O leitor trabalha sozinho: lê nome e produtor continuamente e cruza com os vinhos cadastrados.</p>
+            <p class="vp-scanner-lead" x-show="scannerView==='camera'">Aponte a câmera para a frente do rótulo. O leitor trabalha sozinho: lê nome e produtor continuamente e cruza com os vinhos cadastrados.</p>
+            <p class="vp-scanner-lead" x-show="scannerView==='search'">Prefere procurar? Digite o nome completo, parte do nome, produtor, uva, país, região ou uma sigla. A busca cruza os dados dos 309 vinhos cadastrados.</p>
 
+            <nav class="v193-scanner-tabs" aria-label="Modo do leitor de rótulo">
+              <button type="button" :class="scannerView==='camera'?'is-active':''" @click="scannerSwitchView('camera')">▣ &nbsp; LER RÓTULO</button>
+              <button type="button" :class="scannerView==='search'?'is-active':''" @click="scannerSwitchView('search')">⌕ &nbsp; BUSCAR VINHO</button>
+            </nav>
+
+            <div x-show="scannerView==='camera'" x-transition>
             <section class="vp-scanner-camera-card">
               <div class="vp-scanner-camera-frame">
                 <video x-ref="scannerVideo" playsinline webkit-playsinline muted autoplay></video>
@@ -3444,14 +3511,14 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
               </button>
               <input x-ref="scannerGalleryInput" type="file" accept="image/*" class="hidden" @change="handleScannerGallery($event)" aria-label="Selecionar foto do rótulo na galeria">
 
-              <button type="button" @click="scannerManualOpen=!scannerManualOpen">
+              <button type="button" @click="scannerSwitchView('search')">
                 <span>⌕</span>
-                <small>BUSCA MANUAL</small>
-                <b>Nome ou produtor</b>
+                <small>BUSCA INTELIGENTE</small>
+                <b>Pesquisar 309 vinhos</b>
               </button>
             </div>
 
-            <section x-show="scannerManualOpen" x-transition class="vp-scanner-search-panel">
+            <section x-show="false" class="vp-scanner-search-panel" aria-hidden="true">
               <label for="vpScannerSearch">BUSCAR MANUALMENTE</label>
               <div>
                 <input id="vpScannerSearch" x-model="scannerQuery"
@@ -3480,6 +3547,43 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
                 <article><span>☼</span><b>2. Evite reflexo</b><p>Use boa luz, mas sem brilho forte sobre as letras.</p></article>
                 <article><span>✓</span><b>3. Confirmação segura</b><p>O scanner só abre um vinho quando encontra uma correspondência única e segura.</p></article>
               </div>
+            </section>
+            </div>
+
+            <section x-show="scannerView==='search'" x-transition class="v193-search-shell" aria-label="Buscar vinho pelo nome">
+              <header class="v193-search-head">
+                <p class="vp-scanner-kicker">CATÁLOGO COMPLETO · 309 VINHOS</p>
+                <h3>Encontre pelo que você lembrar</h3>
+                <p>Funciona com nome inteiro, pedaços do nome, produtor, uva, país, região e siglas formadas pelas palavras do rótulo.</p>
+              </header>
+              <div class="v193-searchbox">
+                <input x-ref="scannerSmartSearch" type="search" x-model="scannerQuery" @input.debounce.120ms="scannerBrowseSearch(scannerQuery)" placeholder="Ex.: Postales, Rutini, CS, Malbec, Chile…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Buscar entre os 309 vinhos">
+                <span>⌕</span>
+              </div>
+              <p class="v193-search-hint">Dica: você não precisa digitar o nome certo. “post fin”, “rut qual”, “cab sauv”, “arg” ou uma sigla também podem encontrar resultados.</p>
+
+              <div class="v193-search-summary">
+                <b x-text="scannerQuery.trim() ? scannerSearchTotal+' resultado'+(scannerSearchTotal===1?'':'s') : 'Todos os 309 vinhos'"></b>
+                <span x-text="'mostrando '+scannerSearchResults.length"></span>
+              </div>
+
+              <div x-show="scannerSearchResults.length" class="v193-search-list">
+                <template x-for="r in scannerSearchResults" :key="'smart-search-'+r.wine.id">
+                  <button type="button" class="v193-search-item" @click="scannerOpenSearchWine(r.wine)">
+                    <img :src="wineImage(r.wine)" :alt="r.wine.name" loading="lazy" decoding="async" @error="nextWineImage($event,r.wine)">
+                    <span class="v193-search-item-copy">
+                      <b x-text="r.wine.name"></b>
+                      <small x-text="[r.wine.producer||r.wine.vinicola, r.wine.country, r.wine.region].filter(Boolean).join(' • ')"></small>
+                      <em x-text="r.reason"></em>
+                    </span>
+                    <strong>›</strong>
+                  </button>
+                </template>
+              </div>
+              <div x-show="!scannerSearchResults.length && scannerQuery.trim()" class="v193-search-empty">
+                <b>Nenhum vinho encontrado</b><p>Tente menos letras, só uma parte do nome, o produtor, a uva ou o país.</p>
+              </div>
+              <button x-show="scannerSearchResults.length < scannerSearchTotal" type="button" class="v193-search-more" @click="scannerSearchVisibleLimit+=18;scannerBrowseSearch(scannerQuery)">MOSTRAR MAIS</button>
             </section>
           </section>
 
@@ -4764,6 +4868,10 @@ function wineApp(){
     scannerTextDetector:null,
     scannerAutoOpenTimer:null,
     scannerManualOpen:false,
+    scannerView:'camera',
+    scannerSearchResults:[],
+    scannerSearchVisibleLimit:18,
+    scannerSearchTotal:0,
     scannerTorchSupported:false,
     scannerTorchOn:false,
     scannerLastBarcode:'',
@@ -7368,6 +7476,10 @@ function wineApp(){
       this.scannerWorking=false;
       this.scannerSearched=false;
       this.scannerManualOpen=false;
+      this.scannerView='camera';
+      this.scannerSearchResults=[];
+      this.scannerSearchVisibleLimit=18;
+      this.scannerSearchTotal=0;
       this.scannerTorchSupported=false;
       this.scannerTorchOn=false;
       this.scannerLastBarcode='';
@@ -8019,6 +8131,96 @@ function wineApp(){
         this.scannerAcceptOCRText(text,false);
       }catch(e){this.scannerSearched=true;this.scannerMessage='Não foi possível ler esta imagem. Tente uma foto frontal, próxima e sem reflexo.';}
       finally{this.scannerWorking=false;this.scannerOcrBusy=false;if(ev?.target)ev.target.value='';}
+    },
+    scannerSwitchView(view){
+      const next=view==='search'?'search':'camera';
+      if(next===this.scannerView) return;
+      this.scannerView=next;
+      this.scannerMessage='';
+      this.scannerMatches=[];
+      if(next==='search'){
+        this.stopScanner();
+        this.scannerSearchVisibleLimit=18;
+        this.scannerBrowseSearch(this.scannerQuery);
+        this.$nextTick(()=>{try{this.$refs?.scannerSmartSearch?.focus();}catch(e){}});
+      }else{
+        this.scannerSearchResults=[];
+        this.scannerSearchTotal=0;
+        this.$nextTick(()=>this.startLiveLabelScanner());
+      }
+    },
+    scannerSearchAcronyms(w){
+      const cleanTokens=v=>this.scannerNormalize(v).split(' ').filter(x=>x.length>=2 && !/^\d{4}$/.test(x));
+      const nameTokens=cleanTokens(w?.name||'');
+      const producerTokens=cleanTokens(w?.producer||w?.vinicola||'');
+      const grapes=cleanTokens(Array.isArray(w?.grapes)?w.grapes.join(' '):(w?.grapes||''));
+      const acr=(arr)=>arr.length>=2?arr.map(x=>x[0]).join(''):'';
+      const out=new Set([acr(nameTokens),acr(producerTokens),acr(grapes)]);
+      if(nameTokens.length>=3){
+        out.add(acr(nameTokens.slice(0,2)));
+        out.add(acr(nameTokens.slice(0,3)));
+      }
+      return [...out].filter(x=>x.length>=2);
+    },
+    scannerBrowseRows(query=''){
+      const q=this.scannerNormalize(query);
+      const qCompact=q.replace(/\s+/g,'');
+      const qTokens=q.split(' ').filter(Boolean);
+      const rows=this.wines.map(w=>{
+        const name=this.scannerNormalize(w?.name||'');
+        const producer=this.scannerNormalize(w?.producer||w?.vinicola||'');
+        const grapes=this.scannerNormalize(Array.isArray(w?.grapes)?w.grapes.join(' '):(w?.grapes||''));
+        const country=this.scannerNormalize(w?.country||'');
+        const region=this.scannerNormalize(w?.region||'');
+        const type=this.scannerNormalize(w?.type||'');
+        const style=this.scannerNormalize(w?.estilo||'');
+        const tags=this.scannerNormalize(Array.isArray(w?.tags)?w.tags.join(' '):(w?.tags||''));
+        const full=[name,producer,grapes,country,region,type,style,tags].filter(Boolean).join(' ');
+        const compact=full.replace(/\s+/g,'');
+        const acronyms=this.scannerSearchAcronyms(w);
+        if(!q) return {wine:w,score:0,reason:'catálogo'};
+        let score=0, reason='dados do vinho';
+        if(name===q){score+=1400;reason='nome exato';}
+        else if(name.startsWith(q)){score+=1050;reason='início do nome';}
+        else if(name.includes(q)){score+=900;reason='parte do nome';}
+        if(qCompact.length>=3 && name.replace(/\s+/g,'').includes(qCompact)){score+=720;if(reason==='dados do vinho')reason='nome abreviado';}
+        if(acronyms.includes(qCompact)){score+=980;reason='sigla do rótulo';}
+        if(producer===q){score+=850;reason='produtor';}
+        else if(producer.startsWith(q) || producer.includes(q)){score+=560;if(reason==='dados do vinho')reason='produtor';}
+        if(grapes.includes(q)){score+=420;if(reason==='dados do vinho')reason='uva';}
+        if(country.includes(q)){score+=330;if(reason==='dados do vinho')reason='país';}
+        if(region.includes(q)){score+=300;if(reason==='dados do vinho')reason='região';}
+        let tokenHits=0, prefixHits=0;
+        for(const qt of qTokens){
+          const words=full.split(' ').filter(Boolean);
+          if(words.includes(qt)){tokenHits++;continue;}
+          if(qt.length>=2 && words.some(wd=>wd.startsWith(qt))){prefixHits++;continue;}
+          if(qt.length>=3 && words.some(wd=>wd.includes(qt))){prefixHits++;}
+        }
+        if(qTokens.length){
+          score+=tokenHits*150+prefixHits*95;
+          if(tokenHits+prefixHits===qTokens.length){score+=260;if(reason==='dados do vinho')reason='termos combinados';}
+        }
+        // Busca compacta também permite "rutqual" / "postfin" sem espaços.
+        if(qCompact.length>=4 && compact.includes(qCompact)){score+=360;if(reason==='dados do vinho')reason='abreviação';}
+        return {wine:w,score,reason};
+      }).filter(r=>!q || r.score>0);
+      rows.sort((a,b)=>{
+        if(q && b.score!==a.score) return b.score-a.score;
+        return String(a.wine?.name||'').localeCompare(String(b.wine?.name||''),'pt-BR',{sensitivity:'base'});
+      });
+      return rows;
+    },
+    scannerBrowseSearch(query=''){
+      const rows=this.scannerBrowseRows(query);
+      this.scannerSearchTotal=rows.length;
+      const limit=Math.max(18,Number(this.scannerSearchVisibleLimit)||18);
+      this.scannerSearchResults=rows.slice(0,limit);
+    },
+    scannerOpenSearchWine(wine){
+      if(!wine) return;
+      this.stopScanner();
+      this.openWine(wine);
     },
     scannerSearch(query){
       this.scannerSearched=true; this.scannerMessage='';
@@ -10912,6 +11114,8 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 
 <div id="checkpoint-v190-scanner-multiframe-diagnostico" hidden></div>
 <div id="checkpoint-v191-scanner-paddleocr-android" hidden data-version="V191" data-paid-api="false"></div>
+
+<script type="application/json" id="checkpoint-v193-scanner-smart-search">{"version":"V193","date":"2026-09-09","scope":"Ler Rótulo + Busca Inteligente","changes":["abas Ler Rótulo e Buscar Vinho","busca independente do scanner","309 vinhos pesquisáveis","nome completo e parcial","abreviações por prefixo e texto compacto","siglas de nome/produtor/uvas","cruzamento com produtor, uva, país, região, tipo, estilo e tags","resultados ordenados por relevância","catálogo completo quando busca vazia","abertura direta da ficha do vinho"],"dataPreserved":true}</script>
 </body>
 </html>
 
