@@ -3425,6 +3425,11 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
               <div x-show="scannerCameraOn && scannerOcrText" class="v179-auto-note" style="margin-top:6px;opacity:.78;line-height:1.35">
                 <span>Texto lido: </span><strong x-text="scannerOcrText.slice(0,110)"></strong>
               </div>
+              <div x-show="scannerCameraOn" class="v179-auto-note" style="margin-top:5px;opacity:.72;line-height:1.35">
+                <span>Motor: </span><strong x-text="scannerEngine || (scannerPaddleReady?'PaddleOCR pronto':'carregando…')"></strong>
+                <span x-show="scannerLastRecognizeMs"> · </span><span x-show="scannerLastRecognizeMs" x-text="scannerLastRecognizeMs+' ms'"></span>
+                <span> · leituras: </span><strong x-text="(scannerFrameTexts||[]).length"></strong>
+              </div>
             </section>
 
             <div class="vp-scanner-actions">
@@ -4772,6 +4777,9 @@ function wineApp(){
     scannerPaddleReady:false,
     scannerPaddleError:'',
     scannerPaddleLastAt:0,
+    scannerEngine:'',
+    scannerFrameTexts:[],
+    scannerFrameCandidates:{},
     wineVideoOpen:false,
     wineVideoInlineOpen:false,
     wineAudioMap:{"2":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=903b21d6-b2a5-4bf8-be4a-014e1bda1175.wav","duration":42.39673469387755,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"6":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c76d1771-ac68-4544-80a2-fe3fe035f1d3.wav","duration":42.266122448979594,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"7":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=42bf7958-f580-46d3-8fad-6caf3f3b92a3.wav","duration":43.07591836734694,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"9":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ce9044a5-2072-4a3d-b71d-3d754cb7dd60.wav","duration":39.88897959183674,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"11":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=4c6828a5-e01d-4119-9c17-a0fdccbb488a.wav","duration":42.21387755102041,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"12":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=c85f6413-f463-4382-a645-c060f324b086.wav","duration":41.6130612244898,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"13":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=ed0eb5f3-fe79-4ec7-a0a9-eeb0d29fef60.wav","duration":38.50448979591837,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"14":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=83ea4640-3b78-4426-9aa7-2cab284f935e.wav","duration":41.48244897959184,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"15":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=f82e1682-96c4-425c-b335-8d682aeb59aa.wav","duration":40.333061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"16":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=b444d427-77b2-4eb3-b15f-58f15d1dec26.wav","duration":38.53061224489796,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"20":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=a78f2494-0c0a-4e00-9045-d7ff85a4cd06.wav","duration":39.053061224489795,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"21":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=51c64f38-e395-4576-ad57-9039a418b1c1.wav","duration":39.20979591836735,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"22":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=3b017629-e23b-436d-bac2-3f40b80ef065.wav","duration":36.96326530612245,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"},"25":{"url":"https://resource2.heygen.ai/text_to_speech/a7ea4fef135a4bf7be3bdd780dd7378c/2f8b7ca37f1f45f8bf8473b3bcaba64c/id=14130435-cc40-4b03-8a77-ec501e87b6c6.wav","duration":38.21714285714286,"voice":"Pedro Lima - Friendly","voiceId":"2f8b7ca37f1f45f8bf8473b3bcaba64c","status":"READY"}},
@@ -7253,6 +7261,7 @@ function wineApp(){
       this.scannerLastRecognizeMs=0;
       this.scannerPaddleError='';
       this.scannerPaddleLastAt=0;
+      this.scannerEngine=''; this.scannerFrameTexts=[]; this.scannerFrameCandidates={};
 
       if(!window.isSecureContext){
         this.scannerSearched=true;
@@ -7646,14 +7655,22 @@ function wineApp(){
       if(!video?.videoWidth || !video?.videoHeight) return null;
       const canvas=document.createElement('canvas');
       const vw=video.videoWidth, vh=video.videoHeight, targetAspect=.75;
-      let sw,sh,sx,sy;
-      if(vw/vh>targetAspect){sh=vh;sw=Math.round(vh*targetAspect);sx=Math.round((vw-sw)/2);sy=0;}
-      else{sw=vw;sh=Math.round(vw/targetAspect);sx=0;sy=Math.round((vh-sh)/2);}
-      if(variant===1){const oldH=sh;sh=Math.round(oldH*.72);sy+=Math.round(oldH*.10);}
-      const outW=variant===0?960:1120, outH=Math.max(1,Math.round(outW*sh/sw));
+      let bw,bh,bx,by;
+      if(vw/vh>targetAspect){bh=vh;bw=Math.round(vh*targetAspect);bx=Math.round((vw-bw)/2);by=0;}
+      else{bw=vw;bh=Math.round(vw/targetAspect);bx=0;by=Math.round((vh-bh)/2);}
+      // V190: alterna rótulo inteiro, faixa superior/central e centro ampliado.
+      let sx=bx,sy=by,sw=bw,sh=bh;
+      const mode=((this.scannerLiveLoopCount||0)+variant)%3;
+      if(mode===1){sh=Math.round(bh*.68);sy=by+Math.round(bh*.08);}
+      else if(mode===2){sw=Math.round(bw*.88);sh=Math.round(bh*.58);sx=bx+Math.round((bw-sw)/2);sy=by+Math.round(bh*.18);}
+      const outW=mode===2?1280:1120, outH=Math.max(1,Math.round(outW*sh/sw));
       canvas.width=outW;canvas.height=outH;
-      const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:false});
+      const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:true});
       ctx.drawImage(video,sx,sy,sw,sh,0,0,outW,outH);
+      // Passe central recebe contraste local moderado para letras douradas/brancas em vidro escuro.
+      if(mode===2){
+        try{const img=ctx.getImageData(0,0,outW,outH),d=img.data;for(let i=0;i<d.length;i+=4){for(let c=0;c<3;c++){let v=d[i+c];v=(v-128)*1.18+128;d[i+c]=Math.max(0,Math.min(255,v));}}ctx.putImageData(img,0,0);}catch(e){}
+      }
       return canvas;
     },
     async scannerLoadPaddle(){
@@ -7701,7 +7718,7 @@ function wineApp(){
       try{
         this.scannerOcrStatus='Lendo o nome do rótulo no próprio celular…';
         const t0=performance.now();
-        const results=await this.scannerPaddle.predict(canvas,{textRecScoreThresh:.30,textDetBoxThresh:.45,textDetLimitSideLen:1120});
+        const results=await this.scannerPaddle.predict(canvas,{textRecScoreThresh:.22,textDetBoxThresh:.32,textDetLimitSideLen:1280});
         const result=Array.isArray(results)?results[0]:results;
         const items=Array.isArray(result?.items)?result.items:[];
         const text=items.filter(x=>Number(x?.score||0)>=.30).map(x=>String(x?.text||'').trim()).filter(Boolean).join(' ').trim();
@@ -7799,12 +7816,19 @@ function wineApp(){
         // V189: PaddleOCR/PP-OCRv5 é o motor principal e processa o frame no navegador.
         const paddle=await this.scannerPaddleReadLabel(video,force);
         if(paddle?.ok){
+          this.scannerEngine='PaddleOCR local';
           this.scannerLastRecognizeMs=paddle.latencyMs||0;
-          const text=String(paddle.text||'').trim();
+          const text=String(paddle.text||'').replace(/\s+/g,' ').trim();
           if(text){
-            this.scannerOcrHistory=[text];
-            this.scannerLastOcrSignature=this.scannerNormalizeOCR(text).slice(0,260);
-            const accepted=this.scannerAcceptOCRText(text,!force);
+            // V190: não joga fora o frame anterior. Une até 4 leituras recentes do mesmo rótulo.
+            const norm=this.scannerNormalizeOCR(text);
+            this.scannerFrameTexts=(this.scannerFrameTexts||[]).filter(x=>x&&x.norm!==norm);
+            this.scannerFrameTexts.push({text,norm,at:Date.now()});
+            this.scannerFrameTexts=this.scannerFrameTexts.filter(x=>Date.now()-x.at<9000).slice(-4);
+            const merged=this.scannerFrameTexts.map(x=>x.text).join(' ');
+            this.scannerOcrHistory=this.scannerFrameTexts.map(x=>x.text);
+            this.scannerLastOcrSignature=this.scannerNormalizeOCR(merged).slice(0,260);
+            const accepted=this.scannerAcceptOCRText(merged,!force);
             if(accepted || this.scannerMatches.length===1) return accepted;
             return false;
           }
@@ -7832,6 +7856,7 @@ function wineApp(){
         }
 
         if(!nativeUseful){
+          this.scannerEngine='Leitor alternativo';
           this.scannerOcrStatus='PaddleOCR indisponível neste navegador. Usando leitor alternativo…';
           const ok=await this.scannerLoadTesseract();
           if(!ok){
@@ -7877,7 +7902,7 @@ function wineApp(){
       // Nova tentativa sempre descarta completamente o resultado anterior.
       this.scannerMatches=[]; this.scannerMessage=''; this.scannerSearched=false;
       this.scannerStableWineId=null; this.scannerStableHits=0; this.scannerLastOcrSignature='';
-      this.scannerUnreadableHits=0; this.scannerUnavailableHits=0;
+      this.scannerUnreadableHits=0; this.scannerUnavailableHits=0; this.scannerFrameTexts=[];
       const ok=await this.scannerReadVideoFrame(true);
       if(ok && this.scannerMatches.length===1){this.stopScanner();}
       else if(this.scannerMatches.length>1){this.scannerMessage='Não vou escolher por aproximação. Toque no candidato correto ou tente novamente mais perto.';}
@@ -10801,6 +10826,7 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 {"version":"V189","date":"2026-09-07","scope":"scanner de rótulo","architecture":"PaddleOCR.js PP-OCRv5 no navegador + database fechada de 309 vinhos + Tesseract fallback","paidApi":false,"cloudEndpoint":null,"dataPreserved":true,"wineCount":309}
 </script>
 
+<div id="checkpoint-v190-scanner-multiframe-diagnostico" hidden></div>
 </body>
 </html>
 
