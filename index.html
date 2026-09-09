@@ -3414,7 +3414,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
                 <div x-show="scannerCameraOn && (scannerWorking||scannerOcrBusy)" class="vp-scanner-processing">LENDO RÓTULO…</div>
               </div>
 
-              <div x-show="scannerCameraOn" class="v179-auto-note">AUTOMÁTICO • aproxime até o nome ocupar boa parte da moldura</div>
+              <div x-show="scannerCameraOn" class="v179-auto-note">AUTOMÁTICO • segure firme até a imagem ficar nítida; aproxime o nome da moldura</div>
               <div x-show="scannerCameraOn && scannerTorchSupported" style="display:flex;justify-content:center;margin-top:8px">
                 <button type="button" @click="scannerToggleTorch()" class="vp-scanner-open-wine" x-text="scannerTorchOn?'DESLIGAR LUZ':'LIGAR LUZ'"></button>
               </div>
@@ -3426,9 +3426,13 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
                 <span>Texto lido: </span><strong x-text="scannerOcrText.slice(0,110)"></strong>
               </div>
               <div x-show="scannerCameraOn" class="v179-auto-note" style="margin-top:5px;opacity:.72;line-height:1.35">
-                <span>Motor: </span><strong x-text="scannerEngine || (scannerPaddleReady?'PaddleOCR pronto':'carregando…')"></strong>
+                <span>Motor: </span><strong x-text="scannerEngine || (scannerPaddleReady?'PaddleOCR PP-OCRv5':'PaddleOCR '+(scannerPaddleStage||'carregando'))"></strong>
+                <span x-show="scannerPaddleCdn"> · </span><span x-show="scannerPaddleCdn" x-text="scannerPaddleCdn"></span>
                 <span x-show="scannerLastRecognizeMs"> · </span><span x-show="scannerLastRecognizeMs" x-text="scannerLastRecognizeMs+' ms'"></span>
+                <span> · nitidez: </span><strong x-text="scannerFrameQuality||0"></strong>
+                <span> · luz: </span><strong x-text="scannerFrameBrightness||0"></strong>
                 <span> · leituras: </span><strong x-text="(scannerFrameTexts||[]).length"></strong>
+                <template x-if="scannerPaddleError"><div style="margin-top:4px;font-size:11px;word-break:break-word">Erro Paddle: <span x-text="scannerPaddleError"></span></div></template>
               </div>
             </section>
 
@@ -4777,6 +4781,11 @@ function wineApp(){
     scannerPaddleReady:false,
     scannerPaddleError:'',
     scannerPaddleLastAt:0,
+    scannerPaddleStage:'idle',
+    scannerPaddleCdn:'',
+    scannerFrameQuality:0,
+    scannerFrameBrightness:0,
+    scannerFrameStableHits:0,
     scannerEngine:'',
     scannerFrameTexts:[],
     scannerFrameCandidates:{},
@@ -7261,6 +7270,7 @@ function wineApp(){
       this.scannerLastRecognizeMs=0;
       this.scannerPaddleError='';
       this.scannerPaddleLastAt=0;
+      this.scannerPaddleStage='idle'; this.scannerPaddleCdn=''; this.scannerFrameQuality=0; this.scannerFrameBrightness=0; this.scannerFrameStableHits=0;
       this.scannerEngine=''; this.scannerFrameTexts=[]; this.scannerFrameCandidates={};
 
       if(!window.isSecureContext){
@@ -7306,8 +7316,11 @@ function wineApp(){
           const caps=track?.getCapabilities?.()||{};
           this.scannerTorchSupported=!!caps.torch;
           this.scannerTorchOn=false;
-          if(track?.applyConstraints && Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')){
-            try{await track.applyConstraints({advanced:[{focusMode:'continuous'}]});}catch(e){}
+          if(track?.applyConstraints){
+            const adv={};
+            if(Array.isArray(caps.focusMode) && caps.focusMode.includes('continuous')) adv.focusMode='continuous';
+            if(caps.zoom && Number(caps.zoom.min)<=1.15 && Number(caps.zoom.max)>=1.15) adv.zoom=Math.max(Number(caps.zoom.min)||1,Math.min(Number(caps.zoom.max)||1.15,1.15));
+            if(Object.keys(adv).length){try{await track.applyConstraints({advanced:[adv]});}catch(e){}}
           }
         }catch(e){this.scannerTorchSupported=false;}
 
@@ -7674,59 +7687,126 @@ function wineApp(){
       return canvas;
     },
     async scannerLoadPaddle(){
-      if(this.scannerPaddle){this.scannerPaddleReady=true;return true;}
+      if(this.scannerPaddle){this.scannerPaddleReady=true;this.scannerPaddleStage='ready';return true;}
       if(this.scannerPaddleLoadPromise){try{return await this.scannerPaddleLoadPromise;}catch(e){return false;}}
       this.scannerPaddleLoadPromise=(async()=>{
-        try{
-          this.scannerOcrStatus='Preparando leitor PaddleOCR no celular…';
-          const mod=await import('https://esm.sh/@paddleocr/paddleocr-js?bundle');
-          const PaddleOCR=mod?.PaddleOCR;
-          if(!PaddleOCR) throw new Error('PADDLE_SDK_NOT_FOUND');
-          // PP-OCRv5 multilingual Portuguese. Worker mantém a interface responsiva quando suportado.
+        const sources=[
+          'https://cdn.jsdelivr.net/npm/@paddleocr/paddleocr-js@0.4.2/+esm',
+          'https://esm.sh/@paddleocr/paddleocr-js@0.4.2?bundle'
+        ];
+        let lastError=null;
+        this.scannerPaddleStage='import';
+        this.scannerOcrStatus='Carregando PaddleOCR no celular…';
+        for(const src of sources){
           try{
+            const mod=await import(src);
+            const PaddleOCR=mod?.PaddleOCR || mod?.default?.PaddleOCR;
+            if(!PaddleOCR?.create) throw new Error('PADDLE_SDK_NOT_FOUND');
+            this.scannerPaddleStage='models';
+            this.scannerOcrStatus='Preparando modelos PP-OCRv5… na primeira vez pode levar alguns segundos.';
+            // V191: usa o caminho principal sem Worker. Em site estático/CDN, o worker do pacote
+            // pode falhar por origem/URL de módulo. O SDK oficial suporta main-thread normalmente.
+            // Também evitamos wasmPaths genérico não versionado, que pode causar incompatibilidade
+            // entre o ONNX Runtime empacotado pelo PaddleOCR e WASM de outra versão.
             this.scannerPaddle=await PaddleOCR.create({
-              lang:'pt',ocrVersion:'PP-OCRv5',worker:true,
-              ortOptions:{backend:'wasm',wasmPaths:'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/',numThreads:2,simd:true}
+              lang:'pt',
+              ocrVersion:'PP-OCRv5',
+              textDetectionBatchSize:1,
+              textRecognitionBatchSize:6,
+              ortOptions:{backend:'auto'}
             });
-          }catch(workerError){
-            // Compatibilidade para navegadores que bloqueiam worker de módulo/CDN.
-            this.scannerPaddle=await PaddleOCR.create({
-              lang:'pt',ocrVersion:'PP-OCRv5',
-              ortOptions:{backend:'wasm',wasmPaths:'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/',numThreads:1,simd:true}
-            });
+            this.scannerPaddleReady=!!this.scannerPaddle;
+            if(!this.scannerPaddleReady) throw new Error('PADDLE_CREATE_EMPTY');
+            this.scannerPaddleError='';
+            this.scannerPaddleCdn=src.includes('jsdelivr')?'jsDelivr':'esm.sh';
+            this.scannerPaddleStage='ready';
+            this.scannerEngine='PaddleOCR PP-OCRv5';
+            this.scannerOcrStatus='PaddleOCR pronto.';
+            return true;
+          }catch(e){
+            lastError=e;
+            try{if(this.scannerPaddle?.dispose) await this.scannerPaddle.dispose();}catch(_e){}
+            this.scannerPaddle=null;this.scannerPaddleReady=false;
           }
-          this.scannerPaddleReady=!!this.scannerPaddle;
-          this.scannerPaddleError='';
-          return this.scannerPaddleReady;
-        }catch(e){
-          this.scannerPaddle=null;this.scannerPaddleReady=false;
-          this.scannerPaddleError=String(e?.message||'PADDLE_LOAD_ERROR').slice(0,160);
-          return false;
-        }finally{this.scannerOcrStatus='';}
+        }
+        this.scannerPaddleStage='error';
+        this.scannerPaddleError=String(lastError?.message||lastError||'PADDLE_LOAD_ERROR').slice(0,220);
+        this.scannerOcrStatus='PaddleOCR não carregou: '+this.scannerPaddleError;
+        return false;
       })();
       try{return await this.scannerPaddleLoadPromise;}finally{this.scannerPaddleLoadPromise=null;}
     },
+
+    scannerMeasureFrame(video){
+      if(!video?.videoWidth || !video?.videoHeight) return {ok:false,sharpness:0,brightness:0};
+      try{
+        const c=document.createElement('canvas'); c.width=240; c.height=320;
+        const ctx=c.getContext('2d',{willReadFrequently:true,alpha:false});
+        const vw=video.videoWidth,vh=video.videoHeight,target=.75;
+        let sw,sh,sx,sy;
+        if(vw/vh>target){sh=vh;sw=Math.round(vh*target);sx=Math.round((vw-sw)/2);sy=0;}
+        else{sw=vw;sh=Math.round(vw/target);sx=0;sy=Math.round((vh-sh)/2);}
+        // mede principalmente a região onde o nome costuma estar
+        const cropY=sy+Math.round(sh*.13),cropH=Math.round(sh*.58);
+        ctx.drawImage(video,sx,cropY,sw,cropH,0,0,c.width,c.height);
+        const d=ctx.getImageData(0,0,c.width,c.height).data;
+        let sum=0,n=0,grad=0,gn=0;
+        const gray=new Uint8Array(c.width*c.height);
+        for(let i=0,p=0;i<d.length;i+=4,p++){const g=(d[i]*77+d[i+1]*150+d[i+2]*29)>>8;gray[p]=g;sum+=g;n++;}
+        for(let y=1;y<c.height-1;y+=2){for(let x=1;x<c.width-1;x+=2){const p=y*c.width+x;grad+=Math.abs(gray[p+1]-gray[p-1])+Math.abs(gray[p+c.width]-gray[p-c.width]);gn++;}}
+        const brightness=sum/Math.max(1,n),sharpness=grad/Math.max(1,gn);
+        this.scannerFrameBrightness=Math.round(brightness);this.scannerFrameQuality=Math.round(sharpness*10)/10;
+        return {ok:true,sharpness,brightness};
+      }catch(e){return {ok:true,sharpness:99,brightness:128};}
+    },
     async scannerPaddleReadLabel(video,force=false){
       const now=Date.now();
-      if(!force && now-(this.scannerPaddleLastAt||0)<1100) return {ok:false,skipped:true};
+      if(!force && now-(this.scannerPaddleLastAt||0)<1350) return {ok:false,skipped:true};
+      const quality=this.scannerMeasureFrame(video);
+      // V191: não tenta OCR em frame claramente tremido/escuro. No modo manual, lê mesmo assim.
+      const usable=force || !quality.ok || (quality.sharpness>=7.5 && quality.brightness>=38 && quality.brightness<=235);
+      if(!usable){
+        this.scannerFrameStableHits=0;
+        this.scannerEngine=this.scannerPaddleReady?'PaddleOCR PP-OCRv5':'PaddleOCR carregando';
+        this.scannerOcrStatus=quality.brightness<38?'Pouca luz. Use LIGAR LUZ ou aproxime o rótulo.':'Imagem desfocada. Segure a câmera firme por um instante.';
+        return {ok:false,qualityBlocked:true};
+      }
+      this.scannerFrameStableHits=Math.min(3,(this.scannerFrameStableHits||0)+1);
+      if(!force && this.scannerFrameStableHits<2){
+        this.scannerOcrStatus='Foco melhorando… mantenha o nome parado na moldura.';
+        return {ok:false,qualityBlocked:true};
+      }
       this.scannerPaddleLastAt=now;
       const ok=await this.scannerLoadPaddle();
       if(!ok) return {ok:false,unavailable:true,error:this.scannerPaddleError||'PADDLE_UNAVAILABLE'};
-      const variant=((this.scannerLiveLoopCount||0)%3===0)?1:0;
-      const canvas=this.scannerPreparePaddleCanvas(video,variant);
+      const canvas=this.scannerPreparePaddleCanvas(video,0);
       if(!canvas) return {ok:false,unavailable:true,error:'NO_FRAME'};
       try{
-        this.scannerOcrStatus='Lendo o nome do rótulo no próprio celular…';
+        this.scannerOcrStatus='PaddleOCR lendo o nome do rótulo…';
         const t0=performance.now();
-        const results=await this.scannerPaddle.predict(canvas,{textRecScoreThresh:.22,textDetBoxThresh:.32,textDetLimitSideLen:1280});
+        const results=await this.scannerPaddle.predict(canvas,{
+          textRecScoreThresh:.12,
+          textDetThresh:.20,
+          textDetBoxThresh:.25,
+          textDetUnclipRatio:1.7,
+          textDetLimitSideLen:1280,
+          textDetLimitType:'max'
+        });
         const result=Array.isArray(results)?results[0]:results;
         const items=Array.isArray(result?.items)?result.items:[];
-        const text=items.filter(x=>Number(x?.score||0)>=.30).map(x=>String(x?.text||'').trim()).filter(Boolean).join(' ').trim();
-        return {ok:true,text,provider:'paddleocr-local',latencyMs:Math.round(performance.now()-t0)};
+        const strong=items.filter(x=>Number(x?.score||0)>=.18 && String(x?.text||'').trim().length>=2);
+        const all=items.filter(x=>String(x?.text||'').trim().length>=2);
+        const chosen=strong.length?strong:all;
+        const text=chosen.map(x=>String(x?.text||'').trim()).filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
+        const latency=Math.round(performance.now()-t0);
+        this.scannerPaddleStage='ready';
+        return {ok:true,text,provider:'paddleocr-local',latencyMs:latency,items:chosen.length};
       }catch(e){
-        this.scannerPaddleError=String(e?.message||'PADDLE_PREDICT_ERROR').slice(0,160);
+        this.scannerPaddleError=String(e?.message||'PADDLE_PREDICT_ERROR').slice(0,220);
+        this.scannerPaddleStage='predict-error';
+        this.scannerOcrStatus='Erro do PaddleOCR: '+this.scannerPaddleError;
         return {ok:false,unavailable:true,error:this.scannerPaddleError};
-      }finally{this.scannerOcrStatus='';}
+      }
     },
 
     async scannerLoadTesseract(){
@@ -7834,7 +7914,11 @@ function wineApp(){
           }
         }
 
-        // Fallback: Tesseract/TextDetector só entra se o PaddleOCR local não estiver disponível.
+        // Se o frame foi bloqueado por foco/luz ou apenas pelo intervalo, não cai no Tesseract:
+        // espera um frame melhor para evitar texto-lixo como "GAL GAL ZO".
+        if(paddle?.qualityBlocked || paddle?.skipped) return false;
+
+        // Fallback só entra quando o PaddleOCR realmente falhou ao carregar/executar.
         let texts=[];
         let nativeUseful=false;
         if(this.scannerTextDetector){
@@ -7857,7 +7941,7 @@ function wineApp(){
 
         if(!nativeUseful){
           this.scannerEngine='Leitor alternativo';
-          this.scannerOcrStatus='PaddleOCR indisponível neste navegador. Usando leitor alternativo…';
+          this.scannerOcrStatus='PaddleOCR falhou ('+(this.scannerPaddleError||'erro desconhecido')+'). Usando leitor alternativo…';
           const ok=await this.scannerLoadTesseract();
           if(!ok){
             this.scannerSearched=true;
@@ -10823,10 +10907,11 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 <script type="application/json" id="checkpoint-v187-fotos-vinho-alta-resolucao">{"version":"V187","date":"2026-09-06","scope":"309 fotos de vinhos + resolução OCR","changes":["309 fotos oficiais preservadas com mesmos nomes/caminhos/proporções","upscale conservador 1.5x","sem recorte/recolorização/substituição","OCR ao vivo elevado de 560/680px para 900/1080px","galeria OCR elevada de 1200px para 1800px"],"wineCount":309,"wineImageCount":309,"dataPreserved":true}</script>
 
 <script type="application/json" id="checkpoint-v189-scanner-paddleocr-local">
-{"version":"V189","date":"2026-09-07","scope":"scanner de rótulo","architecture":"PaddleOCR.js PP-OCRv5 no navegador + database fechada de 309 vinhos + Tesseract fallback","paidApi":false,"cloudEndpoint":null,"dataPreserved":true,"wineCount":309}
+{"version":"V191","date":"2026-09-09","scope":"scanner de rótulo","architecture":"PaddleOCR.js PP-OCRv5 main-thread com CDN duplo + controle de nitidez/luz + database fechada de 309 vinhos + Tesseract somente em falha real","paidApi":false,"cloudEndpoint":null,"dataPreserved":true,"wineCount":309}
 </script>
 
 <div id="checkpoint-v190-scanner-multiframe-diagnostico" hidden></div>
+<div id="checkpoint-v191-scanner-paddleocr-android" hidden data-version="V191" data-paid-api="false"></div>
 </body>
 </html>
 
