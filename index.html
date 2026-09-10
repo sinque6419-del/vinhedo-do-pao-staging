@@ -311,8 +311,7 @@ img[data-wine-image],.wine-card img{object-fit:contain!important;object-position
 
 /* Na Home, header/footer/app auxiliar não disputam a tela.
    As outras páginas continuam no DOM e nas funções, mas estão sob seus próprios x-show/x-cloak. */
-body:has(#v116-home[style*="display: none"]) { overflow:auto; }
-body:not(:has(#v116-home[style*="display: none"])) { overflow:hidden; }
+/* V196: overflow da Home é controlado pelo estado JS; não depender do atributo style gerado pelo x-show. */
 
 @media (max-width: 480px){
   #v116-home{background:#0d3024;}
@@ -2993,8 +2992,6 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
     overflow:hidden!important;
     background:#0b3024!important;
   }
-  /* V194: Alpine x-show precisa conseguir ocultar a Home ao abrir outras telas. */
-  #v116-home[style*="display: none"]{display:none!important;}
   #v116-home .v116-home-frame{
     width:min(100vw, calc(100dvh * 711 / 1536))!important;
     height:auto!important;
@@ -3106,7 +3103,8 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
 <!-- TELA 1: HOME / CAPA — arte aprovada, sem rolagem -->
     
 
-<section x-show="screen==='home'" id="v116-home" class="v116-home" aria-label="Página inicial do Vinhedo do Pão">
+<template x-if="screen==='home'">
+<section id="v116-home" class="v116-home" aria-label="Página inicial do Vinhedo do Pão">
   <div class="v116-home-frame">
     <img src="assets/media/img_0003_5ecf509ed61e.jpg" class="v116-home-art" width="711" height="1536" fetchpriority="high" alt="Vinhedo do Pão — Sommelier Digital — encontre o vinho certo para o momento certo">
     <button
@@ -3117,6 +3115,7 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
     </button>
   </div>
 </section>
+</template>
 
 <!-- TELA 2: CENTRAL DE FERRAMENTAS — V116 -->
     
@@ -11156,6 +11155,7 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 
 <!-- checkpoint-v194-home-xshow-corrigido: Home mobile preserva arte inteira sem sobrescrever display:none do Alpine. -->
 <!-- checkpoint-v195-scanner-nome-rapido -->
+<!-- checkpoint-v196-home-navigation-fix: Home usa x-if e sai fisicamente do DOM fora do estado home; elimina sobreposição em todas as abas. -->
 </body>
 </html>
 
