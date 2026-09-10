@@ -2988,11 +2988,13 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
   #v116-home{
     min-height:100dvh!important;
     height:100dvh!important;
-    display:grid!important;
+    display:grid;
     place-items:center!important;
     overflow:hidden!important;
     background:#0b3024!important;
   }
+  /* V194: Alpine x-show precisa conseguir ocultar a Home ao abrir outras telas. */
+  #v116-home[style*="display: none"]{display:none!important;}
   #v116-home .v116-home-frame{
     width:min(100vw, calc(100dvh * 711 / 1536))!important;
     height:auto!important;
@@ -7443,7 +7445,7 @@ function wineApp(){
           this.scannerLiveLoopCount++;
           try{
             const now=performance.now();
-            const interval=this.scannerPaddleReady?1150:1700;
+            const interval=this.scannerPaddleReady?720:1250;
             if(!this.scannerOcrBusy && now-this.scannerLastScanAt>=interval && video.readyState>=2){
               this.scannerLastScanAt=now;
               await this.scannerReadVideoFrame(false);
@@ -7593,6 +7595,7 @@ function wineApp(){
       if(m<4 || n<3) return false;
       // V182: evita que palavras genéricas/ruído do OCR aproximem vinhos diferentes.
       if(Math.abs(a.length-b.length)>2) return false;
+      if(m>=7 && (a.startsWith(b) || b.startsWith(a)) && n>=5) return true;
       const d=this.scannerEditDistance(a,b);
       if(m<=6) return d<=1;
       if(m<=10) return d<=1;
@@ -7651,6 +7654,7 @@ function wineApp(){
       }
 
       // 2) Parcial: usa somente partes realmente distintivas do NOME.
+      // V195 também compara a forma compacta (sem espaços), útil quando o OCR quebra marcas em pedaços.
       // Aliases compartilhados (ex.: apenas "Santa Helena") não podem escolher uma variante.
       const ranked=[];
       for(const e of index){
@@ -7667,6 +7671,19 @@ function wineApp(){
             exactPhrase=true;
             bestPhraseWords=Math.max(bestPhraseWords,this.scannerTokens(alias).length);
             bestPhraseLen=Math.max(bestPhraseLen,alias.length);
+          } else if(ac.length>=8 && qCompact.length>=6){
+            // OCR de rótulo às vezes perde/insere um espaço ou uma letra dentro da marca.
+            const qParts=ocrTokens.filter(t=>t.length>=4);
+            for(let i=0;i<qParts.length;i++){
+              const p=qParts.slice(i,i+3).join('');
+              if(p.length<6) continue;
+              const d=this.scannerEditDistance(ac,p), m=Math.max(ac.length,p.length);
+              if(Math.abs(ac.length-p.length)<=2 && d<=2 && d/m<=.22){
+                bestPhraseWords=Math.max(bestPhraseWords,Math.min(3,qParts.length-i));
+                bestPhraseLen=Math.max(bestPhraseLen,alias.length);
+                break;
+              }
+            }
           }
         }
 
@@ -7783,18 +7800,39 @@ function wineApp(){
       let bw,bh,bx,by;
       if(vw/vh>targetAspect){bh=vh;bw=Math.round(vh*targetAspect);bx=Math.round((vw-bw)/2);by=0;}
       else{bw=vw;bh=Math.round(vw/targetAspect);bx=0;by=Math.round((vh-bh)/2);}
-      // V190: alterna rótulo inteiro, faixa superior/central e centro ampliado.
+
+      // V195 — prioriza a faixa onde normalmente fica MARCA/NOME.
+      // O passe rápido usa menos pixels para reduzir o tempo do PP-OCRv5 no Android.
+      // Um passe mais amplo só é usado depois de falhas, preservando precisão sem deixar todo frame lento.
+      const mode=variant===1?1:0;
       let sx=bx,sy=by,sw=bw,sh=bh;
-      const mode=((this.scannerLiveLoopCount||0)+variant)%3;
-      if(mode===1){sh=Math.round(bh*.68);sy=by+Math.round(bh*.08);}
-      else if(mode===2){sw=Math.round(bw*.88);sh=Math.round(bh*.58);sx=bx+Math.round((bw-sw)/2);sy=by+Math.round(bh*.18);}
-      const outW=mode===2?1280:1120, outH=Math.max(1,Math.round(outW*sh/sw));
-      canvas.width=outW;canvas.height=outH;
+      if(mode===0){
+        sw=Math.round(bw*.94); sh=Math.round(bh*.46);
+        sx=bx+Math.round((bw-sw)/2); sy=by+Math.round(bh*.16);
+      }else{
+        sw=Math.round(bw*.98); sh=Math.round(bh*.66);
+        sx=bx+Math.round((bw-sw)/2); sy=by+Math.round(bh*.08);
+      }
+      const outW=mode===0?760:920;
+      const outH=Math.max(1,Math.round(outW*sh/sw));
+      canvas.width=outW; canvas.height=outH;
       const ctx=canvas.getContext('2d',{alpha:false,willReadFrequently:true});
+      ctx.imageSmoothingEnabled=true;
+      ctx.imageSmoothingQuality='high';
       ctx.drawImage(video,sx,sy,sw,sh,0,0,outW,outH);
-      // Passe central recebe contraste local moderado para letras douradas/brancas em vidro escuro.
-      if(mode===2){
-        try{const img=ctx.getImageData(0,0,outW,outH),d=img.data;for(let i=0;i<d.length;i+=4){for(let c=0;c<3;c++){let v=d[i+c];v=(v-128)*1.18+128;d[i+c]=Math.max(0,Math.min(255,v));}}ctx.putImageData(img,0,0);}catch(e){}
+
+      // Contraste muito leve só no passe amplo. O rápido preserva a arte original do rótulo.
+      if(mode===1){
+        try{
+          const img=ctx.getImageData(0,0,outW,outH),d=img.data;
+          for(let i=0;i<d.length;i+=4){
+            for(let c=0;c<3;c++){
+              const v=(d[i+c]-128)*1.10+128;
+              d[i+c]=Math.max(0,Math.min(255,v));
+            }
+          }
+          ctx.putImageData(img,0,0);
+        }catch(e){}
       }
       return canvas;
     },
@@ -7824,7 +7862,7 @@ function wineApp(){
               lang:'pt',
               ocrVersion:'PP-OCRv5',
               textDetectionBatchSize:1,
-              textRecognitionBatchSize:6,
+              textRecognitionBatchSize:2,
               ortOptions:{backend:'auto'}
             });
             this.scannerPaddleReady=!!this.scannerPaddle;
@@ -7873,46 +7911,45 @@ function wineApp(){
     },
     async scannerPaddleReadLabel(video,force=false){
       const now=Date.now();
-      if(!force && now-(this.scannerPaddleLastAt||0)<1350) return {ok:false,skipped:true};
+      if(!force && now-(this.scannerPaddleLastAt||0)<700) return {ok:false,skipped:true};
       const quality=this.scannerMeasureFrame(video);
-      // V191: não tenta OCR em frame claramente tremido/escuro. No modo manual, lê mesmo assim.
-      const usable=force || !quality.ok || (quality.sharpness>=7.5 && quality.brightness>=38 && quality.brightness<=235);
+      const usable=force || !quality.ok || (quality.sharpness>=6.2 && quality.brightness>=34 && quality.brightness<=240);
       if(!usable){
         this.scannerFrameStableHits=0;
         this.scannerEngine=this.scannerPaddleReady?'PaddleOCR PP-OCRv5':'PaddleOCR carregando';
-        this.scannerOcrStatus=quality.brightness<38?'Pouca luz. Use LIGAR LUZ ou aproxime o rótulo.':'Imagem desfocada. Segure a câmera firme por um instante.';
+        this.scannerOcrStatus=quality.brightness<34?'Pouca luz. Use LIGAR LUZ ou aproxime o rótulo.':'Aguardando foco no nome… segure a garrafa por um instante.';
         return {ok:false,qualityBlocked:true};
       }
       this.scannerFrameStableHits=Math.min(3,(this.scannerFrameStableHits||0)+1);
-      if(!force && this.scannerFrameStableHits<2){
-        this.scannerOcrStatus='Foco melhorando… mantenha o nome parado na moldura.';
-        return {ok:false,qualityBlocked:true};
-      }
       this.scannerPaddleLastAt=now;
       const ok=await this.scannerLoadPaddle();
       if(!ok) return {ok:false,unavailable:true,error:this.scannerPaddleError||'PADDLE_UNAVAILABLE'};
-      const canvas=this.scannerPreparePaddleCanvas(video,0);
+
+      // Primeiro passe sempre é o recorte rápido do nome. O amplo entra só após falha/forçado.
+      const broad=!!force || (this.scannerUnavailableHits||0)>=2 || (this.scannerUnreadableHits||0)>=2 || ((this.scannerLiveLoopCount||0)%5===0);
+      const canvas=this.scannerPreparePaddleCanvas(video,broad?1:0);
       if(!canvas) return {ok:false,unavailable:true,error:'NO_FRAME'};
       try{
-        this.scannerOcrStatus='PaddleOCR lendo o nome do rótulo…';
+        this.scannerOcrStatus=broad?'Lendo rótulo…':'Lendo nome…';
         const t0=performance.now();
         const results=await this.scannerPaddle.predict(canvas,{
-          textRecScoreThresh:.12,
-          textDetThresh:.20,
-          textDetBoxThresh:.25,
-          textDetUnclipRatio:1.7,
-          textDetLimitSideLen:1280,
+          textRecScoreThresh:.16,
+          textDetThresh:.24,
+          textDetBoxThresh:.30,
+          textDetUnclipRatio:1.55,
+          textDetLimitSideLen:broad?960:768,
           textDetLimitType:'max'
         });
         const result=Array.isArray(results)?results[0]:results;
         const items=Array.isArray(result?.items)?result.items:[];
-        const strong=items.filter(x=>Number(x?.score||0)>=.18 && String(x?.text||'').trim().length>=2);
-        const all=items.filter(x=>String(x?.text||'').trim().length>=2);
-        const chosen=strong.length?strong:all;
+        // Para nomes grandes/estilizados, aceita palavras com confiança moderada, mas descarta ruído de 1 caractere.
+        const usableItems=items.filter(x=>Number(x?.score||0)>=.20 && String(x?.text||'').trim().length>=2);
+        const fallbackItems=items.filter(x=>String(x?.text||'').trim().length>=3);
+        const chosen=usableItems.length?usableItems:fallbackItems;
         const text=chosen.map(x=>String(x?.text||'').trim()).filter(Boolean).join(' ').replace(/\s+/g,' ').trim();
         const latency=Math.round(performance.now()-t0);
         this.scannerPaddleStage='ready';
-        return {ok:true,text,provider:'paddleocr-local',latencyMs:latency,items:chosen.length};
+        return {ok:true,text,provider:'paddleocr-local',latencyMs:latency,items:chosen.length,broad};
       }catch(e){
         this.scannerPaddleError=String(e?.message||'PADDLE_PREDICT_ERROR').slice(0,220);
         this.scannerPaddleStage='predict-error';
@@ -11116,6 +11153,9 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 <div id="checkpoint-v191-scanner-paddleocr-android" hidden data-version="V191" data-paid-api="false"></div>
 
 <script type="application/json" id="checkpoint-v193-scanner-smart-search">{"version":"V193","date":"2026-09-09","scope":"Ler Rótulo + Busca Inteligente","changes":["abas Ler Rótulo e Buscar Vinho","busca independente do scanner","309 vinhos pesquisáveis","nome completo e parcial","abreviações por prefixo e texto compacto","siglas de nome/produtor/uvas","cruzamento com produtor, uva, país, região, tipo, estilo e tags","resultados ordenados por relevância","catálogo completo quando busca vazia","abertura direta da ficha do vinho"],"dataPreserved":true}</script>
+
+<!-- checkpoint-v194-home-xshow-corrigido: Home mobile preserva arte inteira sem sobrescrever display:none do Alpine. -->
+<!-- checkpoint-v195-scanner-nome-rapido -->
 </body>
 </html>
 
