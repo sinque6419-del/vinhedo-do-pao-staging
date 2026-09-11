@@ -9650,12 +9650,20 @@ function wineApp(){
       this.ingredientsToolShowAllRecipes=false;
       this.ingredientsToolShowAllWines=false;
       this.ingredientResultsOpen=true;
-      // Ao trocar seleção -> resultados, reposiciona a ferramenta no topo após o DOM atualizar.
-      setTimeout(()=>{
-        const page=document.querySelector('.vp-ingredients-page');
-        if(page) page.scrollIntoView({behavior:'auto',block:'start'});
-        else window.scrollTo({top:0,left:0,behavior:'auto'});
-      },0);
+      // Aguarda o Alpine exibir o painel de resultados e então posiciona
+      // o PRÓPRIO resultado no topo. Duplo RAF evita manter a rolagem
+      // na grade/botão em navegadores mobile durante o x-transition.
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          const results=document.querySelector('.vp-ingredients-results');
+          if(results){
+            const y=results.getBoundingClientRect().top + window.pageYOffset;
+            window.scrollTo({top:Math.max(0,y),left:0,behavior:'auto'});
+          }else{
+            window.scrollTo({top:0,left:0,behavior:'auto'});
+          }
+        });
+      });
     },
     ingredientsToolRecipeIcon(d){
       const t=this.ingredientsToolNormalize((d?.name||'')+' '+(d?.cat||'')+' '+(d?.protein||''));
@@ -10160,12 +10168,20 @@ function wineApp(){
       if(current.length>=3) return;
       this.compareSelected=[...current,w];
       // Assim que houver 2 ou mais vinhos, a comparação passa a existir no DOM.
-      // Reposiciona a tela no início do bloco comparativo após o Alpine atualizar a interface.
+      // Aguarda o Alpine concluir a atualização/x-show e leva o PRÓPRIO bloco
+      // comparativo ao topo. O duplo RAF evita manter a rolagem na lista
+      // em navegadores mobile, sobretudo quando o segundo vinho é escolhido
+      // perto do fim dos resultados de busca.
       if(this.compareSelected.length>=2){
-        setTimeout(()=>{
-          const sheet=document.querySelector('.v119-compare-sheet');
-          if(sheet) sheet.scrollIntoView({behavior:'auto',block:'start'});
-        },0);
+        requestAnimationFrame(()=>{
+          requestAnimationFrame(()=>{
+            const sheet=document.querySelector('.v119-compare-sheet');
+            if(sheet){
+              const y=sheet.getBoundingClientRect().top + window.pageYOffset;
+              window.scrollTo({top:Math.max(0,y),left:0,behavior:'auto'});
+            }
+          });
+        });
       }
     },
     compareScale(v){
