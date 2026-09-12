@@ -4272,13 +4272,14 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
     </div>
 
     <section class="v140-compare-decision">
-      <p class="v119-kicker">Resposta rápida</p>
-      <h3>QUAL É MELHOR PARA VOCÊ?</h3>
-      <div class="v140-verdict-grid">
+      <p class="v119-kicker">Leitura técnica</p>
+      <h3>DESTAQUES ENTRE OS RÓTULOS</h3>
+      <div class="v140-verdict-grid" x-show="compareVerdicts().length">
         <template x-for="(v,i) in compareVerdicts()" :key="i">
           <article><small x-text="v.title"></small><b x-text="v.wine?.name||''"></b><p x-text="v.reason"></p></article>
         </template>
       </div>
+      <p class="v119-data-note" x-show="!compareVerdicts().length">Os dados técnicos cadastrados não mostram diferença suficiente para destacar um rótulo como superior em uma característica específica. O comparador evita forçar um vencedor.</p>
       <h4>HARMONIZAÇÕES EM DESTAQUE</h4>
       <div class="v140-compare-pairings" :style="'grid-template-columns:repeat('+Math.min(compareSelected.length,3)+',minmax(0,1fr))'">
         <template x-for="w in compareSelected" :key="'pair-'+w.id">
@@ -10236,46 +10237,32 @@ function wineApp(){
     compareVerdicts(){
       this.normalizeCompareState();
       if(this.compareSelected.length<2) return [];
-      const explicit=w=>this.compareExplicitProfile(w)||{};
-      const avg=(values)=>{
-        const valid=values.map(Number).filter(Number.isFinite);
-        return valid.length?valid.reduce((a,b)=>a+b,0)/valid.length:null;
-      };
-      const score=(w,kind)=>{
-        const p=explicit(w);
-        if(kind==='easy'){
-          const values=[];
-          if(Number.isFinite(Number(p.tannin))) values.push(6-Number(p.tannin));
-          if(Number.isFinite(Number(p.fruit))) values.push(Number(p.fruit));
-          if(Number.isFinite(Number(p.body))) values.push(6-Math.abs(Number(p.body)-3));
-          return avg(values);
-        }
-        if(kind==='food'){
-          const values=[];
-          if(Number.isFinite(Number(p.acidity))) values.push(Number(p.acidity));
-          if(Number.isFinite(Number(p.body))) values.push(Number(p.body));
-          if(Number.isFinite(Number(p.tannin))) values.push(Number(p.tannin)*0.7);
-          return avg(values);
-        }
-        const values=[];
-        if(Number.isFinite(Number(p.acidity))) values.push(Number(p.acidity));
-        if(Number.isFinite(Number(p.fruit))) values.push(Number(p.fruit));
-        if(Number.isFinite(Number(p.body))) values.push(6-Math.abs(Number(p.body)-3));
-        return avg(values);
-      };
-      const pick=kind=>{
+      const specs=[
+        {key:'acidity',title:'Maior acidez',direction:'max',label:'acidez'},
+        {key:'body',title:'Corpo mais leve',direction:'min',label:'corpo'},
+        {key:'tannin',title:'Menor tanino',direction:'min',label:'tanino',skip:w=>w.type==='Espumante'},
+        {key:'fruit',title:'Maior intensidade de fruta',direction:'max',label:'intensidade de fruta'},
+        {key:'sweetness',title:'Maior doçura',direction:'max',label:'doçura'}
+      ];
+      const out=[];
+      for(const spec of specs){
         const ranked=this.compareSelected
-          .map(w=>({wine:w,value:score(w,kind)}))
-          .filter(x=>Number.isFinite(x.value))
-          .sort((a,b)=>b.value-a.value);
-        return ranked[0]?.wine||null;
-      };
-      const easy=pick('easy'), food=pick('food'), versatile=pick('versatile');
-      return [
-        easy?{title:'Mais fácil de beber',wine:easy,reason:'Conclusão baseada apenas nos dados técnicos disponíveis entre os rótulos comparados.'}:null,
-        food?{title:'Mais gastronômico',wine:food,reason:'Conclusão baseada apenas nos dados técnicos disponíveis entre os rótulos comparados.'}:null,
-        versatile?{title:'Mais versátil à mesa',wine:versatile,reason:'Conclusão baseada apenas nos dados técnicos disponíveis entre os rótulos comparados.'}:null
-      ].filter(Boolean);
+          .filter(w=>!(spec.skip&&spec.skip(w)))
+          .map(w=>({wine:w,value:Number(this.compareExplicitProfile(w)?.[spec.key])}))
+          .filter(x=>Number.isFinite(x.value));
+        if(ranked.length<2) continue;
+        ranked.sort((a,b)=>spec.direction==='min'?a.value-b.value:b.value-a.value);
+        const first=ranked[0], second=ranked[1];
+        // Não força um "vencedor" quando os dados empatam ou a diferença é irrelevante.
+        if(!first || !second || Math.abs(first.value-second.value)<0.5) continue;
+        out.push({
+          title:spec.title,
+          wine:first.wine,
+          reason:`Diferença baseada somente na escala técnica cadastrada de ${spec.label}: ${this.compareScale(first.value)} contra ${this.compareScale(second.value)}.`
+        });
+        if(out.length===3) break;
+      }
+      return out;
     },
     beginnerScore(w){
       const p=this.technicalProfile(w)||{};
