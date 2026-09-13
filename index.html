@@ -3040,6 +3040,17 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
 @media(max-width:420px){.v193-scanner-tabs{margin-top:10px}.v193-search-head h3{font-size:22px}.v193-searchbox input{height:48px;font-size:13px}.v193-search-item{grid-template-columns:52px 1fr 18px}.v193-search-item img{width:52px;height:66px}}
 </style>
 
+
+<style id="vdp-compare-reading-clean-v1">
+.vdp-compare-reading{padding:16px!important}.vdp-compare-reading>h3{text-align:left!important;margin:2px 0 14px!important}
+.vdp-compare-profile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.vdp-compare-profile-card{background:#fffaf0;border:1px solid #dcc79d;border-radius:14px;padding:12px;min-width:0}
+.vdp-compare-profile-head{display:flex;align-items:center;gap:10px;padding-bottom:10px;border-bottom:1px solid #eadfc7}.vdp-compare-profile-thumb{width:54px;height:78px;flex:0 0 54px;display:flex;align-items:center;justify-content:center}.vdp-compare-profile-thumb img{max-width:100%;max-height:100%;object-fit:contain}.vdp-compare-profile-head b{display:block;color:#153e2b;font:700 14px/1.2 Georgia,serif}.vdp-compare-profile-head small{display:block;margin-top:3px;color:#6b746d;font-size:9px;line-height:1.3}
+.vdp-compare-metrics{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:11px 0}.vdp-compare-metrics>div{background:#f6edd9;border-radius:8px;padding:8px}.vdp-compare-metrics span{display:block;color:#776b55;font-size:8px;text-transform:uppercase;letter-spacing:.05em}.vdp-compare-metrics strong{display:block;margin-top:2px;color:#153e2b;font-size:11px}
+.vdp-compare-guidance{display:grid;gap:8px}.vdp-compare-guidance p{margin:0!important;padding-top:8px;border-top:1px solid #eadfc7}.vdp-compare-guidance p strong{display:block;color:#153e2b;font-size:9px;margin-bottom:3px}.vdp-compare-guidance p span{display:block;color:#526057;font-size:10px;line-height:1.45}
+.vdp-compare-pairings-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.vdp-compare-pairing-card{background:#153e2b;color:#fff;border-radius:12px;padding:12px}.vdp-compare-pairing-card>b{display:block;color:#e2c26f;font:700 13px Georgia,serif;margin-bottom:7px}.vdp-compare-pairing-card span{display:block;padding:7px 0;border-top:1px solid rgba(255,255,255,.12)}.vdp-compare-pairing-card span strong{display:block;font-size:10px}.vdp-compare-pairing-card span small{display:block;color:#d6bd8b;font-size:8px;margin-top:2px}
+@media(max-width:700px){.vdp-compare-profile-grid,.vdp-compare-pairings-grid{grid-template-columns:1fr!important}.vdp-compare-profile-card{padding:11px}.vdp-compare-profile-head b{font-size:15px}.vdp-compare-guidance p span{font-size:11px}.vdp-compare-metrics strong{font-size:12px}}
+</style>
 </head>
 <!-- V95 CONTINUIDADE: evidencias ZIP associadas=185; imagens faltantes preenchidas=39; preços despriorizados/ocultos na UI pública. -->
 <!-- V96: recuperacao de fotos pendentes + novos rotulos confirmados visualmente; sem exclusao insegura de rotulos duvidosos. -->
@@ -4247,10 +4258,6 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
       </template>
     </div>
 
-    <p class="v119-data-note">
-      O comparador usa somente dados existentes na ficha do rótulo. Quando uma informação técnica não está confirmada na base, ela aparece como “Não informado” em vez de ser estimada.
-    </p>
-
     <h3 class="v119-section-title">COMPARAÇÃO LADO A LADO</h3>
     <div class="v119-spec-list">
       <template x-for="row in compareRows()" :key="row.label">
@@ -4271,30 +4278,35 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
       </template>
     </div>
 
-    <section class="v140-compare-decision">
+    <section class="v140-compare-decision vdp-compare-reading">
       <p class="v119-kicker">Leitura técnica</p>
-      <h3>PERFIL DE CADA VINHO</h3>
-      <div class="v140-verdict-grid" :style="'grid-template-columns:repeat('+compareSelected.length+',minmax(0,1fr))'">
+      <h3>ENTENDA CADA VINHO</h3>
+      <div class="vdp-compare-profile-grid">
         <template x-for="w in compareSelected" :key="'reading-'+w.id">
-          <article class="vdp-compare-insight">
-            <b x-text="w.name"></b>
-            <div class="vdp-compare-wine-reading">
-              <span><strong>Acidez:</strong> <span x-text="compareMetricDisplay(w,'acidity')"></span></span>
-              <span><strong>Corpo:</strong> <span x-text="compareMetricDisplay(w,'body')"></span></span>
-              <span x-show="w.type!=='Espumante'"><strong>Tanino:</strong> <span x-text="compareMetricDisplay(w,'tannin')"></span></span>
-              <span><strong>Fruta:</strong> <span x-text="compareMetricDisplay(w,'fruit')"></span></span>
-              <span><strong>Doçura:</strong> <span x-text="compareMetricDisplay(w,'sweetness')"></span></span>
+          <article class="vdp-compare-profile-card">
+            <header class="vdp-compare-profile-head">
+              <div class="vdp-compare-profile-thumb"><img :src="wineImage(w)" :alt="w.name" @error="nextWineImage($event,w)"></div>
+              <div><b x-text="w.name"></b><small x-text="wineMeta(w)"></small></div>
+            </header>
+            <div class="vdp-compare-metrics">
+              <div><span>Acidez</span><strong x-text="compareMetricDisplay(w,'acidity')"></strong></div>
+              <div><span>Corpo</span><strong x-text="compareMetricDisplay(w,'body')"></strong></div>
+              <div x-show="w.type!=='Espumante'"><span>Tanino</span><strong x-text="compareMetricDisplay(w,'tannin')"></strong></div>
+              <div><span>Fruta</span><strong x-text="compareMetricDisplay(w,'fruit')"></strong></div>
+              <div><span>Doçura</span><strong x-text="compareMetricDisplay(w,'sweetness')"></strong></div>
             </div>
-            <p><strong>Na prática:</strong> <span x-text="compareWinePractical(w)"></span></p>
-            <p><strong>Para quem combina:</strong> <span x-text="compareWineAudience(w)"></span></p>
-            <p><strong>Na mesa:</strong> <span x-text="compareWineTable(w)"></span></p>
+            <div class="vdp-compare-guidance">
+              <p><strong>Como ele se sente na boca</strong><span x-text="compareWinePractical(w)"></span></p>
+              <p><strong>É uma boa escolha se você gosta de</strong><span x-text="compareWineAudience(w)"></span></p>
+              <p><strong>À mesa</strong><span x-text="compareWineTable(w)"></span></p>
+            </div>
           </article>
         </template>
       </div>
-      <h4>HARMONIZAÇÕES EM DESTAQUE</h4>
-      <div class="v140-compare-pairings" :style="'grid-template-columns:repeat('+Math.min(compareSelected.length,3)+',minmax(0,1fr))'">
+      <h4>HARMONIZAÇÕES PARA COMPARAR</h4>
+      <div class="vdp-compare-pairings-grid">
         <template x-for="w in compareSelected" :key="'pair-'+w.id">
-          <article><b x-text="w.name"></b><template x-for="rel in featuredRecipesForWine(w).slice(0,3)" :key="rel.dish.id"><span><strong x-text="rel.dish.name"></strong><small x-text="pairingLevel(rel.score)"></small></span></template></article>
+          <article class="vdp-compare-pairing-card"><b x-text="w.name"></b><template x-for="rel in featuredRecipesForWine(w).slice(0,3)" :key="rel.dish.id"><span><strong x-text="rel.dish.name"></strong><small x-text="pairingLevel(rel.score)"></small></span></template></article>
         </template>
       </div>
     </section>
