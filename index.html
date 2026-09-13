@@ -4279,10 +4279,18 @@ section[data-main-tools] h1,section[data-main-tools] h2,section[data-main-tools]
         <template x-for="(v,i) in compareVerdicts()" :key="i">
           <article class="vdp-compare-insight">
             <small x-text="v.title"></small>
-            <b x-show="v.wine" x-text="v.wine?.name||''"></b>
-            <p class="vdp-compare-technical"><strong>Diferença técnica:</strong> <span x-text="v.technical"></span></p>
+            <div class="vdp-compare-all-wines" x-show="v.items && v.items.length">
+              <template x-for="item in v.items" :key="v.key+'-'+item.wine.id">
+                <div class="vdp-compare-wine-reading">
+                  <b x-text="item.wine.name"></b>
+                  <span x-text="item.display"></span>
+                  <p x-text="item.reading"></p>
+                </div>
+              </template>
+            </div>
+            <p class="vdp-compare-technical"><strong>Comparação:</strong> <span x-text="v.technical"></span></p>
             <p><strong>Na prática:</strong> <span x-text="v.meaning"></span></p>
-            <p><strong>Para quem faz mais sentido:</strong> <span x-text="v.audience"></span></p>
+            <p><strong>Como escolher:</strong> <span x-text="v.audience"></span></p>
             <p><strong>Na mesa:</strong> <span x-text="v.table"></span></p>
           </article>
         </template>
@@ -10194,9 +10202,11 @@ function wineApp(){
       }
     },
     compareScale(v){
+      // Escala pública do Comparador: linguagem simples e progressiva para o cliente.
+      // Mantém os valores técnicos internos 1–5 sem alterar nenhum perfil dos vinhos.
       const n=Number(v||0);
-      if(n<=1) return 'Baixo';
-      if(n<=2) return 'Baixo–médio';
+      if(n<=1) return 'Suave';
+      if(n<=2) return 'Suave–médio';
       if(n<=3) return 'Médio';
       if(n<=4) return 'Médio–alto';
       return 'Alto';
@@ -10246,81 +10256,84 @@ function wineApp(){
       this.normalizeCompareState();
       if(this.compareSelected.length<2) return [];
 
-      // Interpretação editorial baseada em princípios de degustação/harmonização
-      // usados por WSET, Wine Folly, Decanter e Wine Enthusiast. Os valores
-      // comparados continuam vindo SOMENTE da ficha técnica cadastrada de cada
-      // rótulo; a tradução para linguagem do cliente é uma interpretação do
-      // Sommelier Digital, nunca uma alegação do produtor.
+      // Leitura técnica comparativa: cada critério mostra TODOS os rótulos
+      // selecionados. Não existe vencedor automático. A base numérica vem
+      // somente do perfil técnico cadastrado; a tradução prática é editorial.
       const specs=[
         {
-          key:'acidity', direction:'max', label:'Acidez', title:'Mais vivo e refrescante',
-          skip:null,
-          explain:(a,b)=>`${a.wine.name} tende a parecer mais fresco, vibrante e salivante na boca. ${b.wine.name} tende a entregar uma sensação relativamente mais redonda e menos cortante.`,
-          audience:'Escolha este perfil se você gosta de vinhos mais tensos, refrescantes e com final que convida a outro gole.',
-          table:'Na mesa, maior acidez costuma funcionar muito bem com gordura, frituras, sal e pratos que também tenham acidez, porque ajuda a limpar o paladar.'
+          key:'acidity', label:'ACIDEZ — FRESCOR E TENSÃO',
+          reading:v=>v>=4?'Mais vivo, salivante e refrescante.':v>=3?'Frescor equilibrado, sem dominar o conjunto.':'Sensação relativamente mais macia e menos cortante.',
+          meaning:'Acidez mais alta normalmente traz mais frescor e salivação; níveis menores tendem a deixar a sensação mais redonda. Isso não define qualidade — define estilo.',
+          audience:'Se você gosta de vinho vibrante e refrescante, observe os maiores níveis. Se prefere maciez e menos tensão, observe os menores.',
+          table:'Maior acidez costuma ajudar com frituras, gordura, sal, molhos cítricos e pratos também ácidos, porque refresca e limpa o paladar.'
         },
         {
-          key:'body', direction:'min', label:'Corpo', title:'Mais leve no paladar',
-          skip:null,
-          explain:(a,b)=>`${a.wine.name} tende a ocupar menos o paladar e parecer mais leve. ${b.wine.name}, com corpo maior, tende a transmitir mais volume, peso e riqueza.`,
-          audience:'Prefira o mais leve para beber com facilidade, entradas e pratos delicados; prefira o mais encorpado quando você busca presença e sensação de maior riqueza.',
-          table:'Como regra prática, pratos leves pedem vinhos de intensidade semelhante; pratos mais ricos e intensos costumam acompanhar melhor vinhos de maior corpo.'
+          key:'body', label:'CORPO — PESO E VOLUME NA BOCA',
+          reading:v=>v>=4?'Mais encorpado, com maior peso e presença.':v>=3?'Corpo médio, equilibrando leveza e presença.':'Mais leve e delicado no paladar.',
+          meaning:'Corpo é a sensação de peso e volume do vinho na boca. Um vinho mais encorpado tende a parecer mais cheio; um mais leve tende a ser mais delicado e ágil.',
+          audience:'Escolha maior corpo quando busca presença e intensidade; escolha menor corpo para entradas, pratos delicados ou quando prefere um vinho mais leve.',
+          table:'Uma regra prática útil é aproximar o peso do vinho do peso do prato: pratos delicados com vinhos leves; preparos mais intensos com vinhos de maior corpo.'
         },
         {
-          key:'tannin', direction:'min', label:'Tanino', title:'Mais macio e menos adstringente',
+          key:'tannin', label:'TANINO — FIRMEZA E ADSTRINGÊNCIA',
           skip:w=>w.type==='Espumante',
-          explain:(a,b)=>`${a.wine.name} tende a secar menos a boca e oferecer textura mais macia. ${b.wine.name}, com mais tanino, tende a ter mais firmeza, aderência e estrutura.`,
-          audience:'O menor tanino tende a agradar quem evita aquela sensação de boca seca; o maior tanino interessa a quem gosta de tintos mais firmes e estruturados.',
-          table:'Taninos mais altos costumam se beneficiar de proteínas e gordura — por exemplo carnes e queijos mais intensos — que suavizam a sensação de adstringência.'
+          reading:v=>v>=4?'Mais firme e adstringente, com maior sensação de boca seca.':v>=3?'Tanino moderado, com estrutura perceptível.':'Mais macio e com pouca adstringência.',
+          meaning:'Tanino é a sensação de secura e aderência principalmente associada a tintos. Mais tanino significa mais firmeza; menos tanino tende a dar textura mais macia.',
+          audience:'Quem não gosta de boca seca tende a preferir níveis menores. Quem procura tintos firmes e estruturados pode preferir níveis maiores.',
+          table:'Proteína e gordura — como carnes e queijos mais intensos — costumam suavizar a percepção de taninos elevados.'
         },
         {
-          key:'fruit', direction:'max', label:'Intensidade de fruta', title:'Fruta mais evidente',
-          skip:null,
-          explain:(a,b)=>`${a.wine.name} tende a mostrar a fruta de forma mais evidente no conjunto aromático e gustativo. ${b.wine.name} tende a ser relativamente mais contido nesse aspecto.`,
-          audience:'É uma boa pista para quem gosta de aromas e sabores de fruta mais fáceis de perceber. Atenção: intensidade de fruta não significa que o vinho seja doce.',
-          table:'Perfis frutados podem conversar especialmente bem com pratos que tenham elementos de fruta, molhos agridoce/frutados ou preparos de intensidade semelhante.'
+          key:'fruit', label:'INTENSIDADE DE FRUTA — PRESENÇA AROMÁTICA',
+          reading:v=>v>=4?'Fruta mais evidente e fácil de perceber.':v>=3?'Fruta presente de forma equilibrada.':'Fruta mais discreta dentro do conjunto.',
+          meaning:'Aqui “fruta” mede intensidade aromática/gustativa de fruta, não açúcar. Um vinho pode ser muito frutado e continuar completamente seco.',
+          audience:'Prefira níveis maiores se gosta de aromas de fruta bem evidentes; níveis menores tendem a agradar quem busca um perfil mais contido.',
+          table:'Perfis frutados podem funcionar bem com molhos frutados, preparos agridoce ou pratos de intensidade aromática semelhante.'
         },
         {
-          key:'sweetness', direction:'max', label:'Doçura', title:'Sensação mais doce',
-          skip:null,
-          explain:(a,b)=>`${a.wine.name} tende a apresentar mais sensação de doçura. ${b.wine.name} tende a parecer mais seco dentro da escala cadastrada.`,
-          audience:'Prefira o mais doce se você busca maciez de açúcar ou quer amenizar picância; prefira o mais seco para uma sensação mais direta e gastronômica em pratos salgados.',
-          table:'Com sobremesas, a regra segura é o vinho ser ao menos tão doce quanto o prato. Em comida picante, alguma doçura pode ajudar a equilibrar a ardência.'
+          key:'sweetness', label:'DOÇURA — SENSAÇÃO DE AÇÚCAR',
+          reading:v=>v>=4?'Doçura claramente perceptível.':v>=3?'Leve sensação de maciez/doçura.':'Perfil mais seco dentro da escala cadastrada.',
+          meaning:'Doçura é diferente de fruta. Ela indica sensação de açúcar residual percebida no paladar.',
+          audience:'Se prefere vinhos secos, observe os níveis menores. Se gosta de maciez adocicada ou quer acompanhar picância, níveis maiores podem fazer mais sentido.',
+          table:'Com sobremesa, o vinho deve ser ao menos tão doce quanto o prato. Em pratos picantes, alguma doçura pode ajudar a equilibrar a ardência.'
         }
       ];
 
       const out=[];
       for(const spec of specs){
-        const ranked=this.compareSelected
+        const items=this.compareSelected
           .filter(w=>!(spec.skip&&spec.skip(w)))
-          .map(w=>({wine:w,value:Number(this.compareExplicitProfile(w)?.[spec.key])}))
-          .filter(x=>Number.isFinite(x.value));
-        if(ranked.length<2) continue;
-        ranked.sort((a,b)=>spec.direction==='min'?a.value-b.value:b.value-a.value);
-        const first=ranked[0], last=ranked[ranked.length-1];
-        if(!first || !last || Math.abs(first.value-last.value)<0.5) continue;
+          .map(w=>{
+            const value=Number(this.compareExplicitProfile(w)?.[spec.key]);
+            return Number.isFinite(value)?{wine:w,value,display:this.compareScale(value),reading:spec.reading(value)}:null;
+          })
+          .filter(Boolean);
+        if(items.length<2) continue;
+        const vals=items.map(x=>x.value);
+        const min=Math.min(...vals), max=Math.max(...vals);
+        const technical=max-min<0.5
+          ?`Os ${items.length} rótulos estão praticamente no mesmo nível de ${spec.key==='fruit'?'intensidade de fruta':spec.key}.`
+          :items.map(x=>`${x.wine.name}: ${x.display}`).join(' • ')+'.';
         out.push({
-          title:spec.title,
-          wine:first.wine,
-          technical:`${spec.label}: ${this.compareScale(first.value)} em ${first.wine.name} × ${this.compareScale(last.value)} em ${last.wine.name}.`,
-          meaning:spec.explain(first,last),
+          key:spec.key,
+          title:spec.label,
+          items,
+          technical,
+          meaning:spec.meaning,
           audience:spec.audience,
           table:spec.table
         });
       }
 
-      // Quando os estilos são diferentes, explica a diferença de uso sem
-      // declarar superioridade técnica entre categorias.
       const types=[...new Set(this.compareSelected.map(w=>String(w.type||'').trim()).filter(Boolean))];
       if(types.length>1){
-        const names=this.compareSelected.map(w=>`${w.name} (${w.type||'estilo não informado'})`).join(' × ');
         out.unshift({
-          title:'Estilos diferentes: escolha pelo momento',
-          wine:null,
-          technical:names+'.',
-          meaning:'Aqui não existe um “melhor” absoluto: estilos diferentes entregam experiências diferentes de peso, frescor, textura e ocasião de serviço.',
-          audience:'Use as linhas de corpo, acidez, tanino, fruta e doçura abaixo para decidir qual perfil combina mais com o seu gosto.',
-          table:'Na harmonização, compare principalmente a intensidade do prato com o corpo do vinho e observe acidez, gordura, sal, doçura, picância e proteína.'
+          key:'styles',
+          title:'ESTILOS DIFERENTES — NÃO HÁ UM VENCEDOR ABSOLUTO',
+          items:this.compareSelected.map(w=>({wine:w,display:w.type||'Estilo não informado',reading:`${w.type||'Este estilo'} deve ser lido junto de corpo, acidez, tanino, fruta e doçura.`})),
+          technical:this.compareSelected.map(w=>`${w.name}: ${w.type||'estilo não informado'}`).join(' • ')+'.',
+          meaning:'Tintos, brancos, rosés e espumantes podem ter funções muito diferentes. O objetivo é descobrir qual combina melhor com seu gosto, prato e ocasião.',
+          audience:'Compare primeiro o estilo e depois use os critérios abaixo para entender por que um rótulo pode parecer mais leve, mais fresco, mais firme ou mais frutado.',
+          table:'Na mesa, considere intensidade do prato, gordura, acidez, sal, doçura, picância e proteína em vez de procurar um “melhor” absoluto.'
         });
       }
       return out.slice(0,6);
@@ -11381,7 +11394,9 @@ Fontes metodologicas: WSET, Wine Folly, Decanter; score 0-100 continua indice ed
 <script type="application/json" id="cheese-audit-v137-final-30">{"version":"V137","date":"2026-09-04","lots":[{"lot":11,"count":20,"positions":"201-220"},{"lot":12,"count":10,"positions":"221-230"}],"auditedThisRun":30,"canonicalTotal":230,"auditedTotal":230,"remaining":0,"scope":"ficha técnica + harmonização + coerência da página de queijo","sources":["Governo de Minas — Queijos Artesanais, atualizado 07/08/2026","Embrapa — Queijos Artesanais","Embrapa — oficina de harmonização queijo e vinho"],"note":"Fonte de família não é tratada como prova individual de harmonização para cada queijo; quando não há fonte específica, mantém-se análise técnica conservadora."}</script>
 script type="application/json" id="vdp-phase2-v112-audit">{"version":"V112","date":"2026-09-03","batches":50,"batchSize":14,"recipesAudited":700,"exactImages":103,"imagePending":597,"methodology":["WSET: spice × alcohol/sweetness/acidity/tannin","Wine Folly: acidity, sweetness, intensity, tannin/fat, sauce priority"],"scope":"Structural pairing and image-coverage revalidation; does not claim external individual validation of every pairing or exact image for pending recipes.","batchResults":[{"batch":1,"recipes":14,"exactImages":14,"imagePending":0,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":2,"recipes":14,"exactImages":13,"imagePending":1,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":3,"recipes":14,"exactImages":11,"imagePending":3,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":4,"recipes":14,"exactImages":8,"imagePending":6,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":5,"recipes":14,"exactImages":2,"imagePending":12,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":6,"recipes":14,"exactImages":10,"imagePending":4,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":7,"recipes":14,"exactImages":5,"imagePending":9,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":8,"recipes":14,"exactImages":4,"imagePending":10,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":9,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":10,"recipes":14,"exactImages":3,"imagePending":11,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":11,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":12,"recipes":14,"exactImages":2,"imagePending":12,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":13,"recipes":14,"exactImages":3,"imagePending":11,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":14,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":15,"recipes":14,"exactImages":2,"imagePending":12,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":16,"recipes":14,"exactImages":2,"imagePending":12,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":17,"recipes":14,"exactImages":3,"imagePending":11,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":18,"recipes":14,"exactImages":1,"imagePending":13,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":19,"recipes":14,"exactImages":2,"imagePending":12,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":20,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":21,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":22,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":23,"recipes":14,"exactImages":2,"imagePending":12,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":24,"recipes":14,"exactImages":4,"imagePending":10,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":25,"recipes":14,"exactImages":1,"imagePending":13,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":26,"recipes":14,"exactImages":2,"imagePending":12,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":27,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":28,"recipes":14,"exactImages":1,"imagePending":13,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":29,"recipes":14,"exactImages":2,"imagePending":12,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":30,"recipes":14,"exactImages":1,"imagePending":13,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":31,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":32,"recipes":14,"exactImages":1,"imagePending":13,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":33,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":34,"recipes":14,"exactImages":2,"imagePending":12,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":35,"recipes":14,"exactImages":1,"imagePending":13,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":36,"recipes":14,"exactImages":1,"imagePending":13,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":37,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":38,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":39,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":40,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":41,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":42,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":43,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":44,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":45,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":46,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":47,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":48,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":49,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0},{"batch":50,"recipes":14,"exactImages":0,"imagePending":14,"pairingsValidated":14,"invalidWineRefs":0,"profileIssues":0}]}</script>
 
-<style id="v130-parte9-mobile-final">html,body{max-width:100%;overflow-x:hidden}img{max-width:100%;height:auto}.wine-image-frame,.wineImageFrame,[data-wine-image-frame]{display:flex;align-items:center;justify-content:center;overflow:hidden;aspect-ratio:1/1;padding:12px}.wine-image-frame img,.wineImageFrame img,[data-wine-image-frame] img{width:100%;height:100%;object-fit:contain;object-position:center}@media(max-width:480px){button,a,[role="button"]{max-width:100%}.wine-image-frame,.wineImageFrame,[data-wine-image-frame]{padding:10px}}</style>
+<style id="v130-parte9-mobile-final">html,body{max-width:100%;overflow-x:hidden}img{max-width:100%;height:auto}.wine-image-frame,.wineImageFrame,[data-wine-image-frame]{display:flex;align-items:center;justify-content:center;overflow:hidden;aspect-ratio:1/1;padding:12px}.wine-image-frame img,.wineImageFrame img,[data-wine-image-frame] img{width:100%;height:100%;object-fit:contain;object-position:center}@media(max-width:480px){button,a,[role="button"]{max-width:100%}.wine-image-frame,.wineImageFrame,[data-wine-image-frame]{padding:10px}}
+.vdp-compare-all-wines{display:grid;gap:10px;margin:12px 0}.vdp-compare-wine-reading{padding:11px 12px;border:1px solid rgba(21,62,43,.18);border-radius:12px;background:rgba(248,247,242,.72)}.vdp-compare-wine-reading b{display:block;font-family:Georgia,serif;font-size:.98rem;line-height:1.25}.vdp-compare-wine-reading>span{display:inline-block;margin-top:4px;font-weight:800;color:#153E2B}.vdp-compare-wine-reading p{margin:5px 0 0;font-size:.88rem;line-height:1.45;opacity:.88}@media(min-width:760px){.vdp-compare-all-wines{grid-template-columns:repeat(3,minmax(0,1fr))}}
+</style>
 <script id="v130-parte9-audio-mobile-audit">(function(){const H=['daniel','felipe','ricardo','antonio','antônio','thiago','tiago','paulo','carlos','joao','joão','marcelo','bruno','lucas','pedro','rafael','eduardo','guilherme','leonardo','male','mascul'];window.selectPreferredMalePortugueseVoice=function(){if(!('speechSynthesis' in window))return null;const v=speechSynthesis.getVoices()||[],b=v.filter(x=>/^pt[-_]BR/i.test(x.lang||'')),p=v.filter(x=>/^pt/i.test(x.lang||'')),m=a=>a.find(x=>H.some(h=>(x.name||'').toLowerCase().includes(h)));return m(b)||m(p)||b[0]||p[0]||null};window.stopWineSpeech=function(){try{speechSynthesis.cancel()}catch(e){}};document.addEventListener('visibilitychange',()=>{if(document.hidden)window.stopWineSpeech()});window.__PARTE9_AUDIT__={horizontalOverflow:()=>document.documentElement.scrollWidth<=document.documentElement.clientWidth+1,brokenImages:()=>[...document.images].filter(i=>i.complete&&i.naturalWidth===0).length,voice:()=>{const v=window.selectPreferredMalePortugueseVoice();return v?{name:v.name,lang:v.lang}:null}}})();</script>
 
 <script type="application/json" id="auditoria-final-parte-6">{"part": 6, "canonicalPositions": "241-309", "recordsAudited": 69, "totalWines": 309, "ratingsConfirmedThisPart": 3, "ratingBlockersThisPart": 66, "notesInvented": 0, "imagePolicy": "PENDING_VISUAL_WEB_CONFIRMATION unless visually proven", "date": "2026-08-25"}</script>
